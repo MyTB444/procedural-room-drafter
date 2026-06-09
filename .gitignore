@@ -95,6 +95,8 @@ desktop.ini
 # MISC
 # ═══════════════════════════════════════════════════════
 *.log
+.plastic/
+RoomDrafter/.plastic/
 
 # ═══════════════════════════════════════════════════════
 # PERSONAL CLAUDE CODE CONFIG (local only, not tracked)
