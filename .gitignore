@@ -33,6 +33,7 @@ RoomDrafter4D/*.mdb
 RoomDrafter4D/*.opendb
 RoomDrafter4D/*.VC.db
 RoomDrafter4D/.vs/
+RoomDrafter4D/.vsconfig
 
 # Unity3D-generated crash + build artefacts
 RoomDrafter4D/sysinfo.txt
