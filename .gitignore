@@ -1,49 +1,60 @@
 # ═══════════════════════════════════════════════════════
-# UNITY (project folder: RoomDrafter)
+# UNITY (project folder: RoomDrafter4D)
 # ═══════════════════════════════════════════════════════
-RoomDrafter/[Ll]ibrary/
-RoomDrafter/[Tt]emp/
-RoomDrafter/[Oo]bj/
-RoomDrafter/[Bb]uild/
-RoomDrafter/[Bb]uilds/
-RoomDrafter/[Ll]ogs/
-RoomDrafter/[Uu]ser[Ss]ettings/
-RoomDrafter/[Mm]emoryCaptures/
-RoomDrafter/[Rr]ecordings/
+RoomDrafter4D/[Ll]ibrary/
+RoomDrafter4D/[Tt]emp/
+RoomDrafter4D/[Oo]bj/
+RoomDrafter4D/[Bb]uild/
+RoomDrafter4D/[Bb]uilds/
+RoomDrafter4D/[Ll]ogs/
+RoomDrafter4D/[Uu]ser[Ss]ettings/
+RoomDrafter4D/[Mm]emoryCaptures/
+RoomDrafter4D/[Rr]ecordings/
 
 # Asset meta files Unity recommends ignoring
-RoomDrafter/[Aa]ssets/[Aa]ssetStoreTools*
-RoomDrafter/[Aa]ssets/[Pp]lugins/[Ee]ditor/JetBrains*
+RoomDrafter4D/[Aa]ssets/[Aa]ssetStoreTools*
+RoomDrafter4D/[Aa]ssets/[Pp]lugins/[Ee]ditor/JetBrains*
 
-# Auto-generated VS / Rider / MD solution + project files
-RoomDrafter/*.csproj
-RoomDrafter/*.unityproj
-RoomDrafter/*.sln
-RoomDrafter/*.slnx
-RoomDrafter/*.suo
-RoomDrafter/*.tmp
-RoomDrafter/*.user
-RoomDrafter/*.userprefs
-RoomDrafter/*.pidb
-RoomDrafter/*.booproj
-RoomDrafter/*.svd
-RoomDrafter/*.pdb
-RoomDrafter/*.mdb
-RoomDrafter/*.opendb
-RoomDrafter/*.VC.db
+# Auto-generated IDE solution + project files
+RoomDrafter4D/*.csproj
+RoomDrafter4D/*.unityproj
+RoomDrafter4D/*.sln
+RoomDrafter4D/*.slnx
+RoomDrafter4D/*.slnf
+RoomDrafter4D/*.suo
+RoomDrafter4D/*.tmp
+RoomDrafter4D/*.user
+RoomDrafter4D/*.userprefs
+RoomDrafter4D/*.pidb
+RoomDrafter4D/*.booproj
+RoomDrafter4D/*.svd
+RoomDrafter4D/*.pdb
+RoomDrafter4D/*.mdb
+RoomDrafter4D/*.opendb
+RoomDrafter4D/*.VC.db
+RoomDrafter4D/.vs/
 
 # Unity3D-generated crash + build artefacts
-RoomDrafter/sysinfo.txt
-RoomDrafter/*.apk
-RoomDrafter/*.aab
-RoomDrafter/*.unitypackage
-RoomDrafter/*.app
-RoomDrafter/crashlytics-build.properties
+RoomDrafter4D/sysinfo.txt
+RoomDrafter4D/*.apk
+RoomDrafter4D/*.aab
+RoomDrafter4D/*.unitypackage
+RoomDrafter4D/*.app
+RoomDrafter4D/crashlytics-build.properties
 
 # Gradle / Android leftovers (if you ever build for Android)
-RoomDrafter/[Bb]uild.gradle
-RoomDrafter/[Ee]xportedObj/
-RoomDrafter/.gradle/
+RoomDrafter4D/[Bb]uild.gradle
+RoomDrafter4D/[Ee]xportedObj/
+RoomDrafter4D/.gradle/
+
+# ═══════════════════════════════════════════════════════
+# PLASTIC SCM / UNITY VERSION CONTROL (local metadata)
+# ═══════════════════════════════════════════════════════
+.plastic/
+RoomDrafter4D/.plastic/
+*.plastic
+plastic.workspace
+ignore.conf
 
 # ═══════════════════════════════════════════════════════
 # PYTHON / ML
@@ -95,8 +106,6 @@ desktop.ini
 # MISC
 # ═══════════════════════════════════════════════════════
 *.log
-.plastic/
-RoomDrafter/.plastic/
 
 # ═══════════════════════════════════════════════════════
 # PERSONAL CLAUDE CODE CONFIG (local only, not tracked)
