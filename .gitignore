@@ -14,6 +14,8 @@ RoomDrafter4D/[Rr]ecordings/
 # Asset meta files Unity recommends ignoring
 RoomDrafter4D/[Aa]ssets/[Aa]ssetStoreTools*
 RoomDrafter4D/[Aa]ssets/[Pp]lugins/[Ee]ditor/JetBrains*
+RoomDrafter4D/[Aa]ssets/ExternalAssets
+RoomDrafter4D/[Aa]ssets/ExternalAssets.meta
 
 # Auto-generated IDE solution + project files
 RoomDrafter4D/*.csproj
