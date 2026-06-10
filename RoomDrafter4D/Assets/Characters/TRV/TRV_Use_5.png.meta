@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 28624d8f3cdc795449e899fc4d05cf62
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1857258434484335398
+    second: TRV_Use_5_0
+  - first:
+      213: 349411512577380086
+    second: TRV_Use_5_1
+  - first:
+      213: 8730981199624064632
+    second: TRV_Use_5_2
+  - first:
+      213: -6633228307968534475
+    second: TRV_Use_5_3
+  - first:
+      213: -4744248807782782557
+    second: TRV_Use_5_4
+  - first:
+      213: 5680647380864666274
+    second: TRV_Use_5_5
+  - first:
+      213: 5980178856613826218
+    second: TRV_Use_5_6
+  - first:
+      213: 1218075997817088261
+    second: TRV_Use_5_7
+  - first:
+      213: 3824670497533908535
+    second: TRV_Use_5_8
+  - first:
+      213: -7105223153130709733
+    second: TRV_Use_5_9
+  - first:
+      213: -7331494640344372273
+    second: TRV_Use_5_10
+  - first:
+      213: 5013772781827872827
+    second: TRV_Use_5_11
+  - first:
+      213: 7975204582554119484
+    second: TRV_Use_5_12
+  - first:
+      213: -907446742484127182
+    second: TRV_Use_5_13
+  - first:
+      213: 7503161471474661437
+    second: TRV_Use_5_14
+  - first:
+      213: -7615072162114803434
+    second: TRV_Use_5_15
+  - first:
+      213: 6711651744928080030
+    second: TRV_Use_5_16
+  - first:
+      213: 3343651007419433647
+    second: TRV_Use_5_17
+  - first:
+      213: -630755002322019160
+    second: TRV_Use_5_18
+  - first:
+      213: -7030520110748962145
+    second: TRV_Use_5_19
+  - first:
+      213: 2910377424903049990
+    second: TRV_Use_5_20
+  - first:
+      213: -6048381202160902361
+    second: TRV_Use_5_21
+  - first:
+      213: -46251965195575989
+    second: TRV_Use_5_22
+  - first:
+      213: -1230301912336115392
+    second: TRV_Use_5_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: TRV_Use_5_0
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adc86744b41b936e0800000000000000
+      internalID: -1857258434484335398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_1
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fe4b9f5beb59d400800000000000000
+      internalID: 349411512577380086
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_2
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87ec430742daa2970800000000000000
+      internalID: 8730981199624064632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_3
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 538587d8ff902f3a0800000000000000
+      internalID: -6633228307968534475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_4
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a9690e68da092eb0800000000000000
+      internalID: -4744248807782782557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_5
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2aa01be02b6b5de40800000000000000
+      internalID: 5680647380864666274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_6
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aaec4c95cfcddf250800000000000000
+      internalID: 5980178856613826218
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_7
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50921579aa977e010800000000000000
+      internalID: 1218075997817088261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_8
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 736dc64bd85f31530800000000000000
+      internalID: 3824670497533908535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_9
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1d53c3ff2d256d90800000000000000
+      internalID: -7105223153130709733
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_10
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcbe791f77c414a90800000000000000
+      internalID: -7331494640344372273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_11
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b385f5de7cf749540800000000000000
+      internalID: 5013772781827872827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_12
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 171
+        width: 30
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3da43a305e9dae60800000000000000
+      internalID: 7975204582554119484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_13
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 232f5addef91863f0800000000000000
+      internalID: -907446742484127182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_14
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d38f4a7da95902860800000000000000
+      internalID: 7503161471474661437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_15
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6196e260734d15690800000000000000
+      internalID: -7615072162114803434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_16
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e90a190c3b3942d50800000000000000
+      internalID: 6711651744928080030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_17
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 171
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa2cc1630e8076e20800000000000000
+      internalID: 3343651007419433647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_18
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ac9b42daab1f37f0800000000000000
+      internalID: -630755002322019160
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f92719465339e6e90800000000000000
+      internalID: -7030520110748962145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_20
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60399ad19dcb36820800000000000000
+      internalID: 2910377424903049990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_21
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72f9c03a755df0ca0800000000000000
+      internalID: -6048381202160902361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_22
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4d9a5c251eab5ff0800000000000000
+      internalID: -46251965195575989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Use_5_23
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 049d8bcdde61deee0800000000000000
+      internalID: -1230301912336115392
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      TRV_Use_5_0: -1857258434484335398
+      TRV_Use_5_1: 349411512577380086
+      TRV_Use_5_10: -7331494640344372273
+      TRV_Use_5_11: 5013772781827872827
+      TRV_Use_5_12: 7975204582554119484
+      TRV_Use_5_13: -907446742484127182
+      TRV_Use_5_14: 7503161471474661437
+      TRV_Use_5_15: -7615072162114803434
+      TRV_Use_5_16: 6711651744928080030
+      TRV_Use_5_17: 3343651007419433647
+      TRV_Use_5_18: -630755002322019160
+      TRV_Use_5_19: -7030520110748962145
+      TRV_Use_5_2: 8730981199624064632
+      TRV_Use_5_20: 2910377424903049990
+      TRV_Use_5_21: -6048381202160902361
+      TRV_Use_5_22: -46251965195575989
+      TRV_Use_5_23: -1230301912336115392
+      TRV_Use_5_3: -6633228307968534475
+      TRV_Use_5_4: -4744248807782782557
+      TRV_Use_5_5: 5680647380864666274
+      TRV_Use_5_6: 5980178856613826218
+      TRV_Use_5_7: 1218075997817088261
+      TRV_Use_5_8: 3824670497533908535
+      TRV_Use_5_9: -7105223153130709733
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 88d2737779d74c040b4265bf8482a5ee
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2604014380838256968
+    second: TRV_Magic_5_0
+  - first:
+      213: 4364437012478958669
+    second: TRV_Magic_5_1
+  - first:
+      213: -1154630448625208326
+    second: TRV_Magic_5_2
+  - first:
+      213: -5355434080786518496
+    second: TRV_Magic_5_3
+  - first:
+      213: 4652247068543615558
+    second: TRV_Magic_5_4
+  - first:
+      213: -1776983279304509470
+    second: TRV_Magic_5_5
+  - first:
+      213: 5269607120612937341
+    second: TRV_Magic_5_6
+  - first:
+      213: 4555995070002032468
+    second: TRV_Magic_5_7
+  - first:
+      213: -3605517040762731868
+    second: TRV_Magic_5_8
+  - first:
+      213: -5437026990883685272
+    second: TRV_Magic_5_9
+  - first:
+      213: 5513768547224531765
+    second: TRV_Magic_5_10
+  - first:
+      213: -2686402083931441311
+    second: TRV_Magic_5_11
+  - first:
+      213: 5251242132091624152
+    second: TRV_Magic_5_12
+  - first:
+      213: -6484720442626659452
+    second: TRV_Magic_5_13
+  - first:
+      213: -3645359173079522425
+    second: TRV_Magic_5_14
+  - first:
+      213: -1402865773586771824
+    second: TRV_Magic_5_15
+  - first:
+      213: -4690841414279786880
+    second: TRV_Magic_5_16
+  - first:
+      213: 6525281996497532390
+    second: TRV_Magic_5_17
+  - first:
+      213: -8587328459329572683
+    second: TRV_Magic_5_18
+  - first:
+      213: 1953386285841099132
+    second: TRV_Magic_5_19
+  - first:
+      213: 3657265574358812494
+    second: TRV_Magic_5_20
+  - first:
+      213: -4004029487320702297
+    second: TRV_Magic_5_21
+  - first:
+      213: -2407614458131385430
+    second: TRV_Magic_5_22
+  - first:
+      213: -3756719994372531067
+    second: TRV_Magic_5_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: TRV_Magic_5_0
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8418fdf5841532420800000000000000
+      internalID: 2604014380838256968
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_1
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4c106dc658919c30800000000000000
+      internalID: 4364437012478958669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_2
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: af338d679bde9ffe0800000000000000
+      internalID: -1154630448625208326
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_3
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02ee2bce31dada5b0800000000000000
+      internalID: -5355434080786518496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_4
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 64205e76f0a109040800000000000000
+      internalID: 4652247068543615558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_5
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e7fe315f13e657e0800000000000000
+      internalID: -1776983279304509470
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_6
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 299
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7ec002b1c7612940800000000000000
+      internalID: 5269607120612937341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_7
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 299
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45fe6e1a0652a3f30800000000000000
+      internalID: 4555995070002032468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_8
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 299
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a248b1ba51a6fdc0800000000000000
+      internalID: -3605517040762731868
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_9
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 299
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86cba2622cccb84b0800000000000000
+      internalID: -5437026990883685272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_10
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 299
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5333a0fc747d48c40800000000000000
+      internalID: 5513768547224531765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_11
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 299
+        width: 28
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 167b56fa98bf7bad0800000000000000
+      internalID: -2686402083931441311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_12
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8dad2e895e820e840800000000000000
+      internalID: 5251242132091624152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_13
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 171
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 48b268d6d15a106a0800000000000000
+      internalID: -6484720442626659452
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_14
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 171
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78322e16525196dc0800000000000000
+      internalID: -3645359173079522425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_15
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 171
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0909ec9f205088ce0800000000000000
+      internalID: -1402865773586771824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_16
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 171
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08e892c3698c6eeb0800000000000000
+      internalID: -4690841414279786880
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_17
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 171
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e5bc7447657e8a50800000000000000
+      internalID: 6525281996497532390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_18
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b0fe0c834ea3d880800000000000000
+      internalID: -8587328459329572683
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c79adac3a72db1b10800000000000000
+      internalID: 1953386285841099132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_20
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e470ce0b9a731c230800000000000000
+      internalID: 3657265574358812494
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_21
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a26f024564de68c0800000000000000
+      internalID: -4004029487320702297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_22
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa3fbfa086f669ed0800000000000000
+      internalID: -2407614458131385430
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Magic_5_23
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58c51dea1137ddbc0800000000000000
+      internalID: -3756719994372531067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      TRV_Magic_5_0: 2604014380838256968
+      TRV_Magic_5_1: 4364437012478958669
+      TRV_Magic_5_10: 5513768547224531765
+      TRV_Magic_5_11: -2686402083931441311
+      TRV_Magic_5_12: 5251242132091624152
+      TRV_Magic_5_13: -6484720442626659452
+      TRV_Magic_5_14: -3645359173079522425
+      TRV_Magic_5_15: -1402865773586771824
+      TRV_Magic_5_16: -4690841414279786880
+      TRV_Magic_5_17: 6525281996497532390
+      TRV_Magic_5_18: -8587328459329572683
+      TRV_Magic_5_19: 1953386285841099132
+      TRV_Magic_5_2: -1154630448625208326
+      TRV_Magic_5_20: 3657265574358812494
+      TRV_Magic_5_21: -4004029487320702297
+      TRV_Magic_5_22: -2407614458131385430
+      TRV_Magic_5_23: -3756719994372531067
+      TRV_Magic_5_3: -5355434080786518496
+      TRV_Magic_5_4: 4652247068543615558
+      TRV_Magic_5_5: -1776983279304509470
+      TRV_Magic_5_6: 5269607120612937341
+      TRV_Magic_5_7: 4555995070002032468
+      TRV_Magic_5_8: -3605517040762731868
+      TRV_Magic_5_9: -5437026990883685272
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
