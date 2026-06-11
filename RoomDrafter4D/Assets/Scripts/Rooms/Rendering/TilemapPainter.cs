@@ -66,17 +66,17 @@ namespace TRV
             if (extrasTilemap) extrasTilemap.ClearAllTiles();
         }
 
-        /// <summary>Capture the room's current tiles (all 4 layers) for later restoration.</summary>
+        /// <summary>Capture the room's current tiles + per-cell transforms (all 4 layers) for later restore.</summary>
         public RoomSnapshot Capture(int width, int height)
         {
             var bounds = new BoundsInt(originCell, new Vector3Int(width, height, 1));
             return new RoomSnapshot
             {
                 Bounds = bounds,
-                Walls = wallsTilemap ? wallsTilemap.GetTilesBlock(bounds) : null,
-                Map = mapTilemap ? mapTilemap.GetTilesBlock(bounds) : null,
-                Door = doorTilemap ? doorTilemap.GetTilesBlock(bounds) : null,
-                Extras = extrasTilemap ? extrasTilemap.GetTilesBlock(bounds) : null,
+                Walls = CaptureLayer(wallsTilemap, bounds),
+                Map = CaptureLayer(mapTilemap, bounds),
+                Door = CaptureLayer(doorTilemap, bounds),
+                Extras = CaptureLayer(extrasTilemap, bounds),
             };
         }
 
@@ -84,10 +84,41 @@ namespace TRV
         public void Restore(RoomSnapshot snap)
         {
             Clear();
-            if (wallsTilemap && snap.Walls != null) wallsTilemap.SetTilesBlock(snap.Bounds, snap.Walls);
-            if (mapTilemap && snap.Map != null) mapTilemap.SetTilesBlock(snap.Bounds, snap.Map);
-            if (doorTilemap && snap.Door != null) doorTilemap.SetTilesBlock(snap.Bounds, snap.Door);
-            if (extrasTilemap && snap.Extras != null) extrasTilemap.SetTilesBlock(snap.Bounds, snap.Extras);
+            RestoreLayer(wallsTilemap, snap.Bounds, snap.Walls);
+            RestoreLayer(mapTilemap, snap.Bounds, snap.Map);
+            RestoreLayer(doorTilemap, snap.Bounds, snap.Door);
+            RestoreLayer(extrasTilemap, snap.Bounds, snap.Extras);
+        }
+
+        private static LayerSnapshot CaptureLayer(Tilemap tilemap, BoundsInt bounds)
+        {
+            if (tilemap == null) return default;
+
+            var tiles = tilemap.GetTilesBlock(bounds);
+            var transforms = new Matrix4x4[tiles.Length];
+            int i = 0;
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
+                for (int x = bounds.xMin; x < bounds.xMax; x++)
+                    transforms[i++] = tilemap.GetTransformMatrix(new Vector3Int(x, y, bounds.zMin));
+
+            return new LayerSnapshot { Tiles = tiles, Transforms = transforms };
+        }
+
+        private static void RestoreLayer(Tilemap tilemap, BoundsInt bounds, LayerSnapshot layer)
+        {
+            if (tilemap == null || layer.Tiles == null) return;
+
+            tilemap.SetTilesBlock(bounds, layer.Tiles); // this resets per-cell transforms to identity
+            if (layer.Transforms == null) return;
+
+            int i = 0;
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
+                for (int x = bounds.xMin; x < bounds.xMax; x++)
+                {
+                    var m = layer.Transforms[i++];
+                    if (m != Matrix4x4.identity) // only re-apply rotated/scaled cells
+                        tilemap.SetTransformMatrix(new Vector3Int(x, y, bounds.zMin), m);
+                }
         }
 
         /// <summary>
