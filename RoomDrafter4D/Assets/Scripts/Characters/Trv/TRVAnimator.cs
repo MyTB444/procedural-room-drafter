@@ -68,7 +68,7 @@ namespace TRV
             if (controller == null) return;
 
             // Facing is a discrete 8-way value; turn it into the unit vector the blend tree expects.
-            Vector2 look = TRVDirectionUtil.ToVector(controller.Facing);
+            Vector2 look = CharacterDirectionUtil.ToVector(controller.Facing);
             _lookX.SetFloat(look.x);
             _lookY.SetFloat(look.y);
             _isMoving.SetBool(controller.IsMoving);
@@ -76,9 +76,9 @@ namespace TRV
         }
 
         // Aim the attack blend tree at the cursor-derived direction, then fire the trigger.
-        private void OnAttacked(TRVDirection dir)
+        private void OnAttacked(CharacterDirection dir)
         {
-            Vector2 aim = TRVDirectionUtil.ToVector(dir);
+            Vector2 aim = CharacterDirectionUtil.ToVector(dir);
             _attackX.SetFloat(aim.x);
             _attackY.SetFloat(aim.y);
             _attack.SetTrigger();

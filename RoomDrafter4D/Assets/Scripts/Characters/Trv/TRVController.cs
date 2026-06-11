@@ -11,7 +11,7 @@ namespace TRV
     /// Movement feel: target velocity = direction × speed, and the current velocity is
     /// eased toward it with separate accelerate/decelerate rates. Diagonals are
     /// normalized so W+A is exactly as fast as W. Facing is tracked as one of the 8
-    /// <see cref="TRVDirection"/> values for animation/aiming to consume.
+    /// <see cref="CharacterDirection"/> values for animation/aiming to consume.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class TRVController : MonoBehaviour
@@ -36,24 +36,24 @@ namespace TRV
         private Vector2 _dashDir;
 
         // ── Facing history (for forgiving diagonal release) ──
-        private TRVDirection _previousFacing = TRVDirection.South;
+        private CharacterDirection _previousFacing = CharacterDirection.South;
         private float _facingSetTime = float.NegativeInfinity;
 
         // ── Runtime state others can read / subscribe to ──
         public float CurrentHealth { get; private set; }
         public bool IsAlive => CurrentHealth > 0f;
         public Vector2 MoveDirection { get; private set; } // last non-zero unit heading
-        public TRVDirection Facing { get; private set; } = TRVDirection.South;
+        public CharacterDirection Facing { get; private set; } = CharacterDirection.South;
         public bool IsMoving { get; private set; }
         public bool IsDashing => _dashTimeLeft > 0f;
 
         /// <summary>8-way direction of the most recent attack, aimed at the cursor (independent of movement).</summary>
-        public TRVDirection AttackDirection { get; private set; } = TRVDirection.South;
+        public CharacterDirection AttackDirection { get; private set; } = CharacterDirection.South;
 
-        public event Action<TRVDirection> FacingChanged;
+        public event Action<CharacterDirection> FacingChanged;
         public event Action<float> HealthChanged;   // passes new current health
         public event Action DashStarted;
-        public event Action<TRVDirection> Attacked; // passes the aimed attack direction
+        public event Action<CharacterDirection> Attacked; // passes the aimed attack direction
         public event Action Died;
 
         private void Awake()
@@ -128,7 +128,7 @@ namespace TRV
             if (direction != Vector2.zero)
             {
                 if (stats.SnapTo8Directions)
-                    direction = TRVDirectionUtil.Snap(direction);            // unit, on an axis
+                    direction = CharacterDirectionUtil.Snap(direction);            // unit, on an axis
                 else if (stats.NormalizeDiagonal && direction.sqrMagnitude > 1f)
                     direction = direction.normalized;
             }
@@ -148,15 +148,15 @@ namespace TRV
             if (hasInput)
             {
                 MoveDirection = direction.normalized;
-                SetFacing(TRVDirectionUtil.FromVector(MoveDirection));
+                SetFacing(CharacterDirectionUtil.FromVector(MoveDirection));
             }
             else if (wasMoving)
             {
                 // We just stopped. If facing dropped from a diagonal to one of its component
                 // cardinals only a moment ago, it's because one key was released a frame or two
                 // before the other — restore the diagonal so the idle matches the intended heading.
-                if (TRVDirectionUtil.IsDiagonal(_previousFacing)
-                    && TRVDirectionUtil.AreAdjacent(_previousFacing, Facing)
+                if (CharacterDirectionUtil.IsDiagonal(_previousFacing)
+                    && CharacterDirectionUtil.AreAdjacent(_previousFacing, Facing)
                     && Time.time - _facingSetTime < stats.DiagonalReleaseGrace)
                 {
                     SetFacing(_previousFacing);
@@ -165,7 +165,7 @@ namespace TRV
         }
 
         /// <summary>Commit a new facing, remembering the previous one and when it changed.</summary>
-        private void SetFacing(TRVDirection newFacing)
+        private void SetFacing(CharacterDirection newFacing)
         {
             if (newFacing == Facing) return;
             _previousFacing = Facing;
@@ -184,13 +184,13 @@ namespace TRV
             // Dash toward current movement; if standing still, dash where we face.
             _dashDir = IsMoving && MoveDirection.sqrMagnitude > 0.0001f
                 ? MoveDirection
-                : TRVDirectionUtil.ToVector(Facing);
+                : CharacterDirectionUtil.ToVector(Facing);
 
             _dashTimeLeft = stats.DashDuration;
             _dashCooldown.Begin(stats.DashCooldown);
 
             // Face the dash direction immediately.
-            SetFacing(TRVDirectionUtil.FromVector(_dashDir));
+            SetFacing(CharacterDirectionUtil.FromVector(_dashDir));
 
             DashStarted?.Invoke();
         }
@@ -201,7 +201,7 @@ namespace TRV
             _attackCooldown.Begin(stats.AttackCooldown);
 
             // Aim at the cursor, fully independent of movement direction.
-            AttackDirection = TRVDirectionUtil.FromVector(GetAimDirection());
+            AttackDirection = CharacterDirectionUtil.FromVector(GetAimDirection());
 
             // Drives the attack animation (TRVAnimator listens). Hook the real attack here too:
             // spawn a hitbox along AttackDirection within stats.AttackRange, deal stats.Damage, etc.
@@ -224,7 +224,7 @@ namespace TRV
                 if (aim.sqrMagnitude > 0.0001f)
                     return aim;
             }
-            return TRVDirectionUtil.ToVector(Facing);
+            return CharacterDirectionUtil.ToVector(Facing);
         }
 
         private void HandleInteract()
