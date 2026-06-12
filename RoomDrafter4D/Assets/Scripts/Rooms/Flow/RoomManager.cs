@@ -64,7 +64,9 @@ namespace TRV
                 return;
             }
 
-            StartCoroutine(Transition(DirectionFromCenter(playerWorldPos)));
+            // Classify by nearest edge, not position-vs-centre — doors can be anywhere on an edge,
+            // and a door cell is always nearest its own edge.
+            StartCoroutine(Transition(painter.NearestEdgeWorld(playerWorldPos, biome.Width, biome.Height)));
         }
 
         private IEnumerator Transition(Cardinal exitDir)
@@ -115,14 +117,5 @@ namespace TRV
             }
         }
 
-        /// <summary>Which door the player used, from their position relative to room centre.</summary>
-        private Cardinal DirectionFromCenter(Vector3 worldPos)
-        {
-            Vector3 center = painter.CellCenterWorld(biome.Width / 2, biome.Height / 2);
-            Vector3 delta = worldPos - center;
-            if (Mathf.Abs(delta.x) >= Mathf.Abs(delta.y))
-                return delta.x >= 0 ? Cardinal.East : Cardinal.West;
-            return delta.y >= 0 ? Cardinal.North : Cardinal.South;
-        }
     }
 }

@@ -18,7 +18,7 @@ namespace TRV
         {
             int margin = config.WallThickness; // never carve into the wall ring / door seals
 
-            foreach (var landing in DoorLandings(config))
+            foreach (var landing in DoorLandings(config, grid))
             {
                 var main = LargestRegion(grid);
                 if (!main.Contains(landing))
@@ -33,13 +33,13 @@ namespace TRV
                         grid[x, y] = CellType.Water;
         }
 
-        /// <summary>The interior floor landing just inside each of the 4 doors (shared with RoomManager).</summary>
-        private static List<(int, int)> DoorLandings(BiomeConfig config)
+        /// <summary>The interior floor landing just inside each of the 4 doors.</summary>
+        private static List<(int, int)> DoorLandings(BiomeConfig config, RoomGrid grid)
         {
             var result = new List<(int, int)>(4);
             foreach (var d in FourDirections)
             {
-                var l = RoomDoors.Landing(config, d);
+                var l = RoomDoors.Landing(config, grid, d);
                 result.Add((l.x, l.y));
             }
             return result;

@@ -21,5 +21,20 @@ namespace TRV
 
         public static System.Random Rng(int worldSeed, Vector2Int coord) =>
             new System.Random(For(worldSeed, coord));
+
+        /// <summary>
+        /// Deterministic non-negative hash for one cell of one room — used to pick per-cell tile
+        /// variants at paint time without storing anything (same seed + cell → same variant).
+        /// </summary>
+        public static int CellHash(int seed, int x, int y)
+        {
+            unchecked
+            {
+                int h = seed;
+                h = (h * 73856093) ^ (x * 19349663);
+                h = (h * 83492791) ^ (y * 50331653);
+                return h & 0x7FFFFFFF;
+            }
+        }
     }
 }

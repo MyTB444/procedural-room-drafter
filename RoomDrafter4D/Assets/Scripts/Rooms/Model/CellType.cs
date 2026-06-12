@@ -5,10 +5,11 @@ namespace TRV
     /// </summary>
     public enum CellType
     {
-        Wall = 0,   // perimeter / solid wall      → Walls layer (collider)
-        Floor = 1,  // walkable floor              → Map layer
-        Water = 2,  // impassable water            → Walls layer (collider)
-        Door = 3,   // walkable doorway (4/room)   → Door layer (trigger)
+        Wall = 0,     // perimeter / solid wall                 → Walls layer (collider)
+        Floor = 1,    // walkable floor                         → Map layer
+        Water = 2,    // impassable water                       → Walls layer (collider)
+        Door = 3,     // walkable doorway (4/room)              → Door layer (trigger)
+        Building = 4, // north-wall extension (BuildingPass)    → Walls layer (collider, floor under)
     }
 
     public static class CellTypeExtensions
@@ -17,6 +18,7 @@ namespace TRV
         public static bool IsWalkable(this CellType c) => c == CellType.Floor || c == CellType.Door;
 
         /// <summary>Solid, movement-blocking cells.</summary>
-        public static bool IsSolid(this CellType c) => c == CellType.Wall || c == CellType.Water;
+        public static bool IsSolid(this CellType c) =>
+            c == CellType.Wall || c == CellType.Water || c == CellType.Building;
     }
 }

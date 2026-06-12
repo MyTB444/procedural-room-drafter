@@ -4,7 +4,7 @@ using UnityEngine.Tilemaps;
 namespace TRV
 {
     /// <summary>
-    /// A captured copy of one room's tiles across the 4 layers — including each cell's per-cell
+    /// A captured copy of one room's tiles across the 5 layers — including each cell's per-cell
     /// transform (rotation/scale), so a visited room (the hand-made start area, or rooms where you
     /// rotated tiles) is restored exactly when the player returns to its coord.
     /// </summary>
@@ -15,6 +15,7 @@ namespace TRV
         public LayerSnapshot Map;
         public LayerSnapshot Door;
         public LayerSnapshot Extras;
+        public LayerSnapshot ExtrasBehind;
     }
 
     /// <summary>One tilemap layer's tiles plus their per-cell transform matrices (parallel arrays).</summary>
