@@ -17,12 +17,11 @@ MonoBehaviour:
   <MoveSpeed>k__BackingField: 4
   <Acceleration>k__BackingField: 60
   <Deceleration>k__BackingField: 70
-  <Damage>k__BackingField: 15
+  <Damage>k__BackingField: 40
   <AttackCooldown>k__BackingField: 1
   <AttackRange>k__BackingField: 1.2
   <AttackMoveMultiplier>k__BackingField: 0.5
   <AttackMoveSlowDuration>k__BackingField: 0.4
-  <KnockbackDuration>k__BackingField: 0.2
   <SnapTo8Directions>k__BackingField: 0
   <NormalizeDiagonal>k__BackingField: 1
   <InputDeadzone>k__BackingField: 0.15

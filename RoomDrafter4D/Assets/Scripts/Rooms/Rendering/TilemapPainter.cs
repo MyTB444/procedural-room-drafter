@@ -33,11 +33,30 @@ namespace TRV
         private static readonly Matrix4x4 RotLeft90 = Matrix4x4.Rotate(Quaternion.Euler(0f, 0f, 90f));
         private static readonly Matrix4x4 RotRight90 = Matrix4x4.Rotate(Quaternion.Euler(0f, 0f, -90f));
 
+        // Solid wall cells painted just OUTSIDE each door so the player can't walk into the void
+        // through the opening (the door still transitions on step — that's a trigger, not a walk-through).
+        private const int DoorBackingDepth = 2;
+
         /// <summary>World position of the centre of a grid cell — for placing the player on a landing.</summary>
         public Vector3 CellCenterWorld(int gridX, int gridY)
         {
             var cell = new Vector3Int(originCell.x + gridX, originCell.y + gridY, 0);
             return mapTilemap != null ? mapTilemap.GetCellCenterWorld(cell) : (Vector3)cell;
+        }
+
+        /// <summary>Grid cell (room space) a world position falls in — inverse of CellCenterWorld.</summary>
+        public Vector2Int WorldToGridCell(Vector3 world)
+        {
+            var cell = mapTilemap != null ? mapTilemap.WorldToCell(world) : Vector3Int.RoundToInt(world);
+            return new Vector2Int(cell.x - originCell.x, cell.y - originCell.y);
+        }
+
+        /// <summary>True if a grid cell holds a solid tile (Wall/Water/Building all live on the
+        /// Walls/Collision layer) — i.e. NOT walkable. Used to build the nav grid for pathfinding.</summary>
+        public bool HasSolidAt(int gridX, int gridY)
+        {
+            if (wallsTilemap == null) return false;
+            return wallsTilemap.HasTile(new Vector3Int(originCell.x + gridX, originCell.y + gridY, 0));
         }
 
         public void Paint(RoomGrid grid, BiomeConfig config)
@@ -92,9 +111,46 @@ namespace TRV
 
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
+            PaintDoorBackingWalls(grid, config);
             // Island decor is no longer painted — it's spawned as pooled GameObjects by
             // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
         }
+
+        /// <summary>
+        /// Paint <see cref="DoorBackingDepth"/> solid wall cells directly behind (outward of) each
+        /// door, so the open doorway doesn't expose the void. Rendered as the matching edge wall.
+        /// </summary>
+        private void PaintDoorBackingWalls(RoomGrid grid, BiomeConfig config)
+        {
+            for (int x = 0; x < grid.Width; x++)
+            {
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[x, y] != CellType.Door) continue;
+
+                    var edge = NearestEdge(x, y, grid.Width, grid.Height);
+                    var inward = InwardStep(edge);
+                    var kind = EdgeWallKind(edge);
+                    for (int d = 1; d <= DoorBackingDepth; d++)
+                    {
+                        int gx = x - inward.x * d, gy = y - inward.y * d; // step outward
+                        var pos = new Vector3Int(originCell.x + gx, originCell.y + gy, 0);
+                        int cellHash = RoomSeed.CellHash(grid.VariantSeed, gx, gy);
+                        wallsTilemap.SetTile(pos, config.WallTileFor(kind, cellHash));
+                        if (TryGetWallRotation(kind, config, out var rotation))
+                            wallsTilemap.SetTransformMatrix(pos, rotation);
+                    }
+                }
+            }
+        }
+
+        private static WallKind EdgeWallKind(Cardinal edge) => edge switch
+        {
+            Cardinal.North => WallKind.North,
+            Cardinal.South => WallKind.South,
+            Cardinal.East => WallKind.East,
+            _ => WallKind.West,
+        };
 
         /// <summary>Stamp the 2×3 water decor groups over open water (Extras front layer).</summary>
         private void PaintWaterDecor(RoomGrid grid, BiomeConfig config)
@@ -195,10 +251,15 @@ namespace TRV
             if (extrasBehindTilemap) extrasBehindTilemap.ClearAllTiles();
         }
 
-        /// <summary>Capture the room's current tiles + per-cell transforms (all 4 layers) for later restore.</summary>
+        /// <summary>Capture the room's current tiles + per-cell transforms (all layers) for later
+        /// restore. The bounds are padded by <see cref="DoorBackingDepth"/> so the door-backing
+        /// walls (painted just outside the room) are captured/restored too.</summary>
         public RoomSnapshot Capture(int width, int height)
         {
-            var bounds = new BoundsInt(originCell, new Vector3Int(width, height, 1));
+            int pad = DoorBackingDepth;
+            var bounds = new BoundsInt(
+                originCell - new Vector3Int(pad, pad, 0),
+                new Vector3Int(width + 2 * pad, height + 2 * pad, 1));
             return new RoomSnapshot
             {
                 Bounds = bounds,

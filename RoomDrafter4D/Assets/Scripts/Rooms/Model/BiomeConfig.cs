@@ -90,6 +90,19 @@ namespace TRV
                         "spot qualifies) — 2 to 4 per room, random pick per placement.")]
         [field: SerializeField] public WaterDecorPatch[] WaterDecorPatches { get; private set; }
 
+        [field: Header("Enemies")]
+        [field: Tooltip("Enemy prefabs that can spawn in this biome's rooms — one is picked at " +
+                        "random per spawn (leave a slot empty to skip it). Spawned from EnemyPool.")]
+        [field: SerializeField] public GameObject[] EnemyPrefabs { get; private set; }
+
+        [field: Tooltip("How many enemies to spawn when a room is first generated.")]
+        [field: Min(0)]
+        [field: SerializeField] public int EnemiesPerRoom { get; private set; } = 3;
+
+        [field: Tooltip("Enemies won't spawn within this many cells of the door the player enters from.")]
+        [field: Min(0)]
+        [field: SerializeField] public int EnemySpawnSafeRadius { get; private set; } = 4;
+
         [field: Header("Island decor (pooled objects)")]
         [field: Tooltip("Prefabs scattered as real GameObjects on top of each island (4–5 per " +
                         "island, random pick). Spawned/reused from IslandDecorPool at runtime — not " +

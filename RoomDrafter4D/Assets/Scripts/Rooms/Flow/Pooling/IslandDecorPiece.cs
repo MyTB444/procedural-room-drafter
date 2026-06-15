@@ -18,8 +18,7 @@ namespace TRV
         [Tooltip("Length of the break animation (seconds); the piece returns to the pool after this.")]
         [SerializeField, Min(0f)] private float breakDuration = 1f;
 
-        private IslandDecorPool _pool;
-        private int _prefabIndex;
+        private PrefabPool _pool;
         private bool _alive;
         private Collider2D _collider;
         private Animator _animator;
@@ -37,10 +36,9 @@ namespace TRV
         /// Re-arm the piece when the pool shows it (called each time it's placed). Also recovers a
         /// break that got interrupted by a room change: collider back on, alive again.
         /// </summary>
-        public void Activate(IslandDecorPool pool, int prefabIndex)
+        public void Activate(PrefabPool pool)
         {
             _pool = pool;
-            _prefabIndex = prefabIndex;
             _alive = true;
 
             if (_breaking != null) { StopCoroutine(_breaking); _breaking = null; }
@@ -64,7 +62,7 @@ namespace TRV
 
             if (_collider != null) _collider.enabled = true;    // ready for the next reuse
             _breaking = null;
-            if (_pool != null) _pool.Release(_prefabIndex, gameObject);
+            if (_pool != null) _pool.Release(gameObject);
             else gameObject.SetActive(false);
         }
     }

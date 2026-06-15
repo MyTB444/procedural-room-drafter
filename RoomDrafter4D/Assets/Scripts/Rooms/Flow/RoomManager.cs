@@ -22,6 +22,9 @@ namespace TRV
         [Tooltip("Pools/places island decor objects per room. Optional — auto-found if present.")]
         [SerializeField] private IslandDecorPool decorPool;
 
+        [Tooltip("Pools/spawns enemies per room. Optional — auto-found if present.")]
+        [SerializeField] private EnemyPool enemyPool;
+
         [Header("Start")]
         [SerializeField] private int worldSeed = 12345;
         [SerializeField] private Vector2Int startCoord = Vector2Int.zero;
@@ -39,6 +42,9 @@ namespace TRV
         // Visited rooms, captured on leave and restored on return (includes the hand-made start room).
         private readonly RoomCache _cache = new RoomCache();
 
+        // Walkability + A* for the room currently shown (so enemies path around water).
+        private readonly RoomNav _nav = new RoomNav();
+
         public Vector2Int CurrentCoord => _coord;
 
         private void Awake()
@@ -47,6 +53,7 @@ namespace TRV
             // one player in the scene. Biome still has to be assigned explicitly.
             if (painter == null) painter = GetComponent<TilemapPainter>();
             if (decorPool == null) decorPool = FindFirstObjectByType<IslandDecorPool>();
+            if (enemyPool == null) enemyPool = FindFirstObjectByType<EnemyPool>();
             if (player == null)
             {
                 var found = FindFirstObjectByType<TRVController>();
@@ -65,6 +72,9 @@ namespace TRV
         public void OnPlayerEnteredDoor(Vector3 playerWorldPos)
         {
             if (_transitioning) return;
+
+            // Doors are locked until the room is cleared of enemies.
+            if (enemyPool != null && enemyPool.ActiveCount > 0) return;
 
             if (biome == null || painter == null)
             {
@@ -107,7 +117,9 @@ namespace TRV
                 return;
             }
 
-            // Restore a previously visited room exactly; otherwise generate a fresh one.
+            // Restore a previously visited room exactly; otherwise generate a fresh one. Enemies
+            // only spawn on a FRESH room — a cached (already-visited) room comes back cleared.
+            List<Vector3> enemyPositions = null;
             if (_cache.TryGet(coord, out var snapshot))
             {
                 painter.Restore(snapshot);
@@ -118,10 +130,16 @@ namespace TRV
                 var grid = new RoomGenerator(biome).Generate(RoomSeed.Rng(worldSeed, coord));
                 painter.Paint(grid, biome);
                 _currentIslandDecor = grid.IslandDecor;
+                enemyPositions = PickEnemyPositions(grid, enterFrom);
             }
 
-            // Swap the pooled decor objects over to this room (releases the previous room's).
+            // Rebuild the nav grid from the painted room so enemies can path around water/walls.
+            _nav.Rebuild(painter, biome.Width, biome.Height);
+            RoomNav.Current = _nav;
+
+            // Swap the pooled objects over to this room (each releases the previous room's first).
             if (decorPool != null) decorPool.Show(_currentIslandDecor, painter);
+            if (enemyPool != null) enemyPool.Populate(enemyPositions);
 
             // Spawn in FRONT of the actual door on the entry edge (so doors can be anywhere on it).
             if (player != null)
@@ -139,5 +157,40 @@ namespace TRV
             }
         }
 
+        /// <summary>Pick up to EnemiesPerRoom distinct open-Floor cells (world positions) to spawn on,
+        /// keeping clear of the door the player enters from.</summary>
+        private List<Vector3> PickEnemyPositions(RoomGrid grid, Cardinal enterFrom)
+        {
+            var positions = new List<Vector3>();
+            if (biome.EnemiesPerRoom <= 0 || biome.EnemyPrefabs == null || biome.EnemyPrefabs.Length == 0)
+                return positions;
+
+            var entry = RoomDoors.Landing(biome, grid, enterFrom); // where the player arrives
+            int safeSq = biome.EnemySpawnSafeRadius * biome.EnemySpawnSafeRadius;
+
+            var floor = new List<Vector2Int>();   // all open floor
+            var eligible = new List<Vector2Int>(); // open floor far enough from the entry
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[x, y] != CellType.Floor) continue; // open floor only — not doors/buildings/water
+                    var c = new Vector2Int(x, y);
+                    floor.Add(c);
+                    int dx = x - entry.x, dy = y - entry.y;
+                    if (dx * dx + dy * dy >= safeSq) eligible.Add(c);
+                }
+
+            var pickFrom = eligible.Count > 0 ? eligible : floor; // tiny room → fall back to any floor
+            for (int i = pickFrom.Count - 1; i > 0; i--) // Fisher–Yates
+            {
+                int j = Random.Range(0, i + 1);
+                (pickFrom[i], pickFrom[j]) = (pickFrom[j], pickFrom[i]);
+            }
+
+            int n = Mathf.Min(biome.EnemiesPerRoom, pickFrom.Count);
+            for (int i = 0; i < n; i++)
+                positions.Add(painter.CellCenterWorld(pickFrom[i].x, pickFrom[i].y));
+            return positions;
+        }
     }
 }

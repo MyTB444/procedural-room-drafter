@@ -13,8 +13,8 @@ namespace TRV
     /// normalized so W+A is exactly as fast as W. Facing is tracked as one of the 8
     /// <see cref="CharacterDirection"/> values for animation/aiming to consume.
     /// </summary>
-    [RequireComponent(typeof(Rigidbody2D))]
-    public class TRVController : MonoBehaviour, IDamageable, IKnockbackable
+    [RequireComponent(typeof(Rigidbody2D), typeof(Health))]
+    public class TRVController : MonoBehaviour, IKnockbackable
     {
         [Header("References")]
         [Tooltip("The data asset with all tunable stats.")]
@@ -30,6 +30,7 @@ namespace TRV
         [SerializeField] private AttackHitbox attackHitbox;
 
         private Rigidbody2D _body;
+        private Health _health;
         private Vector2 _velocity;        // our own smoothed velocity
         private Cooldown _attackCooldown;
 
@@ -39,9 +40,6 @@ namespace TRV
         private Cooldown _dashCooldown;
         private Vector2 _dashDir;
 
-        // ── Knockback state ──
-        private float _knockbackTimeLeft; // > 0 while an incoming impulse overrides control
-
         // ── Attack state ──
         private float _attackSlowTimeLeft; // > 0 while the attack swing slows movement
 
@@ -50,8 +48,7 @@ namespace TRV
         private float _facingSetTime = float.NegativeInfinity;
 
         // ── Runtime state others can read / subscribe to ──
-        public float CurrentHealth { get; private set; }
-        public bool IsAlive => CurrentHealth > 0f;
+        public bool IsAlive => _health != null && _health.IsAlive;
         public Vector2 MoveDirection { get; private set; } // last non-zero unit heading
         public CharacterDirection Facing { get; private set; } = CharacterDirection.South;
         public bool IsMoving { get; private set; }
@@ -65,10 +62,8 @@ namespace TRV
         public CharacterDirection AttackDirection { get; private set; } = CharacterDirection.South;
 
         public event Action<CharacterDirection> FacingChanged;
-        public event Action<float> HealthChanged;   // passes new current health
         public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
         public event Action<CharacterDirection> Attacked;    // passes the aimed attack direction
-        public event Action Died;
 
         private void Awake()
         {
@@ -76,6 +71,9 @@ namespace TRV
             // Top-down: no gravity, no physics-driven spin.
             _body.gravityScale = 0f;
             _body.freezeRotation = true;
+
+            _health = GetComponent<Health>();
+            if (_health == null) _health = gameObject.AddComponent<Health>();
 
             if (input == null)
                 input = GetComponent<TRVInput>();
@@ -113,23 +111,14 @@ namespace TRV
                 enabled = false;
                 return;
             }
-            CurrentHealth = stats.MaxHealth;
-            HealthChanged?.Invoke(CurrentHealth);
+            _health.Init(stats.MaxHealth);
         }
 
         private void FixedUpdate()
         {
             if (stats == null || input == null) return;
 
-            // -1) Knockback overrides everything: coast in the impulse direction, easing to a stop,
-            //     and ignore input until the timer runs out so the player can't instantly cancel it.
-            if (_knockbackTimeLeft > 0f)
-            {
-                _knockbackTimeLeft -= Time.fixedDeltaTime;
-                _velocity = Vector2.MoveTowards(_velocity, Vector2.zero, stats.Deceleration * Time.fixedDeltaTime);
-                _body.linearVelocity = _velocity;
-                return;
-            }
+            _health.Invincible = IsInvincible; // dash i-frames gate Health.TakeDamage
 
             // -0.5) Dash windup: a short pause after pressing dash before the burst fires. Movement
             //       stays normal during it (no i-frames yet); when it elapses the burst begins.
@@ -294,37 +283,14 @@ namespace TRV
             Debug.Log($"{stats.CharacterName} interacts ({Facing}).", this);
         }
 
-        /// <summary><see cref="IDamageable"/> entry point — knockback (if any) is applied separately
-        /// by the attacker via <see cref="IKnockbackable"/>, so this only touches health.</summary>
-        public void TakeDamage(in DamageInfo info) => TakeDamage(info.Amount);
-
-        /// <summary>Apply damage. Fires HealthChanged, and Died when health reaches zero.
-        /// No-op while <see cref="IsInvincible"/> (dash i-frames).</summary>
-        public void TakeDamage(float amount)
-        {
-            if (!IsAlive || amount <= 0f || IsInvincible) return;
-            CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
-            HealthChanged?.Invoke(CurrentHealth);
-            if (CurrentHealth == 0f)
-                Died?.Invoke();
-        }
-
-        /// <summary><see cref="IKnockbackable"/> — shove TRV along a direction; overrides movement
-        /// for <see cref="CharacterStats.KnockbackDuration"/>, then eases out. No-op while
-        /// <see cref="IsInvincible"/> (dashing), so a dodge phases through hits cleanly.</summary>
+        /// <summary><see cref="IKnockbackable"/> — shove TRV along a direction as a pure impulse:
+        /// it sets velocity and control returns immediately (no stun), so the push just eases out
+        /// via accel/decel. No-op while <see cref="IsInvincible"/> (dashing). Damage is handled by
+        /// the <see cref="Health"/> component.</summary>
         public void ApplyKnockback(Vector2 direction, float force)
         {
             if (!IsAlive || force <= 0f || direction.sqrMagnitude < 0.0001f || IsInvincible) return;
             _velocity = direction.normalized * force;
-            _knockbackTimeLeft = stats.KnockbackDuration;
-        }
-
-        /// <summary>Restore health up to MaxHealth.</summary>
-        public void Heal(float amount)
-        {
-            if (!IsAlive || amount <= 0f) return;
-            CurrentHealth = Mathf.Min(stats.MaxHealth, CurrentHealth + amount);
-            HealthChanged?.Invoke(CurrentHealth);
         }
     }
 }

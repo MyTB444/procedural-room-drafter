@@ -65,10 +65,5 @@ namespace TRV
         [field: Tooltip("How long the attack slow lasts (seconds) — roughly the attack animation length.")]
         [field: Min(0f)]
         [field: SerializeField] public float AttackMoveSlowDuration { get; private set; } = 0.667f;
-
-        [field: Tooltip("How long an incoming knockback impulse overrides movement before the " +
-                        "character regains control (seconds). The push then eases out via Deceleration.")]
-        [field: Min(0f)]
-        [field: SerializeField] public float KnockbackDuration { get; private set; } = 0.2f;
     }
 }

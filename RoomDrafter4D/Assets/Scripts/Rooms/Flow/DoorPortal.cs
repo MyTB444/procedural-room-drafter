@@ -3,9 +3,10 @@ using UnityEngine;
 namespace TRV
 {
     /// <summary>
-    /// Sits on the Door tilemap (its TilemapCollider2D set to "Is Trigger"). When the player steps
-    /// onto any door tile it tells the <see cref="RoomManager"/>, which works out which of the 4
-    /// doors it was from the player's position and transitions to that neighbour room.
+    /// Sits on the Door tilemap (its TilemapCollider2D set to "Is Trigger"). While the player is on
+    /// any door tile it tells the <see cref="RoomManager"/>, which works out which of the 4 doors it
+    /// was and transitions to that neighbour room. Uses Stay (not Enter) so a door that's locked
+    /// (room not yet cleared) opens the instant the last enemy dies while the player waits on it.
     /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public class DoorPortal : MonoBehaviour
@@ -19,7 +20,7 @@ namespace TRV
             if (col != null) col.isTrigger = true;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        private void OnTriggerStay2D(Collider2D other)
         {
             if (roomManager == null) return;
             if (other.GetComponentInParent<TRVController>() == null) return; // players only

@@ -55,6 +55,10 @@ MonoBehaviour:
     - {fileID: 11400000, guid: cead4e484613b084abd9662c502da901, type: 2}
     - {fileID: 11400000, guid: 2935afdb7791a5a498b92c0520f9beac, type: 2}
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
+  <EnemyPrefabs>k__BackingField:
+  - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
+  <EnemiesPerRoom>k__BackingField: 3
+  <EnemySpawnSafeRadius>k__BackingField: 4
   <IslandDecorObjects>k__BackingField:
   - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
   - {fileID: 8161980004430131537, guid: 1515b6e95fb9d10459e11abf13d71939, type: 3}

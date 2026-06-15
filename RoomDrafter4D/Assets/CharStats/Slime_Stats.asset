@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f56a070ab2d261d4a90745e43e09475c, type: 3}
+  m_Name: Slime_Stats
+  m_EditorClassIdentifier: Assembly-CSharp::TRV.EnemyStats
+  <CharacterName>k__BackingField: Character
+  <MaxHealth>k__BackingField: 80
+  <MoveSpeed>k__BackingField: 2
+  <Acceleration>k__BackingField: 60
+  <Deceleration>k__BackingField: 70
+  <Damage>k__BackingField: 15
+  <AttackCooldown>k__BackingField: 3
+  <AttackRange>k__BackingField: 1.2
+  <AttackMoveMultiplier>k__BackingField: 0.5
+  <AttackMoveSlowDuration>k__BackingField: 0.667
+  <DetectionRadius>k__BackingField: 6
+  <WanderSpeedMultiplier>k__BackingField: 0.5
+  <IdleDurationRange>k__BackingField: {x: 0.8, y: 2}
+  <WanderDurationRange>k__BackingField: {x: 0.6, y: 1.5}
+  <AttackHaltDuration>k__BackingField: 2
