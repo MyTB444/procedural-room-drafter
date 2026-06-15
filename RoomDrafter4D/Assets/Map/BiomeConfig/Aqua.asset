@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cba3642b34386146a984a1f0364b9cd, type: 3}
+  m_Name: Aqua
+  m_EditorClassIdentifier: Assembly-CSharp::TRV.BiomeConfig
+  <Layout>k__BackingField: 1
+  <Width>k__BackingField: 25
+  <Height>k__BackingField: 14
+  <WallThickness>k__BackingField: 1
+  <DoorWidth>k__BackingField: 2
+  <LandingDepth>k__BackingField: 2
+  <DoorCornerPadding>k__BackingField: 2
+  <CorridorWidth>k__BackingField: 2
+  <WideCorridorChance>k__BackingField: 0.35
+  <MediumCorridorChance>k__BackingField: 0.25
+  <ExtraCorridorNodes>k__BackingField: 1
+  <BuildingLeftTile>k__BackingField: {fileID: 11400000, guid: cb6f9f0d87e187a4a9f5a8d7a5cf4b48, type: 2}
+  <BuildingMiddleTile>k__BackingField: {fileID: 11400000, guid: 089e2f9cc4bf60742b2478bc42b10067, type: 2}
+  <BuildingRightTile>k__BackingField: {fileID: 11400000, guid: 390db4f8b4d79904e8628e114376c974, type: 2}
+  <WaterDecorPatches>k__BackingField:
+  - Tiles:
+    - {fileID: 11400000, guid: 9360973c22aac0d4b86cf3e32c62d5e1, type: 2}
+    - {fileID: 11400000, guid: 7ca7ffcddcc2dc44ea7fb86ec2563186, type: 2}
+    - {fileID: 11400000, guid: ba67ff2f7242e6a4587330e20b6e6845, type: 2}
+    - {fileID: 11400000, guid: abf30ebac47084741a08543ece609d41, type: 2}
+    - {fileID: 11400000, guid: e491c4e512cd25a4cadb723c3f62cbc3, type: 2}
+    - {fileID: 11400000, guid: 916416bdcfb03364692c06ee9c7cd325, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: 10467f9905079cc44a34bfb5836fd0bb, type: 2}
+    - {fileID: 11400000, guid: 297e6b2fd52d09848a15daa90471612a, type: 2}
+    - {fileID: 11400000, guid: 4e7178a18b764f14891b0a130e808d00, type: 2}
+    - {fileID: 11400000, guid: 8e559ff20b374bf438275f34eb1bbe94, type: 2}
+    - {fileID: 11400000, guid: 2935afdb7791a5a498b92c0520f9beac, type: 2}
+    - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: 0fec4a4129bc3d14f9f0f3da0a4f8100, type: 2}
+    - {fileID: 11400000, guid: d8bdb877fe1ba9149b5d19d0004c3a3a, type: 2}
+    - {fileID: 11400000, guid: 06a52bb60d543a9499a0d7d7613ac6d9, type: 2}
+    - {fileID: 11400000, guid: e7ab5faeafa8ce14eab624a6e88a79b4, type: 2}
+    - {fileID: 11400000, guid: a18c5e25dcfe797409f376c558847b61, type: 2}
+    - {fileID: 11400000, guid: 15fa30e4be2c9404094ebfca877e8d0a, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: 7d17a7f0122b84c4b83eee8d220adeda, type: 2}
+    - {fileID: 11400000, guid: 9ce852fee149b3f4bbff930dd10a4c8c, type: 2}
+    - {fileID: 11400000, guid: b1e1734261b201249b33883e2ccbeca8, type: 2}
+    - {fileID: 11400000, guid: cead4e484613b084abd9662c502da901, type: 2}
+    - {fileID: 11400000, guid: 2935afdb7791a5a498b92c0520f9beac, type: 2}
+    - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
+  <IslandDecorPatches>k__BackingField:
+  - Tiles:
+    - {fileID: 11400000, guid: 92690ded9df4c8748a116d6ac709af50, type: 2}
+    - {fileID: 11400000, guid: 16658dee448284d4990fc09c8fff1f88, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: 28ff90f085e84e141839f9ef44d369e1, type: 2}
+    - {fileID: 11400000, guid: c40f533d9370e914492c3ce2702a0377, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: 2b58e2d410373cf43939070aaeb498b6, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: bdd54cedfdb60d644a71ec917d7cf8e3, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: 73b7fb9027bc4e741a094ab5133786e7, type: 2}
+    - {fileID: 11400000, guid: fce022284aabea444a6577a86fc3bee6, type: 2}
+  - Tiles:
+    - {fileID: 11400000, guid: 584d1d0b44b4eef468e5fc68382830c0, type: 2}
+  <MinWaterForIsland>k__BackingField: 40
+  <FloorPatches>k__BackingField:
+  - Size: 2
+    Tiles:
+    - {fileID: 11400000, guid: 7f66dd2bca06226449801c6f5917aae5, type: 2}
+    - {fileID: 11400000, guid: 4476daa2562d5f54e9166fead061d723, type: 2}
+    - {fileID: 11400000, guid: 4e204c7d94946884cae050d96d00fd3b, type: 2}
+    - {fileID: 11400000, guid: 47f20a81a69d96948b2ac3934c07b417, type: 2}
+  - Size: 2
+    Tiles:
+    - {fileID: 11400000, guid: 952bad5624a82644facd090d728946b4, type: 2}
+    - {fileID: 11400000, guid: 6235fee2e426fa340aa3fa1944dcdfe1, type: 2}
+    - {fileID: 11400000, guid: 8da3897a7f027eb438c9a1b897577e27, type: 2}
+    - {fileID: 11400000, guid: d757a78efd4d23746a68c514b604dbc7, type: 2}
+  - Size: 2
+    Tiles:
+    - {fileID: 11400000, guid: b47283c85ba5bfc46917d3d28e688ded, type: 2}
+    - {fileID: 11400000, guid: 62b7e18fabb56eb4881415ef395071a4, type: 2}
+    - {fileID: 11400000, guid: 378011ccf9146634d86132af56a924c5, type: 2}
+    - {fileID: 11400000, guid: 16c5bdc068cc0e44f825775f5a21b3a5, type: 2}
+  <FloorPatchCoverage>k__BackingField: 0.9
+  <FillPercent>k__BackingField: 0.45
+  <SmoothingIterations>k__BackingField: 4
+  <SolidThreshold>k__BackingField: 5
+  <FloorTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: be5734828b4998146b369ddb38232659, type: 2}
+  - {fileID: 11400000, guid: c195e3c647b06fc41a35cd9ea5cc4c83, type: 2}
+  - {fileID: 11400000, guid: e65d4a2456bb607448aceb6c06bf9fb3, type: 2}
+  <WaterTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 366ac9b314974b145b3acfd6d9802292, type: 2}
+  - {fileID: 11400000, guid: f28d9388eb6e34b48874179779056b90, type: 2}
+  - {fileID: 11400000, guid: eb576360c8b82be4ea9631d87257cea0, type: 2}
+  - {fileID: 11400000, guid: 2d4bbeb50fa219b458dbc2067f4e9b9b, type: 2}
+  - {fileID: 11400000, guid: 101cf8310e285e047a3e96217bf61fae, type: 2}
+  <DoorTile>k__BackingField: {fileID: 11400000, guid: 7174639161616fb48a1f7507292b6e69, type: 2}
+  <NorthWallTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 043e2b74984b60240a1a576122807f39, type: 2}
+  - {fileID: 11400000, guid: 9f036b63a1a7acd48ad5216e64ad1114, type: 2}
+  - {fileID: 11400000, guid: bf18d7d7831d6a04faadbf1b07dc9120, type: 2}
+  <EastWallTile>k__BackingField: {fileID: 11400000, guid: e7adc27b0ff2d2f4cba092b4712aa719, type: 2}
+  <WestWallTile>k__BackingField: {fileID: 11400000, guid: 6e6274f37d7f1bc48a1102d8fa19a049, type: 2}
+  <NorthWestCornerTile>k__BackingField: {fileID: 11400000, guid: d270bc07043df7543bc5a19c9ec05cf3, type: 2}
+  <NorthEastCornerTile>k__BackingField: {fileID: 11400000, guid: 75cd9e2ae9fb8c549a1d4ef19587be3a, type: 2}

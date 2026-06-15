@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: 2511f50586593524b8824adbcef65009
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -2926437868747580669
+    second: TRV_Block_5_0
+  - first:
+      213: -4186012832114495894
+    second: TRV_Block_5_1
+  - first:
+      213: 5608550282183400147
+    second: TRV_Block_5_2
+  - first:
+      213: -4138454705942987927
+    second: TRV_Block_5_3
+  - first:
+      213: -1087466813327066135
+    second: TRV_Block_5_4
+  - first:
+      213: 8455279513826459982
+    second: TRV_Block_5_5
+  - first:
+      213: -5503574739074478634
+    second: TRV_Block_5_6
+  - first:
+      213: 6498424163525636541
+    second: TRV_Block_5_7
+  - first:
+      213: 4181510587360171648
+    second: TRV_Block_5_8
+  - first:
+      213: 7359344505587553809
+    second: TRV_Block_5_9
+  - first:
+      213: -708837094374846468
+    second: TRV_Block_5_10
+  - first:
+      213: -4258848684003717382
+    second: TRV_Block_5_11
+  - first:
+      213: 8530847974473331156
+    second: TRV_Block_5_12
+  - first:
+      213: 7355058288226174527
+    second: TRV_Block_5_13
+  - first:
+      213: -6631998735547218369
+    second: TRV_Block_5_14
+  - first:
+      213: -4377003319761091265
+    second: TRV_Block_5_15
+  - first:
+      213: 5934012476505088613
+    second: TRV_Block_5_16
+  - first:
+      213: 7434657139041990134
+    second: TRV_Block_5_17
+  - first:
+      213: -8090009301264107002
+    second: TRV_Block_5_18
+  - first:
+      213: 7742420816414156907
+    second: TRV_Block_5_19
+  - first:
+      213: -8897012294350236959
+    second: TRV_Block_5_20
+  - first:
+      213: -8079389033017279170
+    second: TRV_Block_5_21
+  - first:
+      213: -4779710935626361082
+    second: TRV_Block_5_22
+  - first:
+      213: -7620180734391158223
+    second: TRV_Block_5_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: TRV_Block_5_0
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 427
+        width: 30
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30b9c0863443367d0800000000000000
+      internalID: -2926437868747580669
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_1
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 427
+        width: 30
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a6ea694f18b48e5c0800000000000000
+      internalID: -4186012832114495894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_2
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 427
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3da557a24c295dd40800000000000000
+      internalID: 5608550282183400147
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_3
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 96b79351f514196c0800000000000000
+      internalID: -4138454705942987927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_4
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9eb3d96e1ba88e0f0800000000000000
+      internalID: -1087466813327066135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_5
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e41834a7bef275570800000000000000
+      internalID: 8455279513826459982
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_6
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 299
+        width: 30
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6dd07aa1fef5f93b0800000000000000
+      internalID: -5503574739074478634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_7
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 299
+        width: 30
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db1b2cab85a0f2a50800000000000000
+      internalID: 6498424163525636541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_8
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 299
+        width: 38
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 086532089b5b70a30800000000000000
+      internalID: 4181510587360171648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_9
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 299
+        width: 36
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 116d44b16d4a12660800000000000000
+      internalID: 7359344505587553809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_10
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cffca221b64b926f0800000000000000
+      internalID: -708837094374846468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_11
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afe81ddafa785e4c0800000000000000
+      internalID: -4258848684003717382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_12
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 171
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d1f75fc809a36670800000000000000
+      internalID: 8530847974473331156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_13
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 171
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f36830c5b8a621660800000000000000
+      internalID: 7355058288226174527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_14
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 171
+        width: 38
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f364ed0b94866f3a0800000000000000
+      internalID: -6631998735547218369
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_15
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 171
+        width: 36
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f354fe8cba2c143c0800000000000000
+      internalID: -4377003319761091265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_16
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 171
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56262da58e8d95250800000000000000
+      internalID: 5934012476505088613
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_17
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 171
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f57b6707453d2760800000000000000
+      internalID: 7434657139041990134
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_18
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60afb8837638abf80800000000000000
+      internalID: -8090009301264107002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b68a4ff16ba927b60800000000000000
+      internalID: 7742420816414156907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_20
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e298f8e476778480800000000000000
+      internalID: -8897012294350236959
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_21
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3d71dc1b7e30ef80800000000000000
+      internalID: -8079389033017279170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_22
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 607d0f06a3e0badb0800000000000000
+      internalID: -4779710935626361082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Block_5_23
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 13af65adefdaf3690800000000000000
+      internalID: -7620180734391158223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      TRV_Block_5_0: -2926437868747580669
+      TRV_Block_5_1: -4186012832114495894
+      TRV_Block_5_10: -708837094374846468
+      TRV_Block_5_11: -4258848684003717382
+      TRV_Block_5_12: 8530847974473331156
+      TRV_Block_5_13: 7355058288226174527
+      TRV_Block_5_14: -6631998735547218369
+      TRV_Block_5_15: -4377003319761091265
+      TRV_Block_5_16: 5934012476505088613
+      TRV_Block_5_17: 7434657139041990134
+      TRV_Block_5_18: -8090009301264107002
+      TRV_Block_5_19: 7742420816414156907
+      TRV_Block_5_2: 5608550282183400147
+      TRV_Block_5_20: -8897012294350236959
+      TRV_Block_5_21: -8079389033017279170
+      TRV_Block_5_22: -4779710935626361082
+      TRV_Block_5_23: -7620180734391158223
+      TRV_Block_5_3: -4138454705942987927
+      TRV_Block_5_4: -1087466813327066135
+      TRV_Block_5_5: 8455279513826459982
+      TRV_Block_5_6: -5503574739074478634
+      TRV_Block_5_7: 6498424163525636541
+      TRV_Block_5_8: 4181510587360171648
+      TRV_Block_5_9: 7359344505587553809
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

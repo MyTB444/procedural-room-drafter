@@ -1,0 +1,988 @@
+fileFormatVersion: 2
+guid: e807a2ce7e553c14085d92695e69a254
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -7209294560052289840
+    second: TRV_Melee_5_0
+  - first:
+      213: 3543213591811833266
+    second: TRV_Melee_5_1
+  - first:
+      213: 2918094656676669152
+    second: TRV_Melee_5_2
+  - first:
+      213: 5963192831921398777
+    second: TRV_Melee_5_3
+  - first:
+      213: -1247046805936102836
+    second: TRV_Melee_5_4
+  - first:
+      213: 5854186565873789171
+    second: TRV_Melee_5_5
+  - first:
+      213: -3545208036100760233
+    second: TRV_Melee_5_6
+  - first:
+      213: -1816487426984914708
+    second: TRV_Melee_5_7
+  - first:
+      213: -8248498636396330860
+    second: TRV_Melee_5_8
+  - first:
+      213: 7251372548039034215
+    second: TRV_Melee_5_9
+  - first:
+      213: 3177586258768054213
+    second: TRV_Melee_5_10
+  - first:
+      213: 1826162139700016870
+    second: TRV_Melee_5_11
+  - first:
+      213: 3497750196449860575
+    second: TRV_Melee_5_12
+  - first:
+      213: -1688672366346310798
+    second: TRV_Melee_5_13
+  - first:
+      213: 7397572659614917223
+    second: TRV_Melee_5_14
+  - first:
+      213: 7212184430751237097
+    second: TRV_Melee_5_15
+  - first:
+      213: 627525292964817789
+    second: TRV_Melee_5_16
+  - first:
+      213: 2921145102628877304
+    second: TRV_Melee_5_17
+  - first:
+      213: -4338490990461612022
+    second: TRV_Melee_5_18
+  - first:
+      213: -888976022916236565
+    second: TRV_Melee_5_19
+  - first:
+      213: 5532162243137361067
+    second: TRV_Melee_5_20
+  - first:
+      213: -8045910287070776952
+    second: TRV_Melee_5_21
+  - first:
+      213: -6170488610818308302
+    second: TRV_Melee_5_22
+  - first:
+      213: -1804529104333185325
+    second: TRV_Melee_5_23
+  - first:
+      213: 4055605415809015556
+    second: TRV_Melee_5_24
+  - first:
+      213: -5573356308233885074
+    second: TRV_Melee_5_25
+  - first:
+      213: 660793646418627302
+    second: TRV_Melee_5_26
+  - first:
+      213: -249964720234163325
+    second: TRV_Melee_5_27
+  - first:
+      213: 5336220663416463269
+    second: TRV_Melee_5_28
+  - first:
+      213: 5558133889135946819
+    second: TRV_Melee_5_29
+  - first:
+      213: 6195539361223094678
+    second: TRV_Melee_5_30
+  - first:
+      213: -5334818123856083085
+    second: TRV_Melee_5_31
+  - first:
+      213: -5812235445020747292
+    second: TRV_Melee_5_32
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: TRV_Melee_5_0
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0de5dea4bc073fb90800000000000000
+      internalID: -7209294560052289840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_1
+      rect:
+        serializedVersion: 2
+        x: 175
+        y: 421
+        width: 32
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bdb74f2df50c2130800000000000000
+      internalID: 3543213591811833266
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_2
+      rect:
+        serializedVersion: 2
+        x: 303
+        y: 421
+        width: 32
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e6ad2821a72f7820800000000000000
+      internalID: 2918094656676669152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_3
+      rect:
+        serializedVersion: 2
+        x: 429
+        y: 423
+        width: 42
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f3a4d9494481c250800000000000000
+      internalID: 5963192831921398777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_4
+      rect:
+        serializedVersion: 2
+        x: 559
+        y: 425
+        width: 38
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c42a4e1898991bee0800000000000000
+      internalID: -1247046805936102836
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_5
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f865c33aaf3e3150800000000000000
+      internalID: 5854186565873789171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_6
+      rect:
+        serializedVersion: 2
+        x: 717
+        y: 431
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75d9a511314eccec0800000000000000
+      internalID: -3545208036100760233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_7
+      rect:
+        serializedVersion: 2
+        x: 719
+        y: 437
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce0d99f2f4a8ac6e0800000000000000
+      internalID: -1816487426984914708
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_8
+      rect:
+        serializedVersion: 2
+        x: 437
+        y: 419
+        width: 16
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4908d4f4132778d80800000000000000
+      internalID: -8248498636396330860
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_9
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 299
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 765c2ebb9ec02a460800000000000000
+      internalID: 7251372548039034215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_10
+      rect:
+        serializedVersion: 2
+        x: 175
+        y: 299
+        width: 34
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c74805eddd091c20800000000000000
+      internalID: 3177586258768054213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_11
+      rect:
+        serializedVersion: 2
+        x: 301
+        y: 299
+        width: 34
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e636176ac4d75910800000000000000
+      internalID: 1826162139700016870
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_12
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 299
+        width: 52
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fdb527495418a8030800000000000000
+      internalID: 3497750196449860575
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_13
+      rect:
+        serializedVersion: 2
+        x: 555
+        y: 299
+        width: 48
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27be8e50e61a098e0800000000000000
+      internalID: -1688672366346310798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_14
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 299
+        width: 30
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7622d70d32579a660800000000000000
+      internalID: 7397572659614917223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_15
+      rect:
+        serializedVersion: 2
+        x: 719
+        y: 311
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e3c7892783d61460800000000000000
+      internalID: 7212184430751237097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_16
+      rect:
+        serializedVersion: 2
+        x: 47
+        y: 171
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d7badbeddea65b800800000000000000
+      internalID: 627525292964817789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_17
+      rect:
+        serializedVersion: 2
+        x: 175
+        y: 171
+        width: 34
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f3f0937efdf98820800000000000000
+      internalID: 2921145102628877304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_18
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 171
+        width: 32
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a009d443e659ac3c0800000000000000
+      internalID: -4338490990461612022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_19
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 171
+        width: 50
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: beafc346409b9a3f0800000000000000
+      internalID: -888976022916236565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_20
+      rect:
+        serializedVersion: 2
+        x: 549
+        y: 171
+        width: 46
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba4d70edf3036cc40800000000000000
+      internalID: 5532162243137361067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_21
+      rect:
+        serializedVersion: 2
+        x: 679
+        y: 185
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8813c74193f275090800000000000000
+      internalID: -8045910287070776952
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_22
+      rect:
+        serializedVersion: 2
+        x: 687
+        y: 171
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 237c4951d450e5aa0800000000000000
+      internalID: -6170488610818308302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_23
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3dedd55275605f6e0800000000000000
+      internalID: -1804529104333185325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_24
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 43
+        width: 30
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 40f527e53a7684830800000000000000
+      internalID: 4055605415809015556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_25
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 65
+        width: 30
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6a690177f577a2b0800000000000000
+      internalID: -5573356308233885074
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_26
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 43
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ea0e94025c9b2900800000000000000
+      internalID: 660793646418627302
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_27
+      rect:
+        serializedVersion: 2
+        x: 425
+        y: 43
+        width: 40
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 383101c4962f78cf0800000000000000
+      internalID: -249964720234163325
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_28
+      rect:
+        serializedVersion: 2
+        x: 453
+        y: 79
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5af990ebb601e0a40800000000000000
+      internalID: 5336220663416463269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_29
+      rect:
+        serializedVersion: 2
+        x: 551
+        y: 43
+        width: 38
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34c220ce255722d40800000000000000
+      internalID: 5558133889135946819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_30
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69137a1493afaf550800000000000000
+      internalID: 6195539361223094678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_31
+      rect:
+        serializedVersion: 2
+        x: 677
+        y: 57
+        width: 8
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3770e327e2be6f5b0800000000000000
+      internalID: -5334818123856083085
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Melee_5_32
+      rect:
+        serializedVersion: 2
+        x: 681
+        y: 67
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e99a9448aac65fa0800000000000000
+      internalID: -5812235445020747292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      TRV_Melee_5_0: -7209294560052289840
+      TRV_Melee_5_1: 3543213591811833266
+      TRV_Melee_5_10: 3177586258768054213
+      TRV_Melee_5_11: 1826162139700016870
+      TRV_Melee_5_12: 3497750196449860575
+      TRV_Melee_5_13: -1688672366346310798
+      TRV_Melee_5_14: 7397572659614917223
+      TRV_Melee_5_15: 7212184430751237097
+      TRV_Melee_5_16: 627525292964817789
+      TRV_Melee_5_17: 2921145102628877304
+      TRV_Melee_5_18: -4338490990461612022
+      TRV_Melee_5_19: -888976022916236565
+      TRV_Melee_5_2: 2918094656676669152
+      TRV_Melee_5_20: 5532162243137361067
+      TRV_Melee_5_21: -8045910287070776952
+      TRV_Melee_5_22: -6170488610818308302
+      TRV_Melee_5_23: -1804529104333185325
+      TRV_Melee_5_24: 4055605415809015556
+      TRV_Melee_5_25: -5573356308233885074
+      TRV_Melee_5_26: 660793646418627302
+      TRV_Melee_5_27: -249964720234163325
+      TRV_Melee_5_28: 5336220663416463269
+      TRV_Melee_5_29: 5558133889135946819
+      TRV_Melee_5_3: 5963192831921398777
+      TRV_Melee_5_30: 6195539361223094678
+      TRV_Melee_5_31: -5334818123856083085
+      TRV_Melee_5_32: -5812235445020747292
+      TRV_Melee_5_4: -1247046805936102836
+      TRV_Melee_5_5: 5854186565873789171
+      TRV_Melee_5_6: -3545208036100760233
+      TRV_Melee_5_7: -1816487426984914708
+      TRV_Melee_5_8: -8248498636396330860
+      TRV_Melee_5_9: 7251372548039034215
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

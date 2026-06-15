@@ -1,0 +1,754 @@
+fileFormatVersion: 2
+guid: a979b7e53eaf3a9409e8001ce96da85d
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5908270676234153447
+    second: TRV_Ranged_5_0
+  - first:
+      213: 1205249326470762060
+    second: TRV_Ranged_5_1
+  - first:
+      213: -7341478166832147583
+    second: TRV_Ranged_5_2
+  - first:
+      213: 6120714124823255509
+    second: TRV_Ranged_5_3
+  - first:
+      213: 182654560850883728
+    second: TRV_Ranged_5_4
+  - first:
+      213: 4829031240940410871
+    second: TRV_Ranged_5_5
+  - first:
+      213: 801316967684648759
+    second: TRV_Ranged_5_6
+  - first:
+      213: 3731662487019752610
+    second: TRV_Ranged_5_7
+  - first:
+      213: 5787059824478954533
+    second: TRV_Ranged_5_8
+  - first:
+      213: 2352920735498403247
+    second: TRV_Ranged_5_9
+  - first:
+      213: -4434328906621755091
+    second: TRV_Ranged_5_10
+  - first:
+      213: -7210947743172189734
+    second: TRV_Ranged_5_11
+  - first:
+      213: 7328166343649419822
+    second: TRV_Ranged_5_12
+  - first:
+      213: -1949804825188373205
+    second: TRV_Ranged_5_13
+  - first:
+      213: 3128481780023760289
+    second: TRV_Ranged_5_14
+  - first:
+      213: 6689614435089440421
+    second: TRV_Ranged_5_15
+  - first:
+      213: 8011288793369789616
+    second: TRV_Ranged_5_16
+  - first:
+      213: 5554901028878901879
+    second: TRV_Ranged_5_17
+  - first:
+      213: 8831606875666480056
+    second: TRV_Ranged_5_18
+  - first:
+      213: -3645928813530337197
+    second: TRV_Ranged_5_19
+  - first:
+      213: -2041229310613358228
+    second: TRV_Ranged_5_20
+  - first:
+      213: 9033515936906899060
+    second: TRV_Ranged_5_21
+  - first:
+      213: -4736291362892691991
+    second: TRV_Ranged_5_22
+  - first:
+      213: 7942173632732220869
+    second: TRV_Ranged_5_23
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: TRV_Ranged_5_0
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 427
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ed2bcd60e46ef150800000000000000
+      internalID: 5908270676234153447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_1
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 427
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c4e811270e7e9b010800000000000000
+      internalID: 1205249326470762060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_2
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 427
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1831fab0184dd1a90800000000000000
+      internalID: -7341478166832147583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_3
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 427
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5d95ecd411521f450800000000000000
+      internalID: 6120714124823255509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_4
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 427
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0943f18fa5be88200800000000000000
+      internalID: 182654560850883728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_5
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 427
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f7548d045a240340800000000000000
+      internalID: 4829031240940410871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_6
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73f265b5989de1b00800000000000000
+      internalID: 801316967684648759
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_7
+      rect:
+        serializedVersion: 2
+        x: 177
+        y: 299
+        width: 30
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ac8670c24789c330800000000000000
+      internalID: 3731662487019752610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_8
+      rect:
+        serializedVersion: 2
+        x: 303
+        y: 299
+        width: 32
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 524a00ccf34cf4050800000000000000
+      internalID: 5787059824478954533
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_9
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 299
+        width: 30
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fad780051f047a020800000000000000
+      internalID: 2352920735498403247
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_10
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 299
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d21609f7a591672c0800000000000000
+      internalID: -4434328906621755091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_11
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 299
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad1215a9b319deb90800000000000000
+      internalID: -7210947743172189734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_12
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 171
+        width: 28
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e2262389670e2b560800000000000000
+      internalID: 7328166343649419822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_13
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2ded4d87d6e0f4e0800000000000000
+      internalID: -1949804825188373205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_14
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 171
+        width: 32
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a519908a999a6b20800000000000000
+      internalID: 3128481780023760289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_15
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 171
+        width: 34
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5aed4d7b2e846dc50800000000000000
+      internalID: 6689614435089440421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_16
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b4cfd146b0dd2f60800000000000000
+      internalID: 8011288793369789616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_17
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 171
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 77267ccfd09f61d40800000000000000
+      internalID: 5554901028878901879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_18
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bb7ffb59ab209a70800000000000000
+      internalID: 8831606875666480056
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_19
+      rect:
+        serializedVersion: 2
+        x: 179
+        y: 43
+        width: 28
+        height: 34
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 350b921af0f076dc0800000000000000
+      internalID: -3645928813530337197
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_20
+      rect:
+        serializedVersion: 2
+        x: 307
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6976c3c1c81ca3e0800000000000000
+      internalID: -2041229310613358228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_21
+      rect:
+        serializedVersion: 2
+        x: 433
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47e6a2c02ee7d5d70800000000000000
+      internalID: 9033515936906899060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_22
+      rect:
+        serializedVersion: 2
+        x: 561
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e5c7027910554eb0800000000000000
+      internalID: -4736291362892691991
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: TRV_Ranged_5_23
+      rect:
+        serializedVersion: 2
+        x: 689
+        y: 43
+        width: 28
+        height: 36
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5cd4a7be6d4483e60800000000000000
+      internalID: 7942173632732220869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      TRV_Ranged_5_0: 5908270676234153447
+      TRV_Ranged_5_1: 1205249326470762060
+      TRV_Ranged_5_10: -4434328906621755091
+      TRV_Ranged_5_11: -7210947743172189734
+      TRV_Ranged_5_12: 7328166343649419822
+      TRV_Ranged_5_13: -1949804825188373205
+      TRV_Ranged_5_14: 3128481780023760289
+      TRV_Ranged_5_15: 6689614435089440421
+      TRV_Ranged_5_16: 8011288793369789616
+      TRV_Ranged_5_17: 5554901028878901879
+      TRV_Ranged_5_18: 8831606875666480056
+      TRV_Ranged_5_19: -3645928813530337197
+      TRV_Ranged_5_2: -7341478166832147583
+      TRV_Ranged_5_20: -2041229310613358228
+      TRV_Ranged_5_21: 9033515936906899060
+      TRV_Ranged_5_22: -4736291362892691991
+      TRV_Ranged_5_23: 7942173632732220869
+      TRV_Ranged_5_3: 6120714124823255509
+      TRV_Ranged_5_4: 182654560850883728
+      TRV_Ranged_5_5: 4829031240940410871
+      TRV_Ranged_5_6: 801316967684648759
+      TRV_Ranged_5_7: 3731662487019752610
+      TRV_Ranged_5_8: 5787059824478954533
+      TRV_Ranged_5_9: 2352920735498403247
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
