@@ -92,18 +92,8 @@ namespace TRV
 
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
-            PaintIslandDecor(grid, config);
-        }
-
-        /// <summary>Stamp the 1×1 / 1×2 island decor pieces over island floor (Extras front layer).</summary>
-        private void PaintIslandDecor(RoomGrid grid, BiomeConfig config)
-        {
-            foreach (var placement in grid.IslandDecor)
-            {
-                var decor = At(config.IslandDecorPatches, placement.PatchIndex);
-                if (decor?.Tiles != null)
-                    StampGroup(extrasTilemap, placement, 1, decor.Tiles.Length, decor.Tiles);
-            }
+            // Island decor is no longer painted — it's spawned as pooled GameObjects by
+            // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
         }
 
         /// <summary>Stamp the 2×3 water decor groups over open water (Extras front layer).</summary>

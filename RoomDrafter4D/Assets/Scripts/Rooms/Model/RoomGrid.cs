@@ -21,8 +21,9 @@ namespace TRV
         /// <summary>Bottom-left cell of every 4×4 island carved by IslandPass.</summary>
         public List<(int x, int y)> IslandAnchors { get; } = new List<(int x, int y)>();
 
-        /// <summary>Island decor placements (1×1 or 1×2) — X/Y = bottom cell, PatchIndex into
-        /// <see cref="BiomeConfig.IslandDecorPatches"/> (filled by IslandDecorPass).</summary>
+        /// <summary>Island decor object placements — X/Y = cell, PatchIndex into
+        /// <see cref="BiomeConfig.IslandDecorObjects"/> (filled by IslandDecorPass, spawned by
+        /// <see cref="IslandDecorPool"/>).</summary>
         public List<PatchPlacement> IslandDecor { get; } = new List<PatchPlacement>();
 
         /// <summary>

@@ -17,6 +17,8 @@ namespace TRV
     ///   • Speed            (Float)   — 0 when idle, 1 when moving (alternative to IsMoving).
     ///   • AttackX, AttackY (Float)   — unit vector of the cursor-aimed attack (attack blend tree).
     ///   • Attack           (Trigger) — fired on each attack.
+    ///   • DashX, DashY     (Float)   — unit vector of the dash direction (dash blend tree).
+    ///   • Dash             (Trigger) — fired when a dash burst starts.
     /// </summary>
     [RequireComponent(typeof(TRVController))]
     public class TRVAnimator : MonoBehaviour
@@ -36,8 +38,12 @@ namespace TRV
         [SerializeField] private string attackXParam = "AttackX";
         [SerializeField] private string attackYParam = "AttackY";
         [SerializeField] private string attackTriggerParam = "Attack";
+        [SerializeField] private string dashXParam = "DashX";
+        [SerializeField] private string dashYParam = "DashY";
+        [SerializeField] private string dashTriggerParam = "Dash";
 
         private AnimParam _lookX, _lookY, _isMoving, _speed, _attackX, _attackY, _attack;
+        private AnimParam _dashX, _dashY, _dash;
 
         private void Awake()
         {
@@ -51,16 +57,23 @@ namespace TRV
             _attackX = new AnimParam(animator, attackXParam);
             _attackY = new AnimParam(animator, attackYParam);
             _attack = new AnimParam(animator, attackTriggerParam);
+            _dashX = new AnimParam(animator, dashXParam);
+            _dashY = new AnimParam(animator, dashYParam);
+            _dash = new AnimParam(animator, dashTriggerParam);
         }
 
         private void OnEnable()
         {
-            if (controller != null) controller.Attacked += OnAttacked;
+            if (controller == null) return;
+            controller.Attacked += OnAttacked;
+            controller.DashStarted += OnDashStarted;
         }
 
         private void OnDisable()
         {
-            if (controller != null) controller.Attacked -= OnAttacked;
+            if (controller == null) return;
+            controller.Attacked -= OnAttacked;
+            controller.DashStarted -= OnDashStarted;
         }
 
         private void Update()
@@ -82,6 +95,15 @@ namespace TRV
             _attackX.SetFloat(aim.x);
             _attackY.SetFloat(aim.y);
             _attack.SetTrigger();
+        }
+
+        // Point the dash blend tree along the dash direction, then fire the trigger.
+        private void OnDashStarted(CharacterDirection dir)
+        {
+            Vector2 d = CharacterDirectionUtil.ToVector(dir);
+            _dashX.SetFloat(d.x);
+            _dashY.SetFloat(d.y);
+            _dash.SetTrigger();
         }
 
         /// <summary>

@@ -37,20 +37,9 @@ namespace TRV
     }
 
     /// <summary>
-    /// A hand-made decor piece painted on top of islands on the Extras (front) layer by
-    /// <see cref="IslandDecorPass"/>. 1 tile, or 2 tiles stacked vertically.
-    /// </summary>
-    [System.Serializable]
-    public class IslandDecorPatch
-    {
-        [Tooltip("1 entry = single tile; 2 entries = 2 tall (TOP tile first).")]
-        public TileBase[] Tiles;
-    }
-
-    /// <summary>
-    /// One placed tile group: the group's bottom-left cell plus an index into whichever
-    /// BiomeConfig array it came from (floor patches, water decor or island decor — each has its
-    /// own placement list on <see cref="RoomGrid"/>). Recorded by passes, stamped by the painter.
+    /// One placed item: its bottom-left cell plus an index into whichever BiomeConfig array it came
+    /// from — floor patches / water decor tiles (stamped by the painter), or island decor prefabs
+    /// (spawned by <see cref="IslandDecorPool"/>). Each source has its own list on <see cref="RoomGrid"/>.
     /// </summary>
     public readonly struct PatchPlacement
     {

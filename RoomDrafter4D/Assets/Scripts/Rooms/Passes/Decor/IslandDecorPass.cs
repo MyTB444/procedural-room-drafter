@@ -3,11 +3,11 @@ using System.Collections.Generic;
 namespace TRV
 {
     /// <summary>
-    /// Scatters the biome's hand-made island decor pieces (<see cref="BiomeConfig.IslandDecorPatches"/>,
-    /// 1 tile or 2 stacked vertically) on top of each island: 4–5 PER ISLAND, on cells that are
-    /// still island floor (a building may have claimed the island's top row), never overlapping.
-    /// Purely visual — placements go on <see cref="RoomGrid.IslandDecor"/> for the painter
-    /// (Extras front layer); the cells stay walkable Floor.
+    /// Picks where the biome's island decor objects (<see cref="BiomeConfig.IslandDecorObjects"/>)
+    /// go: 4–5 PER ISLAND, on distinct cells that are still island floor (a building may have
+    /// claimed the island's top row). This pass only RECORDS placements on
+    /// <see cref="RoomGrid.IslandDecor"/> (cell + prefab index) — the actual GameObjects are
+    /// spawned/reused from <see cref="IslandDecorPool"/> when the room is shown, not painted here.
     /// </summary>
     public class IslandDecorPass : IRoomPass
     {
@@ -17,10 +17,9 @@ namespace TRV
 
         public void Apply(RoomGrid grid, System.Random rng, BiomeConfig config)
         {
-            var decors = config.IslandDecorPatches;
-            if (decors == null || decors.Length == 0) return;
+            var objects = config.IslandDecorObjects;
+            if (objects == null || objects.Length == 0) return;
 
-            var used = new HashSet<(int, int)>();
             foreach (var (ax, ay) in grid.IslandAnchors)
             {
                 var cells = new List<(int x, int y)>();
@@ -30,25 +29,13 @@ namespace TRV
                             cells.Add((x, y));
                 rng.Shuffle(cells);
 
+                // Each shuffled cell is unique, so taking the first N never overlaps.
                 int target = rng.Next(MinPerIsland, MaxPerIsland + 1);
                 int placed = 0;
                 foreach (var (x, y) in cells)
                 {
                     if (placed >= target) break;
-                    if (used.Contains((x, y))) continue;
-
-                    int index = rng.Next(decors.Length);
-                    int height = decors[index]?.Tiles?.Length ?? 0;
-                    if (height < 1) continue;
-                    if (height > 1) // 2-tall: the cell above must be free island floor too
-                    {
-                        if (y + 1 >= ay + IslandSize || grid[x, y + 1] != CellType.Floor) continue;
-                        if (used.Contains((x, y + 1))) continue;
-                        used.Add((x, y + 1));
-                    }
-
-                    used.Add((x, y));
-                    grid.IslandDecor.Add(new PatchPlacement(x, y, index));
+                    grid.IslandDecor.Add(new PatchPlacement(x, y, rng.Next(objects.Length)));
                     placed++;
                 }
             }

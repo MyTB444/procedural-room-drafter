@@ -10,8 +10,8 @@ namespace TRV
         Corridors = 1, // open water crossed by a random connected walkway network (CorridorPass)
     }
 
-    // FloorPatch / WaterDecorPatch / IslandDecorPatch (the authored tile groups referenced below)
-    // live in Model/TilePatches.cs.
+    // FloorPatch / WaterDecorPatch (the authored tile groups referenced below) live in
+    // Model/TilePatches.cs. Island decor uses GameObject prefabs (IslandDecorObjects), not tiles.
 
     /// <summary>
     /// All tunable data + tile references for one biome's room generation. A ScriptableObject so
@@ -90,10 +90,11 @@ namespace TRV
                         "spot qualifies) — 2 to 4 per room, random pick per placement.")]
         [field: SerializeField] public WaterDecorPatch[] WaterDecorPatches { get; private set; }
 
-        [field: Header("Island decor (Extras front layer)")]
-        [field: Tooltip("Hand-made 1-tile or 2-tall decor pieces scattered on top of each island " +
-                        "(4–5 per island), random pick per placement.")]
-        [field: SerializeField] public IslandDecorPatch[] IslandDecorPatches { get; private set; }
+        [field: Header("Island decor (pooled objects)")]
+        [field: Tooltip("Prefabs scattered as real GameObjects on top of each island (4–5 per " +
+                        "island, random pick). Spawned/reused from IslandDecorPool at runtime — not " +
+                        "painted to a tilemap.")]
+        [field: SerializeField] public GameObject[] IslandDecorObjects { get; private set; }
 
         [field: Header("Water island")]
         [field: Tooltip("If the room's largest water body has at least this many cells, a strictly " +

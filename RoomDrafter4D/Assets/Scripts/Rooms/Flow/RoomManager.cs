@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace TRV
@@ -18,6 +19,9 @@ namespace TRV
         [SerializeField] private ScreenFader fader;
         [SerializeField] private Transform player;
 
+        [Tooltip("Pools/places island decor objects per room. Optional — auto-found if present.")]
+        [SerializeField] private IslandDecorPool decorPool;
+
         [Header("Start")]
         [SerializeField] private int worldSeed = 12345;
         [SerializeField] private Vector2Int startCoord = Vector2Int.zero;
@@ -27,6 +31,10 @@ namespace TRV
 
         private Vector2Int _coord;
         private bool _transitioning;
+
+        // Island decor placements for the room currently shown — saved into its snapshot on leave,
+        // so a cached room re-spawns the same decor without re-running generation.
+        private List<PatchPlacement> _currentIslandDecor;
 
         // Visited rooms, captured on leave and restored on return (includes the hand-made start room).
         private readonly RoomCache _cache = new RoomCache();
@@ -38,6 +46,7 @@ namespace TRV
             // Be forgiving about wiring: the painter usually lives on the same object, and there's
             // one player in the scene. Biome still has to be assigned explicitly.
             if (painter == null) painter = GetComponent<TilemapPainter>();
+            if (decorPool == null) decorPool = FindFirstObjectByType<IslandDecorPool>();
             if (player == null)
             {
                 var found = FindFirstObjectByType<TRVController>();
@@ -76,7 +85,10 @@ namespace TRV
             if (fader != null) yield return fader.FadeOut();
 
             // Save the room we're leaving (hand-made start room or generated, with any changes).
-            _cache.Save(_coord, painter.Capture(biome.Width, biome.Height));
+            // Island decor objects aren't tiles, so carry their placements on the snapshot too.
+            var snapshot = painter.Capture(biome.Width, biome.Height);
+            snapshot.IslandDecor = _currentIslandDecor;
+            _cache.Save(_coord, snapshot);
 
             _coord += exitDir.Offset();
             LoadRoom(_coord, exitDir.Opposite()); // arrive at the opposite door
@@ -97,9 +109,19 @@ namespace TRV
 
             // Restore a previously visited room exactly; otherwise generate a fresh one.
             if (_cache.TryGet(coord, out var snapshot))
+            {
                 painter.Restore(snapshot);
+                _currentIslandDecor = snapshot.IslandDecor;
+            }
             else
-                painter.Paint(new RoomGenerator(biome).Generate(RoomSeed.Rng(worldSeed, coord)), biome);
+            {
+                var grid = new RoomGenerator(biome).Generate(RoomSeed.Rng(worldSeed, coord));
+                painter.Paint(grid, biome);
+                _currentIslandDecor = grid.IslandDecor;
+            }
+
+            // Swap the pooled decor objects over to this room (releases the previous room's).
+            if (decorPool != null) decorPool.Show(_currentIslandDecor, painter);
 
             // Spawn in FRONT of the actual door on the entry edge (so doors can be anywhere on it).
             if (player != null)

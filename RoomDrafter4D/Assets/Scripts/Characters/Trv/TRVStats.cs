@@ -36,6 +36,11 @@ namespace TRV
         // DASH  (a short, fast burst)
         // ─────────────────────────────────────────────────────────────
         [field: Header("Dash")]
+        [field: Tooltip("Windup before the dash burst fires after pressing dash (seconds). 0 = instant. " +
+                        "I-frames begin when the burst starts, NOT during the windup.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float DashStartupDelay { get; private set; } = 0.08f;
+
         [field: Tooltip("Speed of the dash burst in units/second. Set well above MoveSpeed for a snappy lunge.")]
         [field: Min(0f)]
         [field: SerializeField] public float DashSpeed { get; private set; } = 22f;

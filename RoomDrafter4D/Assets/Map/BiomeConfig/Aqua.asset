@@ -55,22 +55,10 @@ MonoBehaviour:
     - {fileID: 11400000, guid: cead4e484613b084abd9662c502da901, type: 2}
     - {fileID: 11400000, guid: 2935afdb7791a5a498b92c0520f9beac, type: 2}
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
-  <IslandDecorPatches>k__BackingField:
-  - Tiles:
-    - {fileID: 11400000, guid: 92690ded9df4c8748a116d6ac709af50, type: 2}
-    - {fileID: 11400000, guid: 16658dee448284d4990fc09c8fff1f88, type: 2}
-  - Tiles:
-    - {fileID: 11400000, guid: 28ff90f085e84e141839f9ef44d369e1, type: 2}
-    - {fileID: 11400000, guid: c40f533d9370e914492c3ce2702a0377, type: 2}
-  - Tiles:
-    - {fileID: 11400000, guid: 2b58e2d410373cf43939070aaeb498b6, type: 2}
-  - Tiles:
-    - {fileID: 11400000, guid: bdd54cedfdb60d644a71ec917d7cf8e3, type: 2}
-  - Tiles:
-    - {fileID: 11400000, guid: 73b7fb9027bc4e741a094ab5133786e7, type: 2}
-    - {fileID: 11400000, guid: fce022284aabea444a6577a86fc3bee6, type: 2}
-  - Tiles:
-    - {fileID: 11400000, guid: 584d1d0b44b4eef468e5fc68382830c0, type: 2}
+  <IslandDecorObjects>k__BackingField:
+  - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
+  - {fileID: 8161980004430131537, guid: 1515b6e95fb9d10459e11abf13d71939, type: 3}
+  - {fileID: 2277051634198294532, guid: 166c7c13ea6b4104ba5fe5153cffef16, type: 3}
   <MinWaterForIsland>k__BackingField: 40
   <FloorPatches>k__BackingField:
   - Size: 2

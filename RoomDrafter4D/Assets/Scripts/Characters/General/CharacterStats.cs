@@ -56,5 +56,19 @@ namespace TRV
         [field: Tooltip("Reach of an attack in world units.")]
         [field: Min(0f)]
         [field: SerializeField] public float AttackRange { get; private set; } = 1.2f;
+
+        [field: Tooltip("Movement speed multiplier while attacking (the brief slow during the swing). " +
+                        "1 = no slow, 0.5 = half speed.")]
+        [field: Range(0f, 1f)]
+        [field: SerializeField] public float AttackMoveMultiplier { get; private set; } = 0.5f;
+
+        [field: Tooltip("How long the attack slow lasts (seconds) — roughly the attack animation length.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float AttackMoveSlowDuration { get; private set; } = 0.667f;
+
+        [field: Tooltip("How long an incoming knockback impulse overrides movement before the " +
+                        "character regains control (seconds). The push then eases out via Deceleration.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float KnockbackDuration { get; private set; } = 0.2f;
     }
 }

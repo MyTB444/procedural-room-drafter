@@ -14,7 +14,7 @@ namespace TRV
     /// <see cref="CharacterDirection"/> values for animation/aiming to consume.
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    public class TRVController : MonoBehaviour
+    public class TRVController : MonoBehaviour, IDamageable, IKnockbackable
     {
         [Header("References")]
         [Tooltip("The data asset with all tunable stats.")]
@@ -26,14 +26,24 @@ namespace TRV
         [Tooltip("Camera used to turn the cursor position into a world aim direction. Defaults to Camera.main.")]
         [SerializeField] private Camera aimCamera;
 
+        [Tooltip("Melee hitbox swung on attack. Auto-found in children if left empty.")]
+        [SerializeField] private AttackHitbox attackHitbox;
+
         private Rigidbody2D _body;
         private Vector2 _velocity;        // our own smoothed velocity
         private Cooldown _attackCooldown;
 
         // ── Dash state ──
-        private float _dashTimeLeft;      // > 0 while dashing
+        private float _dashWindupLeft;    // > 0 during the pre-dash windup (no i-frames yet)
+        private float _dashTimeLeft;      // > 0 while dashing (the burst — i-frames active)
         private Cooldown _dashCooldown;
         private Vector2 _dashDir;
+
+        // ── Knockback state ──
+        private float _knockbackTimeLeft; // > 0 while an incoming impulse overrides control
+
+        // ── Attack state ──
+        private float _attackSlowTimeLeft; // > 0 while the attack swing slows movement
 
         // ── Facing history (for forgiving diagonal release) ──
         private CharacterDirection _previousFacing = CharacterDirection.South;
@@ -47,13 +57,17 @@ namespace TRV
         public bool IsMoving { get; private set; }
         public bool IsDashing => _dashTimeLeft > 0f;
 
+        /// <summary>No damage or knockback lands while true. Granted by the dash — and lost the
+        /// instant an attack cancels the dash, so an attack-cancelled dodge ends invincibility.</summary>
+        public bool IsInvincible => IsDashing;
+
         /// <summary>8-way direction of the most recent attack, aimed at the cursor (independent of movement).</summary>
         public CharacterDirection AttackDirection { get; private set; } = CharacterDirection.South;
 
         public event Action<CharacterDirection> FacingChanged;
         public event Action<float> HealthChanged;   // passes new current health
-        public event Action DashStarted;
-        public event Action<CharacterDirection> Attacked; // passes the aimed attack direction
+        public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
+        public event Action<CharacterDirection> Attacked;    // passes the aimed attack direction
         public event Action Died;
 
         private void Awake()
@@ -67,6 +81,8 @@ namespace TRV
                 input = GetComponent<TRVInput>();
             if (aimCamera == null)
                 aimCamera = Camera.main;
+            if (attackHitbox == null)
+                attackHitbox = GetComponentInChildren<AttackHitbox>(true);
         }
 
         private void OnEnable()
@@ -105,6 +121,25 @@ namespace TRV
         {
             if (stats == null || input == null) return;
 
+            // -1) Knockback overrides everything: coast in the impulse direction, easing to a stop,
+            //     and ignore input until the timer runs out so the player can't instantly cancel it.
+            if (_knockbackTimeLeft > 0f)
+            {
+                _knockbackTimeLeft -= Time.fixedDeltaTime;
+                _velocity = Vector2.MoveTowards(_velocity, Vector2.zero, stats.Deceleration * Time.fixedDeltaTime);
+                _body.linearVelocity = _velocity;
+                return;
+            }
+
+            // -0.5) Dash windup: a short pause after pressing dash before the burst fires. Movement
+            //       stays normal during it (no i-frames yet); when it elapses the burst begins.
+            if (_dashWindupLeft > 0f)
+            {
+                _dashWindupLeft -= Time.fixedDeltaTime;
+                if (_dashWindupLeft <= 0f)
+                    BeginDashBurst();
+            }
+
             // 0) Dash overrides normal movement: drive a constant fast velocity in the
             //    locked dash direction until the timer runs out, then fall through to
             //    normal movement (decel takes over from the high dash speed smoothly).
@@ -133,9 +168,16 @@ namespace TRV
                     direction = direction.normalized;
             }
 
-            // 3) Smoothly ease current velocity toward the target.
-            Vector2 targetVelocity = direction * stats.MoveSpeed;
-            bool hasInput = targetVelocity.sqrMagnitude > 0.0001f;
+            // 3) Smoothly ease current velocity toward the target. Attacking briefly slows movement.
+            float moveSpeed = stats.MoveSpeed;
+            if (_attackSlowTimeLeft > 0f)
+            {
+                _attackSlowTimeLeft -= Time.fixedDeltaTime;
+                moveSpeed *= stats.AttackMoveMultiplier;
+            }
+
+            Vector2 targetVelocity = direction * moveSpeed;
+            bool hasInput = direction.sqrMagnitude > 0.0001f;
             float rate = hasInput ? stats.Acceleration : stats.Deceleration;
 
             _velocity = Vector2.MoveTowards(_velocity, targetVelocity, rate * Time.fixedDeltaTime);
@@ -179,20 +221,29 @@ namespace TRV
         // ─────────────────────────────────────────────────────────────
         private void HandleDash()
         {
-            if (!IsAlive || IsDashing || !_dashCooldown.IsReady) return;
+            if (!IsAlive || IsDashing || _dashWindupLeft > 0f || !_dashCooldown.IsReady
+                || _attackSlowTimeLeft > 0f) return;
 
-            // Dash toward current movement; if standing still, dash where we face.
+            // Lock in the dash direction and face it now; the burst (and i-frames) fire after a
+            // short windup. Dash toward current movement; if standing still, dash where we face.
             _dashDir = IsMoving && MoveDirection.sqrMagnitude > 0.0001f
                 ? MoveDirection
                 : CharacterDirectionUtil.ToVector(Facing);
-
-            _dashTimeLeft = stats.DashDuration;
-            _dashCooldown.Begin(stats.DashCooldown);
-
-            // Face the dash direction immediately.
             SetFacing(CharacterDirectionUtil.FromVector(_dashDir));
 
-            DashStarted?.Invoke();
+            if (stats.DashStartupDelay > 0f)
+                _dashWindupLeft = stats.DashStartupDelay;
+            else
+                BeginDashBurst();
+        }
+
+        /// <summary>Start the actual dash burst — drives velocity, arms i-frames, begins cooldown.</summary>
+        private void BeginDashBurst()
+        {
+            _dashWindupLeft = 0f;
+            _dashTimeLeft = stats.DashDuration;
+            _dashCooldown.Begin(stats.DashCooldown);
+            DashStarted?.Invoke(CharacterDirectionUtil.FromVector(_dashDir));
         }
 
         private void HandleAttack()
@@ -203,8 +254,17 @@ namespace TRV
             // Aim at the cursor, fully independent of movement direction.
             AttackDirection = CharacterDirectionUtil.FromVector(GetAimDirection());
 
-            // Drives the attack animation (TRVAnimator listens). Hook the real attack here too:
-            // spawn a hitbox along AttackDirection within stats.AttackRange, deal stats.Damage, etc.
+            // Attacking briefly slows movement and cancels any in-progress (or winding-up) dash.
+            _attackSlowTimeLeft = stats.AttackMoveSlowDuration;
+            _dashTimeLeft = 0f;
+            _dashWindupLeft = 0f;
+
+            // Swing the melee hitbox along the shown 8-way direction (matches the attack animation),
+            // dealing stats.Damage to whatever it overlaps.
+            if (attackHitbox != null)
+                attackHitbox.Strike(CharacterDirectionUtil.ToVector(AttackDirection), stats.Damage, gameObject);
+
+            // Drives the attack animation (TRVAnimator listens).
             Attacked?.Invoke(AttackDirection);
         }
 
@@ -234,14 +294,29 @@ namespace TRV
             Debug.Log($"{stats.CharacterName} interacts ({Facing}).", this);
         }
 
-        /// <summary>Apply damage. Fires HealthChanged, and Died when health reaches zero.</summary>
+        /// <summary><see cref="IDamageable"/> entry point — knockback (if any) is applied separately
+        /// by the attacker via <see cref="IKnockbackable"/>, so this only touches health.</summary>
+        public void TakeDamage(in DamageInfo info) => TakeDamage(info.Amount);
+
+        /// <summary>Apply damage. Fires HealthChanged, and Died when health reaches zero.
+        /// No-op while <see cref="IsInvincible"/> (dash i-frames).</summary>
         public void TakeDamage(float amount)
         {
-            if (!IsAlive || amount <= 0f) return;
+            if (!IsAlive || amount <= 0f || IsInvincible) return;
             CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
             HealthChanged?.Invoke(CurrentHealth);
             if (CurrentHealth == 0f)
                 Died?.Invoke();
+        }
+
+        /// <summary><see cref="IKnockbackable"/> — shove TRV along a direction; overrides movement
+        /// for <see cref="CharacterStats.KnockbackDuration"/>, then eases out. No-op while
+        /// <see cref="IsInvincible"/> (dashing), so a dodge phases through hits cleanly.</summary>
+        public void ApplyKnockback(Vector2 direction, float force)
+        {
+            if (!IsAlive || force <= 0f || direction.sqrMagnitude < 0.0001f || IsInvincible) return;
+            _velocity = direction.normalized * force;
+            _knockbackTimeLeft = stats.KnockbackDuration;
         }
 
         /// <summary>Restore health up to MaxHealth.</summary>
