@@ -23,6 +23,10 @@ MonoBehaviour:
   <WideCorridorChance>k__BackingField: 0.35
   <MediumCorridorChance>k__BackingField: 0.25
   <ExtraCorridorNodes>k__BackingField: 1
+  <HallMoatThickness>k__BackingField: 2
+  <HallMainRoomSize>k__BackingField: 6
+  <HallExtraRooms>k__BackingField: 3
+  <HallRoomSizeRange>k__BackingField: {x: 2, y: 6}
   <BuildingLeftTile>k__BackingField: {fileID: 11400000, guid: cb6f9f0d87e187a4a9f5a8d7a5cf4b48, type: 2}
   <BuildingMiddleTile>k__BackingField: {fileID: 11400000, guid: 089e2f9cc4bf60742b2478bc42b10067, type: 2}
   <BuildingRightTile>k__BackingField: {fileID: 11400000, guid: 390db4f8b4d79904e8628e114376c974, type: 2}
@@ -100,7 +104,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 043e2b74984b60240a1a576122807f39, type: 2}
   - {fileID: 11400000, guid: 9f036b63a1a7acd48ad5216e64ad1114, type: 2}
   - {fileID: 11400000, guid: bf18d7d7831d6a04faadbf1b07dc9120, type: 2}
+  <SouthWallTileVariants>k__BackingField: []
   <EastWallTile>k__BackingField: {fileID: 11400000, guid: e7adc27b0ff2d2f4cba092b4712aa719, type: 2}
   <WestWallTile>k__BackingField: {fileID: 11400000, guid: 6e6274f37d7f1bc48a1102d8fa19a049, type: 2}
   <NorthWestCornerTile>k__BackingField: {fileID: 11400000, guid: d270bc07043df7543bc5a19c9ec05cf3, type: 2}
   <NorthEastCornerTile>k__BackingField: {fileID: 11400000, guid: 75cd9e2ae9fb8c549a1d4ef19587be3a, type: 2}
+  <SouthWestCornerTile>k__BackingField: {fileID: 0}
+  <SouthEastCornerTile>k__BackingField: {fileID: 0}
