@@ -39,7 +39,28 @@ namespace TRV
             if (grid.Get(x - 1, y) == CellType.Building) return WallKind.East;
             if (grid.Get(x + 1, y) == CellType.Building) return WallKind.West;
 
-            return Classify(x, y, grid.Width, grid.Height, thickness);
+            var positional = Classify(x, y, grid.Width, grid.Height, thickness);
+            if (positional != WallKind.Fill) return positional;
+
+            // Interior wall (not on the room ring) — e.g. a Halls igroom wall. Face the adjacent
+            // floor, the same relationship the room ring has to its interior, so it reuses the same
+            // directional tiles: floor below → north wall, floor right → west wall, etc.
+            return ClassifyByAdjacentFloor(grid, x, y);
+        }
+
+        private static WallKind ClassifyByAdjacentFloor(RoomGrid grid, int x, int y)
+        {
+            if (grid.Get(x, y - 1) == CellType.Floor) return WallKind.North; // floor below → top wall
+            if (grid.Get(x, y + 1) == CellType.Floor) return WallKind.South; // floor above → bottom wall
+            if (grid.Get(x + 1, y) == CellType.Floor) return WallKind.West;  // floor right → left wall
+            if (grid.Get(x - 1, y) == CellType.Floor) return WallKind.East;  // floor left → right wall
+
+            // No orthogonal floor → corner: the floor sits diagonally inward.
+            if (grid.Get(x + 1, y - 1) == CellType.Floor) return WallKind.NorthWest; // floor SE
+            if (grid.Get(x - 1, y - 1) == CellType.Floor) return WallKind.NorthEast; // floor SW
+            if (grid.Get(x + 1, y + 1) == CellType.Floor) return WallKind.SouthWest; // floor NE
+            if (grid.Get(x - 1, y + 1) == CellType.Floor) return WallKind.SouthEast; // floor NW
+            return WallKind.Fill;
         }
 
         /// <summary>

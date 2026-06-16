@@ -17,7 +17,7 @@ namespace TRV
             _passes = new IRoomPass[]
             {
                 new BorderPass(),
-                config.Layout == BiomeLayout.Corridors ? new CorridorPass() : (IRoomPass)new CavePass(),
+                LayoutPass(config.Layout),
                 new DoorPass(),
                 new ConnectivityPass(),
                 new IslandPass(),       // after connectivity: all floor is connected, any hook-in works
@@ -28,6 +28,13 @@ namespace TRV
                 new FloorDecorPass(),   // last: respects patches pre-placed by IslandPass
             };
         }
+
+        /// <summary>The interior-shaping pass for a biome's layout (runs after BorderPass).</summary>
+        private static IRoomPass LayoutPass(BiomeLayout layout) => layout switch
+        {
+            BiomeLayout.Halls => new HallPass(),
+            _ => new CorridorPass(),
+        };
 
         public RoomGrid Generate(System.Random rng)
         {

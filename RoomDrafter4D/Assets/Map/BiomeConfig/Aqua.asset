@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cba3642b34386146a984a1f0364b9cd, type: 3}
   m_Name: Aqua
   m_EditorClassIdentifier: Assembly-CSharp::TRV.BiomeConfig
-  <Layout>k__BackingField: 1
+  <Layout>k__BackingField: 0
   <Width>k__BackingField: 25
   <Height>k__BackingField: 14
   <WallThickness>k__BackingField: 1
@@ -57,8 +57,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 3
-  <EnemySpawnSafeRadius>k__BackingField: 4
+  <EnemiesPerRoom>k__BackingField: 0
+  <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
   - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
   - {fileID: 8161980004430131537, guid: 1515b6e95fb9d10459e11abf13d71939, type: 3}
@@ -84,9 +84,6 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 378011ccf9146634d86132af56a924c5, type: 2}
     - {fileID: 11400000, guid: 16c5bdc068cc0e44f825775f5a21b3a5, type: 2}
   <FloorPatchCoverage>k__BackingField: 0.9
-  <FillPercent>k__BackingField: 0.45
-  <SmoothingIterations>k__BackingField: 4
-  <SolidThreshold>k__BackingField: 5
   <FloorTileVariants>k__BackingField:
   - {fileID: 11400000, guid: be5734828b4998146b369ddb38232659, type: 2}
   - {fileID: 11400000, guid: c195e3c647b06fc41a35cd9ea5cc4c83, type: 2}
@@ -98,6 +95,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2d4bbeb50fa219b458dbc2067f4e9b9b, type: 2}
   - {fileID: 11400000, guid: 101cf8310e285e047a3e96217bf61fae, type: 2}
   <DoorTile>k__BackingField: {fileID: 11400000, guid: 7174639161616fb48a1f7507292b6e69, type: 2}
+  <RotateSouthWalls>k__BackingField: 1
   <NorthWallTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 043e2b74984b60240a1a576122807f39, type: 2}
   - {fileID: 11400000, guid: 9f036b63a1a7acd48ad5216e64ad1114, type: 2}

@@ -220,11 +220,15 @@ namespace TRV
         }
 
         /// <summary>
-        /// Rotation for south-side wall cells that borrow a north tile. Only applies when the
-        /// borrowed slot actually has tiles — an empty slot paints nothing, so nothing to rotate.
+        /// Rotation for south-side wall cells that borrow a north tile — only when the biome has
+        /// <see cref="BiomeConfig.RotateSouthWalls"/> on (else the south tiles are assigned explicitly
+        /// and need no rotation), and the borrowed slot actually has tiles.
         /// </summary>
         private static bool TryGetWallRotation(WallKind kind, BiomeConfig config, out Matrix4x4 rotation)
         {
+            rotation = Matrix4x4.identity;
+            if (!config.RotateSouthWalls) return false;
+
             switch (kind)
             {
                 case WallKind.South when config.HasNorthWallTile:
@@ -237,7 +241,6 @@ namespace TRV
                     rotation = RotRight90;
                     return true;
                 default:
-                    rotation = Matrix4x4.identity;
                     return false;
             }
         }

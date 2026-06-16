@@ -60,7 +60,7 @@ namespace TRV
                 }
             if (bestDist == int.MaxValue) return; // a room with no floor at all
 
-            CorridorPass.CarveL(grid, hook, centre, PathWidth, t, rng);
+            CorridorCarver.CarveL(grid, hook, centre, PathWidth, t, rng);
 
             // The island: a 4×4 floor block centred on the spot (shifted whole at the wall margin).
             int ax = System.Math.Clamp(centre.x - IslandSize / 2, t, grid.Width - t - IslandSize);

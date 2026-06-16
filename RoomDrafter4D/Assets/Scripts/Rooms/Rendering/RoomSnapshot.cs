@@ -19,6 +19,7 @@ namespace TRV
         public LayerSnapshot Extras;
         public LayerSnapshot ExtrasBehind;
         public List<PatchPlacement> IslandDecor;
+        public BiomeConfig Biome; // which biome generated this room (decor indices map into its arrays)
     }
 
     /// <summary>One tilemap layer's tiles plus their per-cell transform matrices (parallel arrays).</summary>

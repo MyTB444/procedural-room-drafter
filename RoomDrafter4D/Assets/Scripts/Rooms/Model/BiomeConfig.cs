@@ -6,8 +6,8 @@ namespace TRV
     /// <summary>Which layout pass shapes a biome's rooms.</summary>
     public enum BiomeLayout
     {
-        Caves = 0,     // cellular-automata caverns (CavePass)
-        Corridors = 1, // open water crossed by a random connected walkway network (CorridorPass)
+        Corridors = 0, // open water crossed by a random connected walkway network (CorridorPass)
+        Halls = 1,     // one big walled inner room ("igroom") ringed by water (HallPass)
     }
 
     // FloorPatch / WaterDecorPatch (the authored tile groups referenced below) live in
@@ -21,9 +21,9 @@ namespace TRV
     public class BiomeConfig : ScriptableObject
     {
         [field: Header("Layout")]
-        [field: Tooltip("Caves = organic cellular-automata caverns. Corridors = open water crossed " +
-                        "by a random connected network of 2- or 4-wide walkways (Aqua).")]
-        [field: SerializeField] public BiomeLayout Layout { get; private set; } = BiomeLayout.Caves;
+        [field: Tooltip("Corridors = open water crossed by a random connected network of 2-/4-wide " +
+                        "walkways (Aqua). Halls = one big walled igroom ringed by water.")]
+        [field: SerializeField] public BiomeLayout Layout { get; private set; } = BiomeLayout.Corridors;
 
         [field: Header("Grid (cells)")]
         [field: Min(7)]
@@ -73,6 +73,22 @@ namespace TRV
                         "a corridor, so more = denser. 0 = just the doors linked up.")]
         [field: Min(0)]
         [field: SerializeField] public int ExtraCorridorNodes { get; private set; } = 1;
+
+        [field: Header("Hall layout")]
+        [field: Tooltip("Halls: minimum cells of water kept between igrooms and from the room edge.")]
+        [field: Min(1)]
+        [field: SerializeField] public int HallMoatThickness { get; private set; } = 2;
+
+        [field: Tooltip("Floor size of the one guaranteed main igroom (square).")]
+        [field: Min(2)]
+        [field: SerializeField] public int HallMainRoomSize { get; private set; } = 6;
+
+        [field: Tooltip("How many extra igrooms to attempt placing alongside the main one.")]
+        [field: Min(0)]
+        [field: SerializeField] public int HallExtraRooms { get; private set; } = 3;
+
+        [field: Tooltip("Floor size range (min..max, per dimension) for the extra igrooms.")]
+        [field: SerializeField] public Vector2Int HallRoomSizeRange { get; private set; } = new Vector2Int(2, 6);
 
         [field: Header("Tiles — Buildings (north-wall extensions)")]
         [field: Tooltip("Where ≥3 consecutive floor cells touch the north wall, that row becomes a " +
@@ -126,19 +142,6 @@ namespace TRV
         [field: Range(0f, 1f)]
         [field: SerializeField] public float FloorPatchCoverage { get; private set; } = 0.9f;
 
-        [field: Header("Cave (cellular automata)")]
-        [field: Tooltip("Chance an interior cell starts as solid water (before smoothing).")]
-        [field: Range(0f, 1f)]
-        [field: SerializeField] public float FillPercent { get; private set; } = 0.45f;
-
-        [field: Tooltip("Smoothing passes. More = rounder, larger caverns / water bodies.")]
-        [field: Min(0)]
-        [field: SerializeField] public int SmoothingIterations { get; private set; } = 4;
-
-        [field: Tooltip("A cell becomes solid water if it has at least this many solid neighbours (of 8).")]
-        [field: Range(1, 8)]
-        [field: SerializeField] public int SolidThreshold { get; private set; } = 5;
-
         [field: Header("Tiles")]
         [field: Tooltip("Floor pool: every floor cell picks one at random, all equal chance. " +
                         "One entry = a uniform floor.")]
@@ -150,38 +153,43 @@ namespace TRV
 
         [field: SerializeField] public TileBase DoorTile { get; private set; }
 
-        [field: Header("Tiles — Outer Walls")]
-        [field: Tooltip("North-wall pool: every north AND south wall cell picks one at random, all " +
-                        "equal chance. South is the pick rotated 180° — there is no south slot. " +
-                        "One entry = a uniform band.")]
+        [field: Header("Tiles — Walls")]
+        [field: Tooltip("ON (Aqua): derive the south/SW/SE wall tiles by rotating the north/NW/NE " +
+                        "ones — leave the South/SW/SE slots empty. OFF (Halls): assign every " +
+                        "direction explicitly, no rotation.")]
+        [field: SerializeField] public bool RotateSouthWalls { get; private set; } = true;
+
+        [field: Tooltip("North-wall pool: each north wall cell picks one at random (1 entry = uniform).")]
         [field: SerializeField] public TileBase[] NorthWallTileVariants { get; private set; }
+        [field: Tooltip("South-wall pool. Used only when Rotate South Walls is OFF (else rotated north).")]
+        [field: SerializeField] public TileBase[] SouthWallTileVariants { get; private set; }
         [field: SerializeField] public TileBase EastWallTile { get; private set; }
         [field: SerializeField] public TileBase WestWallTile { get; private set; }
-        [field: Tooltip("Top-left corner block. Also used for the SW corner, rotated 90° left.")]
         [field: SerializeField] public TileBase NorthWestCornerTile { get; private set; }
-        [field: Tooltip("Top-right corner block. Also used for the SE corner, rotated 90° right.")]
         [field: SerializeField] public TileBase NorthEastCornerTile { get; private set; }
+        [field: Tooltip("Used only when Rotate South Walls is OFF (else NW/NE rotated 90°).")]
+        [field: SerializeField] public TileBase SouthWestCornerTile { get; private set; }
+        [field: SerializeField] public TileBase SouthEastCornerTile { get; private set; }
 
-        /// <summary>True when the north/south bands have tiles to draw from.</summary>
+        /// <summary>True when the north band has tiles to draw from (gates the south 180° rotation).</summary>
         public bool HasNorthWallTile =>
             NorthWallTileVariants != null && NorthWallTileVariants.Length > 0;
 
         /// <summary>
-        /// Tile for a wall cell of the given kind (null = nothing painted). North/south cells draw
-        /// from the variant pool, equal chance via the cell hash. Only the north side has slots —
-        /// the painter derives the south side by rotation: South = North 180°, SouthWest =
-        /// NorthWest 90° left, SouthEast = NorthEast 90° right.
+        /// Tile for a wall cell of the given kind (null = nothing painted). When
+        /// <see cref="RotateSouthWalls"/> is on, the south side reuses the north/NW/NE tiles and the
+        /// painter rotates them; when off, it returns the explicit South/SW/SE slots (no rotation).
         /// </summary>
         public TileBase WallTileFor(WallKind kind, int cellHash) => kind switch
         {
             WallKind.North => PickVariant(NorthWallTileVariants, cellHash),
-            WallKind.South => PickVariant(NorthWallTileVariants, cellHash),
+            WallKind.South => PickVariant(RotateSouthWalls ? NorthWallTileVariants : SouthWallTileVariants, cellHash),
             WallKind.East => EastWallTile,
             WallKind.West => WestWallTile,
             WallKind.NorthWest => NorthWestCornerTile,
             WallKind.NorthEast => NorthEastCornerTile,
-            WallKind.SouthWest => NorthWestCornerTile,
-            WallKind.SouthEast => NorthEastCornerTile,
+            WallKind.SouthWest => RotateSouthWalls ? NorthWestCornerTile : SouthWestCornerTile,
+            WallKind.SouthEast => RotateSouthWalls ? NorthEastCornerTile : SouthEastCornerTile,
             _ => null,
         };
 
