@@ -27,6 +27,7 @@ MonoBehaviour:
   <HallMainRoomSize>k__BackingField: 6
   <HallExtraRooms>k__BackingField: 3
   <HallRoomSizeRange>k__BackingField: {x: 2, y: 6}
+  <HallFloorGrowth>k__BackingField: 2
   <BuildingLeftTile>k__BackingField: {fileID: 11400000, guid: cb6f9f0d87e187a4a9f5a8d7a5cf4b48, type: 2}
   <BuildingMiddleTile>k__BackingField: {fileID: 11400000, guid: 089e2f9cc4bf60742b2478bc42b10067, type: 2}
   <BuildingRightTile>k__BackingField: {fileID: 11400000, guid: 390db4f8b4d79904e8628e114376c974, type: 2}
@@ -61,7 +62,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 0
+  <EnemiesPerRoom>k__BackingField: 3
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
   - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}

@@ -41,6 +41,26 @@ namespace TRV
 
         private readonly CellType[,] _cells;
 
+        /// <summary>
+        /// Optional per-cell wall-tile kind, set by a pass that KNOWS the wall's orientation
+        /// (e.g. <see cref="HallPass"/> igroom borders), so the painter doesn't have to guess it from
+        /// neighbours — guessing breaks when a path runs alongside a wall (floor on two sides). Sparse:
+        /// only the overridden cells; everything else falls back to <see cref="WallKindUtil"/>.
+        /// </summary>
+        private Dictionary<(int x, int y), WallKind> _wallKinds;
+
+        public void SetWallKind(int x, int y, WallKind kind)
+        {
+            _wallKinds ??= new Dictionary<(int x, int y), WallKind>();
+            _wallKinds[(x, y)] = kind;
+        }
+
+        public bool TryGetWallKind(int x, int y, out WallKind kind)
+        {
+            kind = WallKind.Fill;
+            return _wallKinds != null && _wallKinds.TryGetValue((x, y), out kind);
+        }
+
         public RoomGrid(int width, int height)
         {
             Width = width;

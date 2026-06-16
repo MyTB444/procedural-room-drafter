@@ -73,10 +73,17 @@ namespace TRV
                     {
                         case CellType.Wall:
                         {
-                            var kind = WallKindUtil.Classify(grid, x, y, config.WallThickness);
+                            var kind = grid.TryGetWallKind(x, y, out var k)
+                                ? k
+                                : WallKindUtil.Classify(grid, x, y, config.WallThickness);
                             wallsTilemap.SetTile(pos, config.WallTileFor(kind, cellHash));
                             if (TryGetWallRotation(kind, config, out var rotation))
                                 wallsTilemap.SetTransformMatrix(pos, rotation);
+                            // South-facing walls sit on floor (the sprite's base shows ground, not void).
+                            // Only for biomes with explicit south tiles (Halls); when RotateSouthWalls
+                            // is on (Aqua) the south side is north tiles over the water backdrop instead.
+                            if (IsSouthFacing(kind) && !config.RotateSouthWalls)
+                                mapTilemap.SetTile(pos, config.FloorTileAt(cellHash));
                             if (extrasBehindTilemap) // water backdrop under the wall sprite
                                 extrasBehindTilemap.SetTile(pos, config.WaterTileAt(cellHash));
                             break;
@@ -224,6 +231,10 @@ namespace TRV
         /// <see cref="BiomeConfig.RotateSouthWalls"/> on (else the south tiles are assigned explicitly
         /// and need no rotation), and the borrowed slot actually has tiles.
         /// </summary>
+        /// <summary>The south edge + its two corners — these wall cells get floor painted beneath them.</summary>
+        private static bool IsSouthFacing(WallKind kind) =>
+            kind is WallKind.South or WallKind.SouthWest or WallKind.SouthEast;
+
         private static bool TryGetWallRotation(WallKind kind, BiomeConfig config, out Matrix4x4 rotation)
         {
             rotation = Matrix4x4.identity;

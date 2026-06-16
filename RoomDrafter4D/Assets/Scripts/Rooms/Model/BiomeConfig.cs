@@ -87,8 +87,14 @@ namespace TRV
         [field: Min(0)]
         [field: SerializeField] public int HallExtraRooms { get; private set; } = 3;
 
-        [field: Tooltip("Floor size range (min..max, per dimension) for the extra igrooms.")]
-        [field: SerializeField] public Vector2Int HallRoomSizeRange { get; private set; } = new Vector2Int(2, 6);
+        [field: Tooltip("Floor size range (min..max, per dimension) for the extra igrooms. Clamped to " +
+                        "a minimum of 4 so a 2-wide doorway + flanking wall fits each side.")]
+        [field: SerializeField] public Vector2Int HallRoomSizeRange { get; private set; } = new Vector2Int(4, 6);
+
+        [field: Tooltip("How many cells to grow the corridors/landings outward into the water after " +
+                        "carving — bigger = fatter halls and much less water. 0 = keep thin paths.")]
+        [field: Min(0)]
+        [field: SerializeField] public int HallFloorGrowth { get; private set; } = 2;
 
         [field: Header("Tiles — Buildings (north-wall extensions)")]
         [field: Tooltip("Where ≥3 consecutive floor cells touch the north wall, that row becomes a " +

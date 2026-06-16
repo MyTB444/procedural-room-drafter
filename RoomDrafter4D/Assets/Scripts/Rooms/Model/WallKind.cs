@@ -1,9 +1,9 @@
 namespace TRV
 {
     /// <summary>
-    /// Where a Wall cell sits in the outer wall ring — drives which wall tile the painter stamps.
-    /// South is intentionally absent as a tile slot (it reuses the North tile rotated 180°),
-    /// but it still exists here so the painter knows when to apply that rotation.
+    /// Which wall tile the painter stamps for a Wall cell. Used both for the outer ring and for
+    /// interior walls (Halls igrooms). The biome's <see cref="BiomeConfig.RotateSouthWalls"/> decides
+    /// whether South/SW/SE get their own tiles or reuse the north ones rotated.
     /// </summary>
     public enum WallKind
     {
