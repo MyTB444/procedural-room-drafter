@@ -30,6 +30,11 @@ namespace TRV
         [SerializeField] private EnemyPool enemyPool;
 
         [Header("Start")]
+        [Tooltip("Roll a fresh world seed every session so rooms differ run-to-run. Turn OFF to keep " +
+                 "the fixed 'World Seed' below (reproducible rooms for debugging). Seeds are never " +
+                 "saved across sessions either way — within a session it stays fixed so revisited " +
+                 "rooms regenerate identically.")]
+        [SerializeField] private bool randomizeWorldSeed = true;
         [SerializeField] private int worldSeed = 12345;
         [SerializeField] private Vector2Int startCoord = Vector2Int.zero;
 
@@ -85,6 +90,12 @@ namespace TRV
                 var found = FindFirstObjectByType<TRVController>();
                 if (found != null) player = found.transform;
             }
+
+            // Roll a session-unique world seed so neighbour rooms aren't identical every run. It's held
+            // only in memory (never persisted), and fixed for the rest of this session so a room you
+            // walk back into regenerates the same as when you left it.
+            if (randomizeWorldSeed)
+                worldSeed = System.Guid.NewGuid().GetHashCode();
 
             // Default biome for the start room + initial selection.
             _nextBiome = (biomes != null && biomes.Length > 0) ? biomes[0] : null;

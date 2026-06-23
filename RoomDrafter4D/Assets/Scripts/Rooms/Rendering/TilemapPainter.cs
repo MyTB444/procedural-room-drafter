@@ -231,9 +231,10 @@ namespace TRV
         /// <see cref="BiomeConfig.RotateSouthWalls"/> on (else the south tiles are assigned explicitly
         /// and need no rotation), and the borrowed slot actually has tiles.
         /// </summary>
-        /// <summary>The south edge + its two corners — these wall cells get floor painted beneath them.</summary>
-        private static bool IsSouthFacing(WallKind kind) =>
-            kind is WallKind.South or WallKind.SouthWest or WallKind.SouthEast;
+        /// <summary>The straight south edge gets floor painted beneath it (so the sprite's base shows
+        /// ground). NOT the SW/SE corners — under an igroom those corner tiles sit over water and a
+        /// floor patch beneath them just pokes out.</summary>
+        private static bool IsSouthFacing(WallKind kind) => kind == WallKind.South;
 
         private static bool TryGetWallRotation(WallKind kind, BiomeConfig config, out Matrix4x4 rotation)
         {

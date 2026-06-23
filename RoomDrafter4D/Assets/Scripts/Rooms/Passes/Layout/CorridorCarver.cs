@@ -41,90 +41,119 @@ namespace TRV
         }
 
         /// <summary>
-        /// Connect a set of points into ONE network while ROUTING AROUND walls — each new node is
-        /// linked to its nearest already-connected node by a BFS path that only travels Water/Floor
-        /// (never Wall). Used by <see cref="HallPass"/> so the path threads the water between igrooms
-        /// instead of plowing through their walls (which would leave them open). Carves width 1.
+        /// Connect a set of points into ONE network while ROUTING AROUND walls, carving corridors
+        /// <paramref name="width"/> tiles wide. Each node is linked to the rest of the network by a
+        /// BFS that travels only Water (or cells already carved into the network) — never Wall and
+        /// never an igroom's interior Floor — so the corridor threads the water BETWEEN igrooms and
+        /// merges into earlier corridors, instead of plowing through their walls or cutting through a
+        /// room. Used by <see cref="HallPass"/>. Connectivity is guaranteed as long as every node
+        /// sits in the room's single open-water region (the caller keeps igroom footprints inset from
+        /// the wall margin so each doorway approach does).
         /// </summary>
         public static void ConnectThroughWater(RoomGrid grid, IReadOnlyList<(int x, int y)> nodes,
-                                               int margin, Random rng)
+                                               int margin, Random rng, int width = 1)
         {
             if (nodes == null || nodes.Count < 2) return;
 
             int[] order = rng.ShuffledIndices(nodes.Count);
-            var connected = new List<(int x, int y)> { nodes[order[0]] };
+            var network = new HashSet<(int x, int y)>();
+            CarveWide(grid, nodes[order[0]], width, margin, network); // seed the network
             for (int i = 1; i < order.Length; i++)
-            {
-                var from = nodes[order[i]];
-                var to = connected[0];
-                int best = int.MaxValue;
-                foreach (var c in connected)
-                {
-                    int dist = Math.Abs(c.x - from.x) + Math.Abs(c.y - from.y);
-                    if (dist < best) { best = dist; to = c; }
-                }
-                CarveWaterPath(grid, from, to, margin);
-                connected.Add(from);
-            }
+                CarveToNetwork(grid, nodes[order[i]], network, margin, width, rng);
         }
 
         /// <summary>
-        /// Grow the floor outward into the water by <paramref name="iterations"/> cells: each pass
-        /// turns every Water cell touching a Floor cell into Floor. Walls block it and enclosed floor
-        /// (e.g. a Halls igroom interior, ringed by its own walls) has no water to spread into — so
-        /// this only fattens the open corridors/landings while shrinking the water. Stays inside the
-        /// <paramref name="margin"/> ring so the room keeps its water boundary.
+        /// BFS from <paramref name="from"/> over Water (and cells already in the network) until it
+        /// reaches the network, then carve that path <paramref name="width"/> wide. The network is the
+        /// set of corridor cells carved so far; igroom interior Floor is excluded so corridors never
+        /// route through a room. No-op if the node is somehow walled off from the network.
         /// </summary>
-        public static void GrowFloorIntoWater(RoomGrid grid, int margin, int iterations)
+        private static void CarveToNetwork(RoomGrid grid, (int x, int y) from, HashSet<(int x, int y)> network,
+                                           int margin, int width, Random rng)
         {
-            var toFloor = new List<(int x, int y)>();
-            for (int i = 0; i < iterations; i++)
-            {
-                toFloor.Clear();
-                for (int x = margin; x < grid.Width - margin; x++)
-                    for (int y = margin; y < grid.Height - margin; y++)
-                    {
-                        if (grid[x, y] != CellType.Water) continue;
-                        if (grid.Get(x + 1, y) == CellType.Floor || grid.Get(x - 1, y) == CellType.Floor ||
-                            grid.Get(x, y + 1) == CellType.Floor || grid.Get(x, y - 1) == CellType.Floor)
-                            toFloor.Add((x, y));
-                    }
-                foreach (var (x, y) in toFloor)
-                    grid[x, y] = CellType.Floor;
-            }
-        }
+            if (network.Contains(from)) return;
 
-        private static readonly (int dx, int dy)[] FourWay = { (1, 0), (-1, 0), (0, 1), (0, -1) };
-
-        /// <summary>BFS the shortest Water/Floor path from <paramref name="from"/> to
-        /// <paramref name="to"/> (walls block it) and carve it to Floor. No-op if walled off.</summary>
-        private static void CarveWaterPath(RoomGrid grid, (int x, int y) from, (int x, int y) to, int margin)
-        {
             var came = new Dictionary<(int x, int y), (int x, int y)> { [from] = from };
             var queue = new Queue<(int x, int y)>();
             queue.Enqueue(from);
+            (int x, int y) hit = from;
             bool found = false;
 
-            while (queue.Count > 0)
+            while (queue.Count > 0 && !found)
             {
                 var c = queue.Dequeue();
-                if (c == to) { found = true; break; }
                 foreach (var (dx, dy) in FourWay)
                 {
                     var n = (x: c.x + dx, y: c.y + dy);
                     if (came.ContainsKey(n) || !grid.IsInterior(n.x, n.y, margin)) continue;
-                    var cell = grid[n.x, n.y];
-                    if (cell != CellType.Water && cell != CellType.Floor && n != to) continue;
+                    if (network.Contains(n)) { came[n] = c; hit = n; found = true; break; }
+                    if (grid[n.x, n.y] != CellType.Water) continue; // walls + room interiors block
                     came[n] = c;
                     queue.Enqueue(n);
                 }
             }
-            if (!found) return;
+            if (!found) return; // node is walled off from the network — leave it (shouldn't happen)
 
-            for (var c = to; c != from; c = came[c])
-                grid[c.x, c.y] = CellType.Floor;
-            grid[from.x, from.y] = CellType.Floor;
+            // Carve every cell from `from` up to (but not including) the network cell it joined.
+            for (var c = came[hit]; ; c = came[c])
+            {
+                CarveWide(grid, c, width, margin, network);
+                if (c == from) break;
+            }
         }
+
+        /// <summary>
+        /// Widen the corridor to <paramref name="width"/> tiles AT <paramref name="cell"/> by carving a
+        /// width×width Floor block that CONTAINS the cell — choosing the placement (the cell may sit at
+        /// any position in the block) that is fully interior and wall-free, so the block widens toward
+        /// OPEN water instead of always +x/+y. That keeps the corridor a full 2 tiles even where the
+        /// path hugs an igroom wall (a fixed +x/+y block would clip into the wall and pinch to 1). Only
+        /// Water cells in the block are turned to Floor — Walls/Doors/existing Floor are left as-is, so
+        /// it never breaches a room or merges into its interior. Falls back to carving just the cell in
+        /// a genuine 1-wide squeeze (e.g. a 1-cell moat between two igrooms). Carved cells join
+        /// <paramref name="network"/> so later corridors can fuse with this one.
+        /// </summary>
+        private static void CarveWide(RoomGrid grid, (int x, int y) cell, int width, int margin,
+                                      HashSet<(int x, int y)> network)
+        {
+            // Prefer the +x/+y placement (ox=oy=0) for a uniform look in the open, then fall back to
+            // placements that extend the other way so the block can dodge an adjacent wall.
+            for (int ox = 0; ox > -width; ox--)
+                for (int oy = 0; oy > -width; oy--)
+                {
+                    int ax = cell.x + ox, ay = cell.y + oy;
+                    if (!BlockClear(grid, ax, ay, width, margin)) continue;
+
+                    for (int x = ax; x < ax + width; x++)
+                        for (int y = ay; y < ay + width; y++)
+                        {
+                            if (grid[x, y] == CellType.Water) grid[x, y] = CellType.Floor;
+                            network.Add((x, y));
+                        }
+                    return;
+                }
+
+            // No wall-free block fits here — carve the single cell so the path stays connected.
+            if (grid.IsInterior(cell.x, cell.y, margin) && grid[cell.x, cell.y] == CellType.Water)
+                grid[cell.x, cell.y] = CellType.Floor;
+            network.Add(cell);
+        }
+
+        /// <summary>True if every cell of the width×width block at (ax, ay) is interior and not a
+        /// Wall/Door — i.e. the block can become a solid floor patch without breaching anything.</summary>
+        private static bool BlockClear(RoomGrid grid, int ax, int ay, int width, int margin)
+        {
+            for (int x = ax; x < ax + width; x++)
+                for (int y = ay; y < ay + width; y++)
+                {
+                    if (!grid.IsInterior(x, y, margin)) return false;
+                    var cell = grid[x, y];
+                    if (cell == CellType.Wall || cell == CellType.Door) return false;
+                }
+            return true;
+        }
+
+        private static readonly (int dx, int dy)[] FourWay = { (1, 0), (-1, 0), (0, 1), (0, -1) };
 
         /// <summary>L-shaped corridor between two points; the elbow direction is random.</summary>
         public static void CarveL(RoomGrid grid, (int x, int y) a, (int x, int y) b,

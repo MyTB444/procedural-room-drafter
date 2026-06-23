@@ -4,25 +4,34 @@ namespace TRV
 {
     /// <summary>
     /// Halls layout: the whole room is water (so the perimeter reads as water, not walls), holding
-    /// several walled "igrooms" (rooms-within-the-room) — one guaranteed main
-    /// (<see cref="BiomeConfig.HallMainRoomSize"/> floor, square) plus up to
-    /// <see cref="BiomeConfig.HallExtraRooms"/> extras of random size, packed
-    /// <see cref="BiomeConfig.HallMoatThickness"/> cells apart. Each igroom is a Floor rectangle with
-    /// a FULL 1-cell Wall border (it stays completely closed except a single 2-wide doorway breached
-    /// on a random side — floor side min 4 leaves room for it + flanking wall). Every border cell's
-    /// exact <see cref="WallKind"/> is recorded on the grid so the painter stamps the right
-    /// directional/corner tile — no neighbour-guessing. The connecting path is routed THROUGH THE
-    /// WATER around the igrooms (<see cref="CorridorCarver.ConnectThroughWater"/>), so it never
-    /// breaches a wall except at the doorways. Finally the floor is GROWN into the surrounding water
-    /// (<see cref="BiomeConfig.HallFloorGrowth"/>) to fatten the corridors and drain the room — igrooms
-    /// are walled so only the paths spread, leaving big halls of floor and little water.
+    /// several walled "igrooms" (rooms-within-the-room) — one big MAIN igroom plus a handful of
+    /// SMALLER extras. Each igroom is a Floor rectangle with a FULL 1-cell Wall border (closed except
+    /// a single 2-wide doorway on a water-facing side); every border cell's exact <see cref="WallKind"/>
+    /// is recorded on the grid so the painter stamps the right tile (no neighbour-guessing).
+    ///
+    /// Placement is a DETERMINISTIC first-fit pack (not random — random fragments the small interior
+    /// so only 1–2 rooms fit). To always reach <see cref="DesiredMinRooms"/> the main starts at its
+    /// configured size and is SHRUNK only as far as needed: a floor-6 main (8×8 footprint) is so big
+    /// it leaves room for one extra, so when the door layout is tight the main steps down (worst case
+    /// to the same size as the extras) until at least 3 igrooms fit. Footprints touch the wall margin
+    /// (no inset) and door reserves are kept minimal — both reclaim the width the third room needs;
+    /// connectivity is preserved instead by opening each doorway onto interior open water.
+    ///
+    /// A single 2-wide corridor network (<see cref="CorridorCarver.ConnectThroughWater"/>) threads the
+    /// water AROUND the igrooms, joining every igroom doorway AND every room door landing — guaranteed
+    /// connected, so no igroom is stranded (which would let <see cref="ConnectivityPass"/> flood its
+    /// floor away).
     /// </summary>
     public class HallPass : IRoomPass
     {
-        private const int PlacementAttempts = 40;
-
         /// <summary>Smallest igroom floor side: a 2-wide doorway + a flanking wall cell each side.</summary>
         private const int MinFloorSide = 4;
+
+        /// <summary>Extra igroom floor WIDTH (footprint 6) — kept small so three rooms fit the width.</summary>
+        private const int ExtraFloorWidth = MinFloorSide;
+
+        private const int DesiredMinRooms = 3;
+        private const int MaxRooms = 5;
 
         private static readonly Cardinal[] FourDirections =
             { Cardinal.North, Cardinal.East, Cardinal.South, Cardinal.West };
@@ -31,25 +40,22 @@ namespace TRV
         {
             int t = config.WallThickness;
             int gap = System.Math.Max(1, config.HallMoatThickness);
+            int corridorWidth = System.Math.Max(2, config.CorridorWidth); // the 2-tile halls
 
             // Everything starts as water — including the perimeter (a solid water boundary).
             grid.Fill(CellType.Water);
 
-            var occupied = new bool[grid.Width, grid.Height];
+            // Plan room footprints (on a scratch occupancy map) before carving anything.
+            var rooms = PlanRooms(grid, config, rng, t, gap);
+
+            // Carve every igroom: floor interior + recorded wall border.
+            foreach (var r in rooms)
+                CarveRoom(grid, r.x, r.y, r.fw, r.fh);
+
+            // Open each igroom's doorway onto open water and collect the network nodes.
             var nodes = new List<(int x, int y)>();
-
-            // Keep the door approaches clear so no igroom lands on a door and blocks it.
-            ReserveDoorApproaches(grid, occupied, config, t, gap);
-
-            // The guaranteed main igroom, then the random extras (placed wherever they still fit).
-            int main = System.Math.Max(2, config.HallMainRoomSize);
-            TryPlaceRoom(grid, occupied, nodes, main, main, t, gap, rng);
-
-            // Min floor side 4: a 2-wide doorway plus a wall cell flanking each side needs it.
-            int min = System.Math.Max(MinFloorSide, config.HallRoomSizeRange.x);
-            int max = System.Math.Max(min, config.HallRoomSizeRange.y);
-            for (int i = 0; i < config.HallExtraRooms; i++)
-                TryPlaceRoom(grid, occupied, nodes, rng.Next(min, max + 1), rng.Next(min, max + 1), t, gap, rng);
+            foreach (var r in rooms)
+                nodes.Add(OpenDoorway(grid, r.x, r.y, r.fw, r.fh, t, rng));
 
             // The room's own doors join the network so the player can walk door → igroom → door.
             foreach (var d in FourDirections)
@@ -58,37 +64,74 @@ namespace TRV
                 nodes.Add((landing.x, landing.y));
             }
 
-            // The path that links every doorway + door landing, threading the water around igrooms.
-            CorridorCarver.ConnectThroughWater(grid, nodes, t, rng);
-
-            // Fatten the paths and drain the room: grow the floor into the surrounding water (igrooms
-            // are walled, so only the corridors/landings spread — leaving big halls, little water).
-            CorridorCarver.GrowFloorIntoWater(grid, t, config.HallFloorGrowth);
+            // One 2-wide corridor network linking every doorway + door landing, threading the water
+            // around the igrooms. Guaranteed-connected, so ConnectivityPass finds nothing to prune.
+            CorridorCarver.ConnectThroughWater(grid, nodes, t, rng, corridorWidth);
         }
 
         /// <summary>
-        /// Try to drop an igroom of the given FLOOR size somewhere it fits (footprint = floor + a
-        /// 1-cell wall border, kept <paramref name="gap"/> cells from other igrooms and the edge).
-        /// On success carves it, opens a doorway, and adds the doorway's outside cell to
-        /// <paramref name="nodes"/>.
+        /// Pack a big main igroom + smaller extras with first-fit, shrinking the main until at least
+        /// <see cref="DesiredMinRooms"/> fit (it stays as big as the door layout allows). Returns the
+        /// chosen footprints; the grid is untouched (planning runs on a scratch occupancy map).
         /// </summary>
-        private static void TryPlaceRoom(RoomGrid grid, bool[,] occupied, List<(int x, int y)> nodes,
-                                         int floorW, int floorH, int t, int gap, System.Random rng)
+        private static List<(int x, int y, int fw, int fh)> PlanRooms(
+            RoomGrid grid, BiomeConfig config, System.Random rng, int t, int gap)
         {
-            int fw = floorW + 2, fh = floorH + 2; // footprint (walls included)
-            if (fw > grid.Width - 2 * t || fh > grid.Height - 2 * t) return;
+            int maxMain = System.Math.Max(MinFloorSide, config.HallMainRoomSize);
+            var best = new List<(int x, int y, int fw, int fh)>();
 
-            for (int attempt = 0; attempt < PlacementAttempts; attempt++)
+            for (int mainFloor = maxMain; mainFloor >= MinFloorSide; mainFloor--)
             {
-                int x0 = rng.Next(t, grid.Width - t - fw + 1);
-                int y0 = rng.Next(t, grid.Height - t - fh + 1);
-                if (!AreaClear(occupied, x0 - gap, y0 - gap, fw + 2 * gap, fh + 2 * gap)) continue;
+                var occupied = new bool[grid.Width, grid.Height];
+                ReserveDoorApproaches(grid, occupied, config, t);
+                var rooms = new List<(int x, int y, int fw, int fh)>();
 
-                Mark(occupied, x0, y0, fw, fh);
-                CarveRoom(grid, x0, y0, fw, fh);
-                nodes.Add(OpenDoorway(grid, x0, y0, fw, fh, rng));
-                return;
+                // The big main first (square), so the pack reserves its space up front.
+                if (TryFindSpot(occupied, grid, mainFloor + 2, mainFloor + 2, t, gap, out var ms))
+                    rooms.Add((ms.x, ms.y, mainFloor + 2, mainFloor + 2));
+
+                // Then the smaller extras: fixed-width footprint so several fit across, with a little
+                // height variety (floor 4 or 5).
+                while (rooms.Count < MaxRooms)
+                {
+                    int fw = ExtraFloorWidth + 2;
+                    int fh = ExtraFloorWidth + 2 + rng.Next(0, 2); // footprint 6 or 7 tall
+                    if (!TryFindSpot(occupied, grid, fw, fh, t, gap, out var es))
+                    {
+                        // The taller pick may not fit where the shorter one would — retry at min height.
+                        if (fh == ExtraFloorWidth + 2 ||
+                            !TryFindSpot(occupied, grid, fw, ExtraFloorWidth + 2, t, gap, out es))
+                            break;
+                        fh = ExtraFloorWidth + 2;
+                    }
+                    rooms.Add((es.x, es.y, fw, fh));
+                }
+
+                if (rooms.Count >= DesiredMinRooms) return rooms;
+                if (rooms.Count > best.Count) best = rooms;
             }
+            return best; // tightest possible — fewer than the target only if the room genuinely can't hold them
+        }
+
+        /// <summary>First-fit search for a clear footprint (+ <paramref name="gap"/> moat), packing
+        /// toward the bottom-left. Marks the footprint on success. Footprints may touch the wall margin
+        /// (no inset) — the doorway picks a water-facing side, so a margin-hugging room still connects.</summary>
+        private static bool TryFindSpot(bool[,] occupied, RoomGrid grid, int fw, int fh, int t, int gap,
+                                        out (int x, int y) spot)
+        {
+            spot = default;
+            int hiX = grid.Width - t - fw, hiY = grid.Height - t - fh;
+            if (hiX < t || hiY < t) return false;
+
+            for (int x0 = t; x0 <= hiX; x0++)
+                for (int y0 = t; y0 <= hiY; y0++)
+                    if (AreaClear(occupied, x0 - gap, y0 - gap, fw + 2 * gap, fh + 2 * gap))
+                    {
+                        Mark(occupied, x0, y0, fw, fh);
+                        spot = (x0, y0);
+                        return true;
+                    }
+            return false;
         }
 
         /// <summary>Carve the floor interior + full wall border, recording each border cell's exact
@@ -119,45 +162,48 @@ namespace TRV
             return WallKind.East;
         }
 
-        /// <summary>Breach a 2-wide opening in one random wall side (a wall cell still flanks each
-        /// side of it) and return the cell just OUTSIDE it — the network node the water path connects
-        /// to. The floor min side of 4 guarantees room for the 2 cells + flanks.</summary>
-        private static (int x, int y) OpenDoorway(RoomGrid grid, int x0, int y0, int fw, int fh, System.Random rng)
+        /// <summary>
+        /// Breach a 2-wide opening in one WATER-FACING wall side (a wall cell still flanks each side),
+        /// trying the four sides in random order so the result varies. Returns the cell just OUTSIDE
+        /// the opening — the lower-left of the 2-wide approach, so a width-2 corridor lines up flush.
+        /// Picking a side whose approach is interior open water is what keeps every igroom connectable
+        /// even when it hugs the wall margin. Falls back to the first side if none face open water.
+        /// </summary>
+        private static (int x, int y) OpenDoorway(RoomGrid grid, int x0, int y0, int fw, int fh,
+                                                  int margin, System.Random rng)
         {
             int x1 = x0 + fw - 1, y1 = y0 + fh - 1;
-            switch (rng.Next(4))
+
+            // Roll a door position per side, then prefer a side that opens onto interior water.
+            int nx = rng.Next(x0 + 1, x1 - 1);          // North/South opening start (columns nx, nx+1)
+            int ey = rng.Next(y0 + 1, y1 - 1);          // East/West opening start (rows ey, ey+1)
+            var sides = new[]
             {
-                case 0: // North
-                {
-                    int x = rng.Next(x0 + 1, x1 - 1);
-                    grid[x, y1] = CellType.Floor; grid[x + 1, y1] = CellType.Floor;
-                    return (x, y1 + 1);
-                }
-                case 1: // South
-                {
-                    int x = rng.Next(x0 + 1, x1 - 1);
-                    grid[x, y0] = CellType.Floor; grid[x + 1, y0] = CellType.Floor;
-                    return (x, y0 - 1);
-                }
-                case 2: // East
-                {
-                    int y = rng.Next(y0 + 1, y1 - 1);
-                    grid[x1, y] = CellType.Floor; grid[x1, y + 1] = CellType.Floor;
-                    return (x1 + 1, y);
-                }
-                default: // West
-                {
-                    int y = rng.Next(y0 + 1, y1 - 1);
-                    grid[x0, y] = CellType.Floor; grid[x0, y + 1] = CellType.Floor;
-                    return (x0 - 1, y);
-                }
+                (a: (nx, y1 + 1), w1: (nx, y1), w2: (nx + 1, y1)),     // North
+                (a: (nx, y0 - 1), w1: (nx, y0), w2: (nx + 1, y0)),     // South
+                (a: (x1 + 1, ey), w1: (x1, ey), w2: (x1, ey + 1)),     // East
+                (a: (x0 - 1, ey), w1: (x0, ey), w2: (x0, ey + 1)),     // West
+            };
+
+            int[] order = rng.ShuffledIndices(sides.Length);
+            int chosen = order[0];
+            foreach (int i in order)
+            {
+                var (ax, ay) = sides[i].a;
+                if (grid.IsInterior(ax, ay, margin) && grid[ax, ay] == CellType.Water) { chosen = i; break; }
             }
+
+            var s = sides[chosen];
+            grid[s.w1.Item1, s.w1.Item2] = CellType.Floor;
+            grid[s.w2.Item1, s.w2.Item2] = CellType.Floor;
+            return s.a;
         }
 
-        /// <summary>Block out the band just inside each door so igrooms can't sit on a door's landing.</summary>
-        private static void ReserveDoorApproaches(RoomGrid grid, bool[,] occupied, BiomeConfig config, int t, int gap)
+        /// <summary>Keep each door's landing clear so an igroom can't sit on a door and block it.
+        /// Minimal depth (just the landing) so the pack keeps as much width as possible.</summary>
+        private static void ReserveDoorApproaches(RoomGrid grid, bool[,] occupied, BiomeConfig config, int t)
         {
-            int reserve = config.LandingDepth + gap;
+            int reserve = config.LandingDepth;
             int dw = config.DoorWidth;
             int n = grid.DoorStarts[(int)Cardinal.North];
             int s = grid.DoorStarts[(int)Cardinal.South];
