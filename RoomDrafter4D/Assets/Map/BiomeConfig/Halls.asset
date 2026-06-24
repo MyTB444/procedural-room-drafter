@@ -45,9 +45,33 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f92e89a865cca3c40a3542fb5b64ba0e, type: 2}
   - {fileID: 11400000, guid: 0f1518b8d3401b2488943ed3452d9a09, type: 2}
   - {fileID: 11400000, guid: f14f8265e7293ef44b4cacafe15936e8, type: 2}
+  <RoomFloorTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 6d48163ca0c398344916e75bb6ff071e, type: 2}
+  - {fileID: 11400000, guid: c1bf9b1a85ccef245b676439f6333cb7, type: 2}
+  - {fileID: 11400000, guid: 7a692f4f18873804f8c20fa144ba6b61, type: 2}
+  - {fileID: 11400000, guid: 44be99da999997946b8b8e57881c4350, type: 2}
   <WaterTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 2bf2b9006978ac343b220d1b338d9363, type: 2}
+  <NorthWaterTile>k__BackingField: {fileID: 11400000, guid: 8c7175b094e9bb64db932b9ceeb20947, type: 2}
   <DoorTile>k__BackingField: {fileID: 11400000, guid: 75d2d3a941a4d284781147a9ce880f9a, type: 2}
+  <LeftRoomDoorTile>k__BackingField: {fileID: 11400000, guid: 1e9d155bfc893834c93145bb165fbcae, type: 2}
+  <RightRoomDoorTile>k__BackingField: {fileID: 11400000, guid: 47058316ab1a6ce49ae3122d750f02f1, type: 2}
+  <LeftLeadingTile>k__BackingField: {fileID: 11400000, guid: aa2507ac82d833d4c848742187ba6d4a, type: 2}
+  <RightLeadingTile>k__BackingField: {fileID: 11400000, guid: a8fff6690530a544880d87ec26c3b187, type: 2}
+  <NorthDoorLeftWallTile>k__BackingField: {fileID: 11400000, guid: d9e20a382e0aa2e459e68a1d65ca0ac7, type: 2}
+  <NorthDoorRightWallTile>k__BackingField: {fileID: 11400000, guid: 8dee4c1c072ffb04dbfd5a827d3339ad, type: 2}
+  <LeftStairTile>k__BackingField: {fileID: 11400000, guid: 464b5ec5140dc1143a9628eae3456c95, type: 2}
+  <RightStairTile>k__BackingField: {fileID: 11400000, guid: c04f4148ebf41764fac9c04017e822a8, type: 2}
+  <LeftDoorTile>k__BackingField: {fileID: 11400000, guid: 284f1b9e6a338564f90eca097b39cb31, type: 2}
+  <RightDoorTile>k__BackingField: {fileID: 11400000, guid: c11efebe2a700144e858c1a03d70394a, type: 2}
+  <NorthBehindTile>k__BackingField: {fileID: 11400000, guid: 8c7175b094e9bb64db932b9ceeb20947, type: 2}
+  <Transition1Tile>k__BackingField: {fileID: 11400000, guid: 77cc71402d2358744a27805e5735b4d9, type: 2}
+  <Transition2Tile>k__BackingField: {fileID: 11400000, guid: caa87212785f7af4d82c12d2f0acffa2, type: 2}
+  <BlankBehindTile>k__BackingField: {fileID: 11400000, guid: 2bf2b9006978ac343b220d1b338d9363, type: 2}
+  <NorthBehindLeftEndTile>k__BackingField: {fileID: 11400000, guid: 8dee4c1c072ffb04dbfd5a827d3339ad, type: 2}
+  <NorthBehindRightEndTile>k__BackingField: {fileID: 11400000, guid: d9e20a382e0aa2e459e68a1d65ca0ac7, type: 2}
+  <Transition1LeftEndTile>k__BackingField: {fileID: 11400000, guid: 02f0700d3bddcb546b86845840f3da8c, type: 2}
+  <Transition1RightEndTile>k__BackingField: {fileID: 11400000, guid: b2e5c407642a00a4b9af950faaa50ba3, type: 2}
   <RotateSouthWalls>k__BackingField: 0
   <NorthWallTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 2ca4ef8d7e471be4da74bf0c375b9c81, type: 2}

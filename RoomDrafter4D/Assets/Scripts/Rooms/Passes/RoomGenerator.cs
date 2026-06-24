@@ -20,6 +20,7 @@ namespace TRV
                 LayoutPass(config.Layout),
                 new DoorPass(),
                 new ConnectivityPass(),
+                new DeadEndPrunePass(), // Halls: drop stray 1-tile dead-end corridors (connect nothing)
                 new IslandPass(),       // after connectivity: all floor is connected, any hook-in works
                 new BuildingPass(),     // north-wall extensions over finished floor (islands included)
                 // new LandmarkPass(),  // added once landmark stamps exist

@@ -26,6 +26,13 @@ namespace TRV
         /// <see cref="IslandDecorPool"/>).</summary>
         public List<PatchPlacement> IslandDecor { get; } = new List<PatchPlacement>();
 
+        /// <summary>The 2 doorway cells of each 2-wide igroom entrance — X/Y = cell, Facing = the
+        /// direction the entrance opens (sets rotation), Left = whether this cell holds the LEFT half
+        /// (else the right). Filled by <see cref="HallPass"/>; the painter stamps the 2-wide stairs
+        /// (Map layer) and door halves (Extras front) on them, both rotated to Facing.</summary>
+        public List<(int x, int y, Cardinal facing, bool left)> Entrances { get; } =
+            new List<(int x, int y, Cardinal facing, bool left)>();
+
         /// <summary>
         /// Per-room seed for paint-time per-cell tile variants (set by RoomGenerator from the room
         /// rng, hashed with cell coords via <see cref="RoomSeed.CellHash"/>).
@@ -60,6 +67,21 @@ namespace TRV
             kind = WallKind.Fill;
             return _wallKinds != null && _wallKinds.TryGetValue((x, y), out kind);
         }
+
+        /// <summary>
+        /// Cells that are the INTERIOR floor of a room-within-a-room (a Halls igroom), so the painter
+        /// can pave them with the distinct room-floor tiles instead of the corridor floor. Sparse:
+        /// recorded by <see cref="HallPass"/>; everything else paints as normal floor.
+        /// </summary>
+        private HashSet<(int x, int y)> _roomFloors;
+
+        public void MarkRoomFloor(int x, int y)
+        {
+            _roomFloors ??= new HashSet<(int x, int y)>();
+            _roomFloors.Add((x, y));
+        }
+
+        public bool IsRoomFloor(int x, int y) => _roomFloors != null && _roomFloors.Contains((x, y));
 
         public RoomGrid(int width, int height)
         {

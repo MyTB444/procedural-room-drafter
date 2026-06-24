@@ -69,6 +69,7 @@ namespace TRV
                 {
                     var pos = new Vector3Int(originCell.x + x, originCell.y + y, 0);
                     int cellHash = RoomSeed.CellHash(grid.VariantSeed, x, y);
+                    bool northEdge = y >= grid.Height - config.WallThickness; // top water-border row(s)
                     switch (grid[x, y])
                     {
                         case CellType.Wall:
@@ -82,22 +83,60 @@ namespace TRV
                             // South-facing walls sit on floor (the sprite's base shows ground, not void).
                             // Only for biomes with explicit south tiles (Halls); when RotateSouthWalls
                             // is on (Aqua) the south side is north tiles over the water backdrop instead.
+                            // In Halls every south wall is an igroom's, so use the igroom floor set —
+                            // the base matches the room interior just above it.
                             if (IsSouthFacing(kind) && !config.RotateSouthWalls)
-                                mapTilemap.SetTile(pos, config.FloorTileAt(cellHash));
-                            if (extrasBehindTilemap) // water backdrop under the wall sprite
-                                extrasBehindTilemap.SetTile(pos, config.WaterTileAt(cellHash));
+                                mapTilemap.SetTile(pos, config.RoomFloorTileAt(cellHash));
+                            // Water backdrop under the wall sprite — an igroom wall sitting on the room's
+                            // north edge gets the north-edge water behind it, so it blends with the border.
+                            if (extrasBehindTilemap)
+                                extrasBehindTilemap.SetTile(pos, northEdge
+                                    ? config.NorthWaterTileAt(cellHash)
+                                    : config.WaterTileAt(cellHash));
                             break;
                         }
                         case CellType.Water:
-                            wallsTilemap.SetTile(pos, config.WaterTileAt(cellHash));
+                            // North-edge water (the top of the room's water border) gets its own tile.
+                            wallsTilemap.SetTile(pos, northEdge
+                                ? config.NorthWaterTileAt(cellHash)
+                                : config.WaterTileAt(cellHash));
                             break;
                         case CellType.Floor:
-                            mapTilemap.SetTile(pos, config.FloorTileAt(cellHash));
+                            // Igroom interiors get the distinct room-floor tiles; corridors the regular floor.
+                            mapTilemap.SetTile(pos, grid.IsRoomFloor(x, y)
+                                ? config.RoomFloorTileAt(cellHash)
+                                : config.FloorTileAt(cellHash));
                             break;
                         case CellType.Door:
+                        {
                             mapTilemap.SetTile(pos, config.FloorTileAt(cellHash)); // walkable floor under the door
-                            doorTilemap.SetTile(pos, config.DoorTile);
+                            if (config.LeftRoomDoorTile != null) // Halls: 2-wide left/right door, rotated to its edge
+                            {
+                                var edge = NearestEdge(x, y, grid.Width, grid.Height);
+                                int doorStart = grid.DoorStarts[(int)edge];
+                                bool firstCell = edge is Cardinal.North or Cardinal.South ? x == doorStart : y == doorStart;
+                                bool isLeft = firstCell == (edge is Cardinal.South or Cardinal.East);
+                                var rot = EntranceRotation(edge);
+                                doorTilemap.SetTile(pos, isLeft ? config.LeftRoomDoorTile : config.RightRoomDoorTile);
+                                doorTilemap.SetTransformMatrix(pos, rot);
+
+                                // A matching 'leading' tile one cell in front of the door (inward), on Extras
+                                // front. It faces the opposite way to the door — a full 180° flip of the
+                                // 2-wide pair, so the rotation is +180° AND the left/right halves swap cells.
+                                if (config.LeftLeadingTile != null && extrasTilemap != null)
+                                {
+                                    var step = InwardStep(edge);
+                                    var lead = new Vector3Int(pos.x + step.x, pos.y + step.y, 0);
+                                    extrasTilemap.SetTile(lead, isLeft ? config.RightLeadingTile : config.LeftLeadingTile);
+                                    extrasTilemap.SetTransformMatrix(lead, rot * Rot180);
+                                }
+                            }
+                            else
+                            {
+                                doorTilemap.SetTile(pos, config.DoorTile);
+                            }
                             break;
+                        }
                         case CellType.Building:
                             // Corridor buildings sit on floor; water-following extensions stand in
                             // water (their underlay shows through any sprite transparency).
@@ -116,9 +155,13 @@ namespace TRV
                 }
             }
 
+            PaintExtrasBehindBands(grid, config);
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
             PaintDoorBackingWalls(grid, config);
+            PaintNorthDoorWalls(grid, config);
+            PaintStairs(grid, config);
+            PaintDoors(grid, config);
             // Island decor is no longer painted — it's spawned as pooled GameObjects by
             // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
         }
@@ -151,6 +194,26 @@ namespace TRV
             }
         }
 
+        /// <summary>
+        /// Paint the two unique flank-wall tiles on the collision layer at the cells immediately LEFT
+        /// (west) and RIGHT (east) of the NORTH room door — the door's frame, replacing the regular
+        /// border there. Halls-only (on when the tiles are assigned). The 4 doors are corner-padded so
+        /// both flank cells are always inside the grid.
+        /// </summary>
+        private void PaintNorthDoorWalls(RoomGrid grid, BiomeConfig config)
+        {
+            if (wallsTilemap == null || config.NorthDoorLeftWallTile == null) return;
+
+            int c = grid.DoorStarts[(int)Cardinal.North];     // door's first (west) column
+            int row = grid.Height - config.WallThickness;     // the north door's row
+            int left = c - 1, right = c + config.DoorWidth;   // first cell each side of the 2-wide door
+
+            wallsTilemap.SetTile(new Vector3Int(originCell.x + left, originCell.y + row, 0),
+                config.NorthDoorLeftWallTile);
+            wallsTilemap.SetTile(new Vector3Int(originCell.x + right, originCell.y + row, 0),
+                config.NorthDoorRightWallTile);
+        }
+
         private static WallKind EdgeWallKind(Cardinal edge) => edge switch
         {
             Cardinal.North => WallKind.North,
@@ -169,6 +232,69 @@ namespace TRV
                     StampGroup(extrasTilemap, placement, WaterDecorPatch.Width, WaterDecorPatch.Height, decor.Tiles);
             }
         }
+
+        /// <summary>
+        /// Fill the ExtrasBehind layer (whole width) with fixed horizontal bands from beneath the north
+        /// edge down to the south: TWO NorthBehind rows, one Transition1 row, one Transition2 row, then
+        /// Blank fills the rest to the bottom. The top north-edge row keeps its water backdrop
+        /// (this starts one cell below it). Off unless <see cref="BiomeConfig.NorthBehindTile"/> is
+        /// assigned (so it only affects Halls). At WATER cells the band tile goes on the collision layer
+        /// instead (water would otherwise hide the ExtrasBehind tile) — it replaces the water tile and
+        /// carries that cell's collision, so the band tiles used over water need a collider type.
+        /// </summary>
+        private void PaintExtrasBehindBands(RoomGrid grid, BiomeConfig config)
+        {
+            if (extrasBehindTilemap == null || config.NorthBehindTile == null) return;
+
+            int total = grid.Height - config.WallThickness; // banded rows: y in [0, total)
+            if (total <= 0) return;
+
+            const int north = 2; // two NorthBehind rows, then straight into the transition
+
+            int topY = grid.Height - 1 - config.WallThickness; // first row beneath the north edge
+            for (int depth = 0; depth < total; depth++)
+            {
+                int y = topY - depth;
+                for (int x = 0; x < grid.Width; x++)
+                {
+                    var tile = BandTile(config, grid, x, y, depth, north);
+                    if (tile == null) continue;
+                    var pos = new Vector3Int(originCell.x + x, originCell.y + y, 0);
+                    if (grid[x, y] == CellType.Water && wallsTilemap != null)
+                        wallsTilemap.SetTile(pos, tile); // over water → collision layer (keeps it solid)
+                    else
+                        extrasBehindTilemap.SetTile(pos, tile);
+                }
+            }
+        }
+
+        private static TileBase BandTile(BiomeConfig config, RoomGrid grid, int x, int y, int depth, int north)
+        {
+            if (depth < north) // NorthBehind
+                return BandEnd(config.NorthBehindTile, config.NorthBehindLeftEndTile, config.NorthBehindRightEndTile, grid, x, y);
+            if (depth == north) // Transition1
+                return BandEnd(config.Transition1Tile, config.Transition1LeftEndTile, config.Transition1RightEndTile, grid, x, y);
+            if (depth == north + 1) // Transition2
+                return config.Transition2Tile;
+            return config.BlankBehindTile; // fills the rest to the bottom
+        }
+
+        /// <summary>The band tile, swapped for its left/right end-cap when the cell meets a FIELD floor
+        /// tile horizontally — floor to the WEST → left end, floor to the EAST → right end. Only the
+        /// room's field/corridor floor counts; an igroom's INTERIOR floor (room-floor) is ignored, so a
+        /// band next to a room interior isn't mistaken for the field edge.</summary>
+        private static TileBase BandEnd(TileBase baseTile, TileBase leftEnd, TileBase rightEnd,
+                                        RoomGrid grid, int x, int y)
+        {
+            if (leftEnd != null && IsFieldFloor(grid, x - 1, y)) return leftEnd;
+            if (rightEnd != null && IsFieldFloor(grid, x + 1, y)) return rightEnd;
+            return baseTile;
+        }
+
+        /// <summary>True for the room's walkable field/corridor floor — Floor that is NOT an igroom's
+        /// interior (room-floor).</summary>
+        private static bool IsFieldFloor(RoomGrid grid, int x, int y) =>
+            grid.Get(x, y) == CellType.Floor && !grid.IsRoomFloor(x, y);
 
         /// <summary>Safe array lookup — never trust a placement index against the live config.</summary>
         private static T At<T>(T[] array, int index) where T : class =>
@@ -214,6 +340,57 @@ namespace TRV
             if (rightEnd) return config.BuildingRightTile;
             return config.BuildingMiddleTile;
         }
+
+        /// <summary>
+        /// Stamp the 2-wide stairs (left + right halves) on the 2 doorway cells of each igroom entrance
+        /// (Map layer, in the wall line), rotated to the direction the entrance opens. Tiles are
+        /// authored facing NORTH: a South-opening entrance keeps them (base faces north, back toward
+        /// the igroom), West → rotate right, East → rotate left, North → 180°. The halves swap cells
+        /// with the rotation — HallPass already tagged each cell with which half it holds.
+        /// </summary>
+        private void PaintStairs(RoomGrid grid, BiomeConfig config)
+        {
+            if (mapTilemap == null) return;
+
+            foreach (var (gx, gy, facing, left) in grid.Entrances)
+            {
+                var tile = left ? config.LeftStairTile : config.RightStairTile;
+                if (tile == null) continue;
+                var pos = new Vector3Int(originCell.x + gx, originCell.y + gy, 0);
+                mapTilemap.SetTile(pos, tile);
+                mapTilemap.SetTransformMatrix(pos, EntranceRotation(facing));
+            }
+        }
+
+        /// <summary>
+        /// Stamp the 2-wide igroom door (left + right halves) on the same 2 doorway cells as the stairs,
+        /// on the Extras front layer (above the floor/stairs) and rotated to the entrance direction —
+        /// exactly like <see cref="PaintStairs"/>. Decorative only (front layer, no collider).
+        /// </summary>
+        private void PaintDoors(RoomGrid grid, BiomeConfig config)
+        {
+            if (extrasTilemap == null) return;
+
+            foreach (var (gx, gy, facing, left) in grid.Entrances)
+            {
+                var tile = left ? config.LeftDoorTile : config.RightDoorTile;
+                if (tile == null) continue;
+                var pos = new Vector3Int(originCell.x + gx, originCell.y + gy, 0);
+                extrasTilemap.SetTile(pos, tile);
+                extrasTilemap.SetTransformMatrix(pos, EntranceRotation(facing));
+            }
+        }
+
+        /// <summary>Rotation for a 2-wide entrance decoration authored facing NORTH: a South-opening
+        /// entrance keeps it (base faces north, back toward the igroom), West → rotate right, East →
+        /// rotate left, North → 180°. Shared by the stairs and the door.</summary>
+        private static Matrix4x4 EntranceRotation(Cardinal facing) => facing switch
+        {
+            Cardinal.North => Rot180,    // entrance opens north → faces south
+            Cardinal.East => RotLeft90,  // opens east  → faces west
+            Cardinal.West => RotRight90, // opens west  → faces east
+            _ => Matrix4x4.identity,     // opens south → faces north (authored default)
+        };
 
         /// <summary>Stamp the decorative floor patch groups over the base floor (Map layer).</summary>
         private void PaintFloorPatches(RoomGrid grid, BiomeConfig config)

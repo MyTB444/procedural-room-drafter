@@ -17,6 +17,11 @@ namespace TRV
 
         public void Apply(RoomGrid grid, System.Random rng, BiomeConfig config)
         {
+            // North-wall buildings are a corridor-layout (Aqua) flourish. In Halls igrooms can sit
+            // against the top edge, and this pass would mistake an igroom's top interior row (floor,
+            // wall above) for a buildable run and eat it — so skip Halls entirely.
+            if (config.Layout == BiomeLayout.Halls) return;
+
             int t = config.WallThickness;
             int y = grid.Height - t - 1; // the interior row touching the north wall band
 

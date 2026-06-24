@@ -153,11 +153,76 @@ namespace TRV
                         "One entry = a uniform floor.")]
         [field: SerializeField] public TileBase[] FloorTileVariants { get; private set; }
 
+        [field: Tooltip("Room-floor pool: fills the INTERIOR of Halls igrooms (a distinct floor from " +
+                        "the corridor floor). Leave empty to reuse the regular Floor pool.")]
+        [field: SerializeField] public TileBase[] RoomFloorTileVariants { get; private set; }
+
         [field: Tooltip("Water pool (e.g. 5 tiles): every water cell — and the water backdrop " +
                         "behind walls — picks one at random, all equal chance.")]
         [field: SerializeField] public TileBase[] WaterTileVariants { get; private set; }
 
+        [field: Tooltip("North-edge water tile: the water cells along the very top of the room (the " +
+                        "north water border in Halls) use this instead of the regular water pool. " +
+                        "Empty = reuse the regular water.")]
+        [field: SerializeField] public TileBase NorthWaterTile { get; private set; }
+
         [field: SerializeField] public TileBase DoorTile { get; private set; }
+
+        [field: Tooltip("Left half of the 2-wide ROOM door (the 4 perimeter doors), on the Door layer, " +
+                        "rotated to the door's edge like the igroom doors. Replaces Door Tile when set " +
+                        "(assign only on Halls). Authored facing NORTH; must NOT lock its transform.")]
+        [field: SerializeField] public TileBase LeftRoomDoorTile { get; private set; }
+
+        [field: Tooltip("Right half of the 2-wide room door (paired with Left Room Door Tile).")]
+        [field: SerializeField] public TileBase RightRoomDoorTile { get; private set; }
+
+        [field: Tooltip("Left half of the 2-wide 'leading' tiles painted one cell IN FRONT of each room " +
+                        "door (inward, away from the edge), on the Extras front layer, rotated to the " +
+                        "door's edge like the room door. Authored facing NORTH; must NOT lock transform.")]
+        [field: SerializeField] public TileBase LeftLeadingTile { get; private set; }
+
+        [field: Tooltip("Right half of the 2-wide leading tiles (paired with Left Leading Tile).")]
+        [field: SerializeField] public TileBase RightLeadingTile { get; private set; }
+
+        [field: Tooltip("Unique wall tile for the cell immediately LEFT (west) of the NORTH room door, " +
+                        "painted on the collision layer in place of the regular border (Halls). Empty = off.")]
+        [field: SerializeField] public TileBase NorthDoorLeftWallTile { get; private set; }
+
+        [field: Tooltip("Unique wall tile for the cell immediately RIGHT (east) of the NORTH room door.")]
+        [field: SerializeField] public TileBase NorthDoorRightWallTile { get; private set; }
+
+        [field: Tooltip("Left half of the 2-wide stairs in front of a Halls igroom entrance. Authored " +
+                        "facing NORTH (the left half when ascending north); the painter rotates it to the " +
+                        "entrance's direction. Must NOT lock its transform. Empty = no stairs.")]
+        [field: SerializeField] public TileBase LeftStairTile { get; private set; }
+
+        [field: Tooltip("Right half of the 2-wide stairs (paired with Left Stair Tile).")]
+        [field: SerializeField] public TileBase RightStairTile { get; private set; }
+
+        [field: Tooltip("Left half of the 2-wide igroom door, on the Extras front layer over the same " +
+                        "doorway cells as the stairs. Authored facing NORTH; rotated to the entrance " +
+                        "direction like the stairs. Must NOT lock its transform. Empty = no door.")]
+        [field: SerializeField] public TileBase LeftDoorTile { get; private set; }
+
+        [field: Tooltip("Right half of the 2-wide igroom door (paired with Left Door Tile).")]
+        [field: SerializeField] public TileBase RightDoorTile { get; private set; }
+
+        [field: Header("Tiles — ExtrasBehind background (Halls)")]
+        [field: Tooltip("Horizontal bands painted on ExtrasBehind from beneath the north edge down: a " +
+                        "random run of NorthBehind, then Transition1, Transition2, then Blank fills the " +
+                        "rest to the south edge. Assign North Behind to enable.")]
+        [field: SerializeField] public TileBase NorthBehindTile { get; private set; }
+        [field: SerializeField] public TileBase Transition1Tile { get; private set; }
+        [field: SerializeField] public TileBase Transition2Tile { get; private set; }
+        [field: SerializeField] public TileBase BlankBehindTile { get; private set; }
+
+        [field: Tooltip("End-cap tiles for the NorthBehind / Transition1 bands where they meet a floor " +
+                        "tile horizontally: floor to the WEST → the Left end, floor to the EAST → the " +
+                        "Right end. Empty = use the regular band tile.")]
+        [field: SerializeField] public TileBase NorthBehindLeftEndTile { get; private set; }
+        [field: SerializeField] public TileBase NorthBehindRightEndTile { get; private set; }
+        [field: SerializeField] public TileBase Transition1LeftEndTile { get; private set; }
+        [field: SerializeField] public TileBase Transition1RightEndTile { get; private set; }
 
         [field: Header("Tiles — Walls")]
         [field: Tooltip("ON (Aqua): derive the south/SW/SE wall tiles by rotating the north/NW/NE " +
@@ -202,8 +267,21 @@ namespace TRV
         /// <summary>Floor tile for a cell — random pick from the pool, equal chance.</summary>
         public TileBase FloorTileAt(int cellHash) => PickVariant(FloorTileVariants, cellHash);
 
+        /// <summary>Floor tile for an igroom INTERIOR cell — picks from the room-floor pool, or falls
+        /// back to the regular floor pool when that pool is empty (so biomes that don't set it look
+        /// unchanged).</summary>
+        public TileBase RoomFloorTileAt(int cellHash) =>
+            RoomFloorTileVariants != null && RoomFloorTileVariants.Length > 0
+                ? PickVariant(RoomFloorTileVariants, cellHash)
+                : FloorTileAt(cellHash);
+
         /// <summary>Water tile for a cell — random pick from the pool, equal chance.</summary>
         public TileBase WaterTileAt(int cellHash) => PickVariant(WaterTileVariants, cellHash);
+
+        /// <summary>Water tile for a north-edge cell — the dedicated north tile, or the regular water
+        /// pool when none is set.</summary>
+        public TileBase NorthWaterTileAt(int cellHash) =>
+            NorthWaterTile != null ? NorthWaterTile : WaterTileAt(cellHash);
 
         private static TileBase PickVariant(TileBase[] variants, int cellHash) =>
             variants == null || variants.Length == 0 ? null : variants[cellHash % variants.Length];
