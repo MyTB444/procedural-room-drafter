@@ -62,7 +62,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 3
+  <EnemiesPerRoom>k__BackingField: 0
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
   - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
@@ -93,13 +93,34 @@ MonoBehaviour:
   - {fileID: 11400000, guid: be5734828b4998146b369ddb38232659, type: 2}
   - {fileID: 11400000, guid: c195e3c647b06fc41a35cd9ea5cc4c83, type: 2}
   - {fileID: 11400000, guid: e65d4a2456bb607448aceb6c06bf9fb3, type: 2}
+  <RoomFloorTileVariants>k__BackingField: []
   <WaterTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 366ac9b314974b145b3acfd6d9802292, type: 2}
   - {fileID: 11400000, guid: f28d9388eb6e34b48874179779056b90, type: 2}
   - {fileID: 11400000, guid: eb576360c8b82be4ea9631d87257cea0, type: 2}
   - {fileID: 11400000, guid: 2d4bbeb50fa219b458dbc2067f4e9b9b, type: 2}
   - {fileID: 11400000, guid: 101cf8310e285e047a3e96217bf61fae, type: 2}
+  <NorthWaterTile>k__BackingField: {fileID: 0}
+  <UnderWallTile>k__BackingField: {fileID: 11400000, guid: 6542c7abfbc8754438a88bb3c6249151, type: 2}
   <DoorTile>k__BackingField: {fileID: 11400000, guid: 7174639161616fb48a1f7507292b6e69, type: 2}
+  <LeftRoomDoorTile>k__BackingField: {fileID: 0}
+  <RightRoomDoorTile>k__BackingField: {fileID: 0}
+  <LeftLeadingTile>k__BackingField: {fileID: 0}
+  <RightLeadingTile>k__BackingField: {fileID: 0}
+  <NorthDoorLeftWallTile>k__BackingField: {fileID: 11400000, guid: bf480c2c398a73d469c3354d8175fad7, type: 2}
+  <NorthDoorRightWallTile>k__BackingField: {fileID: 11400000, guid: 04b5996aa1f020c49a4fd147ca11f7a5, type: 2}
+  <LeftStairTile>k__BackingField: {fileID: 0}
+  <RightStairTile>k__BackingField: {fileID: 0}
+  <LeftDoorTile>k__BackingField: {fileID: 0}
+  <RightDoorTile>k__BackingField: {fileID: 0}
+  <NorthBehindTile>k__BackingField: {fileID: 0}
+  <Transition1Tile>k__BackingField: {fileID: 0}
+  <Transition2Tile>k__BackingField: {fileID: 0}
+  <BlankBehindTile>k__BackingField: {fileID: 0}
+  <NorthBehindLeftEndTile>k__BackingField: {fileID: 0}
+  <NorthBehindRightEndTile>k__BackingField: {fileID: 0}
+  <Transition1LeftEndTile>k__BackingField: {fileID: 0}
+  <Transition1RightEndTile>k__BackingField: {fileID: 0}
   <RotateSouthWalls>k__BackingField: 1
   <NorthWallTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 043e2b74984b60240a1a576122807f39, type: 2}

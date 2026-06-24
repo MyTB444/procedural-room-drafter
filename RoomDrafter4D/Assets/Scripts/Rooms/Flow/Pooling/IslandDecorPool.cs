@@ -21,8 +21,11 @@ namespace TRV
         /// Show decor for a room: release the previous room's objects, then place a pooled instance
         /// at each placement's cell (world position via <paramref name="painter"/>), using
         /// <paramref name="biome"/>'s decor prefabs (the same biome that generated the placements).
+        /// Each piece is wired to REMOVE its placement from <paramref name="placements"/> when broken,
+        /// so a destroyed piece doesn't respawn when the player returns (the room's snapshot rides the
+        /// same list).
         /// </summary>
-        public void Show(IReadOnlyList<PatchPlacement> placements, TilemapPainter painter, BiomeConfig biome)
+        public void Show(List<PatchPlacement> placements, TilemapPainter painter, BiomeConfig biome)
         {
             ReleaseAll();
             var prefabs = biome != null ? biome.IslandDecorObjects : null;
@@ -34,7 +37,8 @@ namespace TRV
                 var go = Rent(prefabs[p.PatchIndex]);
                 if (go == null) continue; // empty prefab slot
                 go.transform.position = painter.CellCenterWorld(p.X, p.Y);
-                go.GetComponent<IslandDecorPiece>().Activate(this);
+                var placement = p; // capture by value for the forget callback
+                go.GetComponent<IslandDecorPiece>().Activate(this, () => placements.Remove(placement));
                 go.SetActive(true);
             }
         }

@@ -33,6 +33,16 @@ namespace TRV
         public List<(int x, int y, Cardinal facing, bool left)> Entrances { get; } =
             new List<(int x, int y, Cardinal facing, bool left)>();
 
+        /// <summary>True if (x, y) is an igroom entrance (doorway) cell — those are <see cref="CellType.Floor"/>
+        /// but carry stairs/door decor, so callers that key off "real" floor (e.g. the ExtrasBehind band
+        /// end-caps) must skip them.</summary>
+        public bool IsEntrance(int x, int y)
+        {
+            foreach (var e in Entrances)
+                if (e.x == x && e.y == y) return true;
+            return false;
+        }
+
         /// <summary>
         /// Per-room seed for paint-time per-cell tile variants (set by RoomGenerator from the room
         /// rng, hashed with cell coords via <see cref="RoomSeed.CellHash"/>).

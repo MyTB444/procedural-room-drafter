@@ -87,7 +87,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: -1617217799, guid: 08ec287460a559c4e9f514c2a2f59f4c, type: 3}
   m_Color: {r: 0.836478, g: 0.836478, b: 0.836478, a: 1}
@@ -231,7 +231,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TRV.HitFlash
   flashColor: {r: 1, g: 0, b: 0, a: 1}
-  duration: 0.1
+  duration: 0.4
 --- !u!114 &603929530937889892
 MonoBehaviour:
   m_ObjectHideFlags: 0

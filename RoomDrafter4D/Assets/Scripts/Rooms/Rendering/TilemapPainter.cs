@@ -15,9 +15,11 @@ namespace TRV
         [SerializeField] private Tilemap wallsTilemap;
         [SerializeField] private Tilemap mapTilemap;
         [SerializeField] private Tilemap doorTilemap;
-        [Tooltip("Front decor layer (your 'ExtrasFront') — gets the 2×3 water decor groups, " +
-                 "rendered above the water.")]
+        [Tooltip("Front decor layer (your 'ExtrasFront') — igroom doors, leading tiles, UnderWall, " +
+                 "rendered above the water but behind the player.")]
         [SerializeField] private Tilemap extrasTilemap;
+        [Tooltip("ExtrasFrontOfPlayer — renders ABOVE the player. Gets the 2×3 water decor groups.")]
+        [SerializeField] private Tilemap extrasFrontOfPlayerTilemap;
         [Tooltip("ExtrasBehind — renders under the Walls layer. Gets a water tile beneath every wall " +
                  "cell so wall sprites with transparency show water behind them.")]
         [SerializeField] private Tilemap extrasBehindTilemap;
@@ -77,7 +79,20 @@ namespace TRV
                             var kind = grid.TryGetWallKind(x, y, out var k)
                                 ? k
                                 : WallKindUtil.Classify(grid, x, y, config.WallThickness);
-                            wallsTilemap.SetTile(pos, config.WallTileFor(kind, cellHash));
+                            var wallTile = config.WallTileFor(kind, cellHash);
+                            // A building run's end FRAMING wall (an interior wall with a Building beside it,
+                            // placed where the run stops against water) gets the north-door flank tiles
+                            // MIRRORED — matching the door-frame ends. Interior-only (positional Fill) so a
+                            // ring wall that merely sits next to a building keeps its edge tile.
+                            bool buildingW = grid.Get(x - 1, y) == CellType.Building;
+                            bool buildingE = grid.Get(x + 1, y) == CellType.Building;
+                            if ((buildingW || buildingE) &&
+                                WallKindUtil.Classify(x, y, grid.Width, grid.Height, config.WallThickness) == WallKind.Fill)
+                            {
+                                if (buildingW && config.NorthDoorLeftWallTile != null) wallTile = config.NorthDoorLeftWallTile;
+                                else if (buildingE && config.NorthDoorRightWallTile != null) wallTile = config.NorthDoorRightWallTile;
+                            }
+                            wallsTilemap.SetTile(pos, wallTile);
                             if (TryGetWallRotation(kind, config, out var rotation))
                                 wallsTilemap.SetTransformMatrix(pos, rotation);
                             // South-facing walls sit on floor (the sprite's base shows ground, not void).
@@ -158,6 +173,7 @@ namespace TRV
             PaintExtrasBehindBands(grid, config);
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
+            PaintUnderWalls(grid, config); // after water decor so the underside shadow wins on overlap
             PaintDoorBackingWalls(grid, config);
             PaintNorthDoorWalls(grid, config);
             PaintStairs(grid, config);
@@ -197,8 +213,8 @@ namespace TRV
         /// <summary>
         /// Paint the two unique flank-wall tiles on the collision layer at the cells immediately LEFT
         /// (west) and RIGHT (east) of the NORTH room door — the door's frame, replacing the regular
-        /// border there. Halls-only (on when the tiles are assigned). The 4 doors are corner-padded so
-        /// both flank cells are always inside the grid.
+        /// wall/border there. On when the tiles are assigned (Aqua's wall-ring flanks, or Halls' water
+        /// border). The 4 doors are corner-padded so both flank cells are always inside the grid.
         /// </summary>
         private void PaintNorthDoorWalls(RoomGrid grid, BiomeConfig config)
         {
@@ -222,14 +238,34 @@ namespace TRV
             _ => WallKind.West,
         };
 
-        /// <summary>Stamp the 2×3 water decor groups over open water (Extras front layer).</summary>
+        /// <summary>
+        /// Stamp the UnderWall tile on the Extras front layer over every water cell sitting directly
+        /// BENEATH a Building or Floor tile — the shadowed underside of the wall/floor edge. Off unless
+        /// <see cref="BiomeConfig.UnderWallTile"/> is assigned.
+        /// </summary>
+        private void PaintUnderWalls(RoomGrid grid, BiomeConfig config)
+        {
+            if (extrasTilemap == null || config.UnderWallTile == null) return;
+
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[x, y] != CellType.Water) continue;
+                    var above = grid.Get(x, y + 1);
+                    if (above == CellType.Building || above == CellType.Floor)
+                        extrasTilemap.SetTile(new Vector3Int(originCell.x + x, originCell.y + y, 0), config.UnderWallTile);
+                }
+        }
+
+        /// <summary>Stamp the 2×3 water decor groups over open water (ExtrasFrontOfPlayer — in front
+        /// of the player).</summary>
         private void PaintWaterDecor(RoomGrid grid, BiomeConfig config)
         {
             foreach (var placement in grid.WaterDecor)
             {
                 var decor = At(config.WaterDecorPatches, placement.PatchIndex);
                 if (decor != null)
-                    StampGroup(extrasTilemap, placement, WaterDecorPatch.Width, WaterDecorPatch.Height, decor.Tiles);
+                    StampGroup(extrasFrontOfPlayerTilemap, placement, WaterDecorPatch.Width, WaterDecorPatch.Height, decor.Tiles);
             }
         }
 
@@ -292,9 +328,10 @@ namespace TRV
         }
 
         /// <summary>True for the room's walkable field/corridor floor — Floor that is NOT an igroom's
-        /// interior (room-floor).</summary>
+        /// interior (room-floor) and NOT an igroom entrance cell (those are Floor but carry stairs, so
+        /// the band caps shouldn't treat them as the field edge).</summary>
         private static bool IsFieldFloor(RoomGrid grid, int x, int y) =>
-            grid.Get(x, y) == CellType.Floor && !grid.IsRoomFloor(x, y);
+            grid.Get(x, y) == CellType.Floor && !grid.IsRoomFloor(x, y) && !grid.IsEntrance(x, y);
 
         /// <summary>Safe array lookup — never trust a placement index against the live config.</summary>
         private static T At<T>(T[] array, int index) where T : class =>
@@ -325,16 +362,19 @@ namespace TRV
         /// <summary>
         /// Building run cells: ends get the cap tiles, everything between the middle tile.
         /// Exception: an end whose tile ABOVE is right next to a door (i.e. the end sits directly
-        /// below the door-flank wall) copies that flank's tile — East left of the door, West right
-        /// of it — so the building visually continues the door frame.
+        /// below the door-flank wall) gets the door-frame wall so the building continues the frame —
+        /// the north-door flank tiles MIRRORED when assigned (left end → door's RIGHT flank, right end
+        /// → door's LEFT flank; Aqua), else the East/West wall (East left of the door, West right).
         /// </summary>
         private static TileBase BuildingTile(RoomGrid grid, int x, int y, BiomeConfig config)
         {
             bool leftEnd = grid.Get(x - 1, y) != CellType.Building;
             bool rightEnd = grid.Get(x + 1, y) != CellType.Building;
 
-            if (rightEnd && grid.Get(x + 1, y + 1) == CellType.Door) return config.EastWallTile;
-            if (leftEnd && grid.Get(x - 1, y + 1) == CellType.Door) return config.WestWallTile;
+            if (rightEnd && grid.Get(x + 1, y + 1) == CellType.Door)
+                return config.NorthDoorLeftWallTile != null ? config.NorthDoorLeftWallTile : config.EastWallTile;
+            if (leftEnd && grid.Get(x - 1, y + 1) == CellType.Door)
+                return config.NorthDoorRightWallTile != null ? config.NorthDoorRightWallTile : config.WestWallTile;
 
             if (leftEnd) return config.BuildingLeftTile;
             if (rightEnd) return config.BuildingRightTile;
@@ -441,6 +481,7 @@ namespace TRV
             if (doorTilemap) doorTilemap.ClearAllTiles();
             if (extrasTilemap) extrasTilemap.ClearAllTiles();
             if (extrasBehindTilemap) extrasBehindTilemap.ClearAllTiles();
+            if (extrasFrontOfPlayerTilemap) extrasFrontOfPlayerTilemap.ClearAllTiles();
         }
 
         /// <summary>Capture the room's current tiles + per-cell transforms (all layers) for later
@@ -460,6 +501,7 @@ namespace TRV
                 Door = CaptureLayer(doorTilemap, bounds),
                 Extras = CaptureLayer(extrasTilemap, bounds),
                 ExtrasBehind = CaptureLayer(extrasBehindTilemap, bounds),
+                ExtrasFrontOfPlayer = CaptureLayer(extrasFrontOfPlayerTilemap, bounds),
             };
         }
 
@@ -472,6 +514,7 @@ namespace TRV
             RestoreLayer(doorTilemap, snap.Bounds, snap.Door);
             RestoreLayer(extrasTilemap, snap.Bounds, snap.Extras);
             RestoreLayer(extrasBehindTilemap, snap.Bounds, snap.ExtrasBehind);
+            RestoreLayer(extrasFrontOfPlayerTilemap, snap.Bounds, snap.ExtrasFrontOfPlayer);
         }
 
         private static LayerSnapshot CaptureLayer(Tilemap tilemap, BoundsInt bounds)

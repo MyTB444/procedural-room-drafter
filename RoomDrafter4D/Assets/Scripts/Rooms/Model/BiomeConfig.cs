@@ -79,22 +79,10 @@ namespace TRV
         [field: Min(1)]
         [field: SerializeField] public int HallMoatThickness { get; private set; } = 2;
 
-        [field: Tooltip("Floor size of the one guaranteed main igroom (square).")]
+        [field: Tooltip("Floor size of the one guaranteed main igroom (square). Shrinks per room if the " +
+                        "door layout is too tight to also fit the smaller extras.")]
         [field: Min(2)]
         [field: SerializeField] public int HallMainRoomSize { get; private set; } = 6;
-
-        [field: Tooltip("How many extra igrooms to attempt placing alongside the main one.")]
-        [field: Min(0)]
-        [field: SerializeField] public int HallExtraRooms { get; private set; } = 3;
-
-        [field: Tooltip("Floor size range (min..max, per dimension) for the extra igrooms. Clamped to " +
-                        "a minimum of 4 so a 2-wide doorway + flanking wall fits each side.")]
-        [field: SerializeField] public Vector2Int HallRoomSizeRange { get; private set; } = new Vector2Int(4, 6);
-
-        [field: Tooltip("How many cells to grow the corridors/landings outward into the water after " +
-                        "carving — bigger = fatter halls and much less water. 0 = keep thin paths.")]
-        [field: Min(0)]
-        [field: SerializeField] public int HallFloorGrowth { get; private set; } = 2;
 
         [field: Header("Tiles — Buildings (north-wall extensions)")]
         [field: Tooltip("Where ≥3 consecutive floor cells touch the north wall, that row becomes a " +
@@ -148,7 +136,7 @@ namespace TRV
         [field: Range(0f, 1f)]
         [field: SerializeField] public float FloorPatchCoverage { get; private set; } = 0.9f;
 
-        [field: Header("Tiles")]
+        [field: Header("Tiles — Floor & Water")]
         [field: Tooltip("Floor pool: every floor cell picks one at random, all equal chance. " +
                         "One entry = a uniform floor.")]
         [field: SerializeField] public TileBase[] FloorTileVariants { get; private set; }
@@ -166,6 +154,11 @@ namespace TRV
                         "Empty = reuse the regular water.")]
         [field: SerializeField] public TileBase NorthWaterTile { get; private set; }
 
+        [field: Tooltip("UnderWall tile: painted on the Extras FRONT layer over a water cell that sits " +
+                        "directly BENEATH a Building or Floor tile (the shadowed underside). Empty = off.")]
+        [field: SerializeField] public TileBase UnderWallTile { get; private set; }
+
+        [field: Header("Tiles — Room doors (the 4 perimeter doors)")]
         [field: SerializeField] public TileBase DoorTile { get; private set; }
 
         [field: Tooltip("Left half of the 2-wide ROOM door (the 4 perimeter doors), on the Door layer, " +
@@ -185,12 +178,14 @@ namespace TRV
         [field: SerializeField] public TileBase RightLeadingTile { get; private set; }
 
         [field: Tooltip("Unique wall tile for the cell immediately LEFT (west) of the NORTH room door, " +
-                        "painted on the collision layer in place of the regular border (Halls). Empty = off.")]
+                        "painted on the collision layer in place of the regular flank wall (Aqua) or " +
+                        "water border (Halls). Empty = off.")]
         [field: SerializeField] public TileBase NorthDoorLeftWallTile { get; private set; }
 
         [field: Tooltip("Unique wall tile for the cell immediately RIGHT (east) of the NORTH room door.")]
         [field: SerializeField] public TileBase NorthDoorRightWallTile { get; private set; }
 
+        [field: Header("Tiles — Igroom entrance (stairs + door halves)")]
         [field: Tooltip("Left half of the 2-wide stairs in front of a Halls igroom entrance. Authored " +
                         "facing NORTH (the left half when ascending north); the painter rotates it to the " +
                         "entrance's direction. Must NOT lock its transform. Empty = no stairs.")]
