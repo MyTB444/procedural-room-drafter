@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -13,6 +14,9 @@ namespace TRV
         [Header("Tilemap Layers")]
         [Tooltip("Walls layer (your scene's 'Collision' tilemap) — draws Wall + Water, blocks movement.")]
         [SerializeField] private Tilemap wallsTilemap;
+        [Tooltip("UnseenCollision — in Halls the water-boundary collision blocks (NOT igroom walls) go " +
+                 "here instead of the Walls layer. Needs a TilemapCollider2D; assign for Halls.")]
+        [SerializeField] private Tilemap unseenCollisionTilemap;
         [SerializeField] private Tilemap mapTilemap;
         [SerializeField] private Tilemap doorTilemap;
         [Tooltip("Front decor layer (your 'ExtrasFront') — igroom doors, leading tiles, UnderWall, " +
@@ -20,9 +24,13 @@ namespace TRV
         [SerializeField] private Tilemap extrasTilemap;
         [Tooltip("ExtrasFrontOfPlayer — renders ABOVE the player. Gets the 2×3 water decor groups.")]
         [SerializeField] private Tilemap extrasFrontOfPlayerTilemap;
+        [Tooltip("FrontOfEverything — the topmost layer (renders above all others). Gets the waterfalls.")]
+        [SerializeField] private Tilemap frontOfEverythingTilemap;
         [Tooltip("ExtrasBehind — renders under the Walls layer. Gets a water tile beneath every wall " +
                  "cell so wall sprites with transparency show water behind them.")]
         [SerializeField] private Tilemap extrasBehindTilemap;
+        [Tooltip("ExtrasFullBehind — the backmost layer. Gets the Halls north→south banded background.")]
+        [SerializeField] private Tilemap extrasFullBehindTilemap;
 
         [Header("Placement")]
         [Tooltip("Cell coordinate the grid's (0,0) maps to, so rooms paint onto your existing footprint. " +
@@ -39,6 +47,22 @@ namespace TRV
         // through the opening (the door still transitions on step — that's a trigger, not a walk-through).
         private const int DoorBackingDepth = 2;
 
+        // How many waterfall columns to drop from the north edge (Halls), inclusive range.
+        private const int MinWaterfalls = 1, MaxWaterfalls = 2;
+
+        // How many floor decor columns to scatter on the field floor (Halls), inclusive range.
+        private const int MinFloorDecor = 2, MaxFloorDecor = 3;
+        // Keep a (solid-based) floor decor at least this many cells from any door landing / other decor.
+        private const int FloorDecorDoorClearance = 3, FloorDecorSpacing = 4;
+
+        // 3×3 cube patches per room (Halls), split across two layers (never all on one).
+        private const int CubeSize = 3;
+        // 2–3 cubes per room: 2 → 1 behind + 1 front, 3 → 2/1.
+        private const int MinCubeCount = 2, MaxCubeCount = 3;
+        // Behind cubes can't anchor on a south corner in the bottom this-many rows (keeps them off the
+        // front cubes at the south edge while leaving most of the map available).
+        private const int CubeBehindMinRow = 5;
+
         /// <summary>World position of the centre of a grid cell — for placing the player on a landing.</summary>
         public Vector3 CellCenterWorld(int gridX, int gridY)
         {
@@ -53,17 +77,30 @@ namespace TRV
             return new Vector2Int(cell.x - originCell.x, cell.y - originCell.y);
         }
 
-        /// <summary>True if a grid cell holds a solid tile (Wall/Water/Building all live on the
-        /// Walls/Collision layer) — i.e. NOT walkable. Used to build the nav grid for pathfinding.</summary>
+        /// <summary>True if a grid cell holds a solid tile — Wall/Building (+ Aqua water) live on the
+        /// Walls/Collision layer, Halls water lives on the UnseenCollision layer — i.e. NOT walkable.
+        /// Used to build the nav grid for pathfinding, so it must see BOTH collision layers.</summary>
         public bool HasSolidAt(int gridX, int gridY)
         {
-            if (wallsTilemap == null) return false;
-            return wallsTilemap.HasTile(new Vector3Int(originCell.x + gridX, originCell.y + gridY, 0));
+            var pos = new Vector3Int(originCell.x + gridX, originCell.y + gridY, 0);
+            return (wallsTilemap != null && wallsTilemap.HasTile(pos))
+                || (unseenCollisionTilemap != null && unseenCollisionTilemap.HasTile(pos));
         }
+
+        /// <summary>Where a water-collision tile goes: the UnseenCollision layer in Halls (so the water
+        /// boundary isn't on the visible Walls layer), the Walls layer otherwise (or if it's unassigned).</summary>
+        private Tilemap WaterCollisionTilemap(BiomeConfig config) =>
+            config.Layout == BiomeLayout.Halls && unseenCollisionTilemap != null ? unseenCollisionTilemap : wallsTilemap;
 
         public void Paint(RoomGrid grid, BiomeConfig config)
         {
             Clear();
+
+            // Halls puts everything "behind" (the per-wall water backdrop AND the banded background) on
+            // the backmost ExtrasFullBehind layer; other biomes use the regular ExtrasBehind.
+            var behindTilemap = config.Layout == BiomeLayout.Halls ? extrasFullBehindTilemap : extrasBehindTilemap;
+            // Halls water collision goes on the UnseenCollision layer (not the visible Walls layer).
+            var waterTilemap = WaterCollisionTilemap(config);
 
             for (int x = 0; x < grid.Width; x++)
             {
@@ -104,15 +141,16 @@ namespace TRV
                                 mapTilemap.SetTile(pos, config.RoomFloorTileAt(cellHash));
                             // Water backdrop under the wall sprite — an igroom wall sitting on the room's
                             // north edge gets the north-edge water behind it, so it blends with the border.
-                            if (extrasBehindTilemap)
-                                extrasBehindTilemap.SetTile(pos, northEdge
+                            if (behindTilemap)
+                                behindTilemap.SetTile(pos, northEdge
                                     ? config.NorthWaterTileAt(cellHash)
                                     : config.WaterTileAt(cellHash));
                             break;
                         }
                         case CellType.Water:
                             // North-edge water (the top of the room's water border) gets its own tile.
-                            wallsTilemap.SetTile(pos, northEdge
+                            // In Halls this lands on the UnseenCollision layer instead of Walls.
+                            waterTilemap.SetTile(pos, northEdge
                                 ? config.NorthWaterTileAt(cellHash)
                                 : config.WaterTileAt(cellHash));
                             break;
@@ -157,8 +195,8 @@ namespace TRV
                             // water (their underlay shows through any sprite transparency).
                             if (grid.Get(x, y - 1) == CellType.Water)
                             {
-                                if (extrasBehindTilemap)
-                                    extrasBehindTilemap.SetTile(pos, config.WaterTileAt(cellHash));
+                                if (behindTilemap)
+                                    behindTilemap.SetTile(pos, config.WaterTileAt(cellHash));
                             }
                             else
                             {
@@ -173,13 +211,179 @@ namespace TRV
             PaintExtrasBehindBands(grid, config);
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
+            var floorDecor = PaintFloorDecor(grid, config);
             PaintUnderWalls(grid, config); // after water decor so the underside shadow wins on overlap
             PaintDoorBackingWalls(grid, config);
             PaintNorthDoorWalls(grid, config);
+            PaintIgroomWallUnderlay(grid, config);
             PaintStairs(grid, config);
             PaintDoors(grid, config);
+            PaintWaterfalls(grid, config);
+            PaintCubePatches(grid, config, floorDecor); // after floor decor so cubes stay clear of it
             // Island decor is no longer painted — it's spawned as pooled GameObjects by
             // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
+        }
+
+        /// <summary>
+        /// Drop 1–2 waterfall columns (Halls) on the FrontOfEverything layer (above all others): from a
+        /// random column's north edge straight DOWN, stamping <see cref="BiomeConfig.WaterfallTile"/>. It
+        /// passes THROUGH the first floor block and the non-floor gap after it, then stops at the NEXT
+        /// floor tile — so a fall cascades over a room/wall and lands on the field floor below. igroom
+        /// INTERIOR floor (room-floor) is ignored (treated as non-floor, so the fall flows over it); a
+        /// stair (Floor) is a valid landing, so the fall still never runs through one. Use an AnimatedTile
+        /// for the cycling look. Deterministic per room (seeded by VariantSeed); off unless assigned (Halls).
+        /// At least ONE fall always leads into a room: it pours down a column that lands on a 3×3
+        /// <see cref="BiomeConfig.WaterfallBasePatch"/> placed fully INSIDE an igroom (off its walls), as
+        /// far as possible from that room's stairs (see <see cref="PaintIgroomWaterfall"/> +
+        /// <see cref="IgroomPatchTargets"/>). When two falls are rolled, the second either leads to a
+        /// DIFFERENT room's patch or is a plain random fall (coin flip) — so a room gets 1 patch-fall,
+        /// 2 patch-falls, or 1 patch-fall + 1 plain. The rest flow to the field floor.
+        /// </summary>
+        private void PaintWaterfalls(RoomGrid grid, BiomeConfig config)
+        {
+            if (frontOfEverythingTilemap == null || config.WaterfallTile == null) return;
+
+            var rng = new System.Random(grid.VariantSeed);
+            int count = rng.Next(MinWaterfalls, MaxWaterfalls + 1);
+            var targets = IgroomPatchTargets(grid); // (patch-centre column, patch-centre row) per hostable igroom
+            rng.Shuffle(targets);
+            int patchIdx = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                // The first fall always leads to a patch (when a room can host one); a later fall leads
+                // to a DIFFERENT room's patch, or — coin flip — is a plain random fall.
+                bool leadToPatch = patchIdx < targets.Count && (i == 0 || rng.Next(0, 2) == 0);
+                if (leadToPatch)
+                {
+                    var t = targets[patchIdx++];
+                    PaintIgroomWaterfall(grid, config, t.x, t.y);
+                }
+                else
+                {
+                    PaintFallingColumn(grid, config, rng.Next(0, grid.Width));
+                }
+            }
+        }
+
+        /// <summary>A free-falling waterfall column: from the north edge straight DOWN, through the first
+        /// floor block and the gap after it, stopping at the NEXT field-floor tile.</summary>
+        private void PaintFallingColumn(RoomGrid grid, BiomeConfig config, int x)
+        {
+            bool seenFloor = false, pastFloor = false; // pastFloor = exited the first floor block
+            for (int y = grid.Height - 1; y >= 0; y--)
+            {
+                bool isFloor = grid[x, y] == CellType.Floor && !grid.IsRoomFloor(x, y);
+                if (isFloor)
+                {
+                    if (pastFloor) break; // the next floor after the gap → land here, stop
+                    seenFloor = true;
+                }
+                else if (seenFloor) pastFloor = true; // left the first floor block
+                frontOfEverythingTilemap.SetTile(new Vector3Int(originCell.x + x, originCell.y + y, 0), config.WaterfallTile);
+            }
+        }
+
+        /// <summary>
+        /// The patch-leading waterfall: pour down column <paramref name="cx"/> from the north edge and
+        /// STOP just above the patch centre row <paramref name="pc"/>. Below the stop, stamp the
+        /// <see cref="BiomeConfig.WaterfallEnderTile"/> on the Map layer at the next 2 tiles, then a 3×3
+        /// <see cref="BiomeConfig.WaterfallBasePatch"/> on the Collision layer (Walls tilemap) centred on
+        /// (cx, pc) — fully inside the igroom interior — so the player can't walk through the fall's base.
+        /// </summary>
+        private void PaintIgroomWaterfall(RoomGrid grid, BiomeConfig config, int cx, int pc)
+        {
+            int stopY = pc + 1; // last waterfall tile = the patch's top row
+            for (int y = grid.Height - 1; y >= stopY; y--) // fall, stopping AT the stop tile
+                frontOfEverythingTilemap.SetTile(new Vector3Int(originCell.x + cx, originCell.y + y, 0), config.WaterfallTile);
+
+            if (mapTilemap != null && config.WaterfallEnderTile != null)
+                for (int d = 1; d <= 2; d++) // the 2 tiles just below the stop (= the patch's lower rows)
+                {
+                    int y = stopY - d;
+                    if (y < 0) break;
+                    mapTilemap.SetTile(new Vector3Int(originCell.x + cx, originCell.y + y, 0), config.WaterfallEnderTile);
+                }
+
+            // 3×3 collision patch on the Collision layer, centred on (cx, pc) → bottom-left (cx-1, pc-1).
+            // Tiles carry their own collider so this blocks the fall's base.
+            var pad = config.WaterfallBasePatch;
+            if (wallsTilemap != null && pad != null && pad.Length >= 9)
+                StampGroup(wallsTilemap, new PatchPlacement(cx - 1, pc - 1, 0), 3, 3, pad);
+        }
+
+        /// <summary>
+        /// One patch target per hostable igroom: the (column, row) CENTRE of a 3×3 patch placed fully
+        /// inside the igroom interior (off its walls), as FAR as possible from that room's stairs, on a
+        /// column a north-edge fall can actually reach (no other igroom above it). Reconstructs each
+        /// igroom's rect from its matched corner walls (NW + nearest NE on the top row + nearest SW down
+        /// the left column); igrooms with an interior smaller than 3×3 can't host a patch and are skipped.
+        /// </summary>
+        private static List<Vector2Int> IgroomPatchTargets(RoomGrid grid)
+        {
+            var nw = new List<Vector2Int>();
+            var ne = new List<Vector2Int>();
+            var sw = new List<Vector2Int>();
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                    if (grid.TryGetWallKind(x, y, out var k))
+                    {
+                        if (k == WallKind.NorthWest) nw.Add(new Vector2Int(x, y));
+                        else if (k == WallKind.NorthEast) ne.Add(new Vector2Int(x, y));
+                        else if (k == WallKind.SouthWest) sw.Add(new Vector2Int(x, y));
+                    }
+
+            var targets = new List<Vector2Int>();
+            foreach (var a in nw) // a = NW corner (x0, y1 = top)
+            {
+                int x0 = a.x, y1 = a.y;
+                int x1 = int.MaxValue; // nearest NE on the same top row → right edge
+                foreach (var b in ne)
+                    if (b.y == y1 && b.x > x0 && b.x < x1) x1 = b.x;
+                if (x1 == int.MaxValue) continue;
+
+                int y0 = int.MinValue; // nearest SW down the left column → bottom row
+                foreach (var c in sw)
+                    if (c.x == x0 && c.y < y1 && c.y > y0) y0 = c.y;
+                if (y0 == int.MinValue) continue;
+
+                // A 3×3 patch centre must stay 1 cell inside the interior (interior = walls + 1), so it
+                // never paints over a wall: centre column in [x0+2, x1-2], centre row in [y0+2, y1-2].
+                int cxLo = x0 + 2, cxHi = x1 - 2, pcLo = y0 + 2, pcHi = y1 - 2;
+                if (cxLo > cxHi || pcLo > pcHi) continue; // interior smaller than 3×3 → can't host a patch
+
+                // Stairs reference: average the igroom's entrance cells (fall back to the SW corner).
+                int sx = 0, sy = 0, n = 0;
+                foreach (var (gx, gy, _, _) in grid.Entrances)
+                    if (gx >= x0 && gx <= x1 && gy >= y0 && gy <= y1) { sx += gx; sy += gy; n++; }
+                float refX = n > 0 ? sx / (float)n : x0;
+                float refY = n > 0 ? sy / (float)n : y0;
+
+                // Pick the valid patch centre FARTHEST from the stairs whose column the fall can reach.
+                Vector2Int best = default;
+                float bestD = -1f;
+                for (int cx = cxLo; cx <= cxHi; cx++)
+                {
+                    if (!ColumnReachable(grid, cx, y1)) continue; // an igroom above would catch the fall first
+                    for (int pc = pcLo; pc <= pcHi; pc++)
+                    {
+                        float d = Sq(cx - refX) + Sq(pc - refY);
+                        if (d > bestD) { bestD = d; best = new Vector2Int(cx, pc); }
+                    }
+                }
+                if (bestD >= 0f) targets.Add(best);
+            }
+            return targets;
+        }
+
+        /// <summary>True if a north-edge fall down column <paramref name="cx"/> reaches an igroom whose top
+        /// wall is at <paramref name="topRow"/> — i.e. no other igroom (room-floor or recorded wall) sits
+        /// above it on that column.</summary>
+        private static bool ColumnReachable(RoomGrid grid, int cx, int topRow)
+        {
+            for (int y = topRow + 1; y < grid.Height; y++)
+                if (grid.IsRoomFloor(cx, y) || grid.TryGetWallKind(cx, y, out _)) return false;
+            return true;
         }
 
         /// <summary>
@@ -230,6 +434,30 @@ namespace TRV
                 config.NorthDoorRightWallTile);
         }
 
+        /// <summary>
+        /// Paint a water collision tile on the UnseenCollision layer directly UNDER every igroom wall
+        /// sprite (the wall's OWN cell) EXCEPT the STRAIGHT south wall (`WallKind.South`, which gets a
+        /// floor tile beneath it instead) — the SW/SE corners still get the underlay. The underlay sits on the wall cell, NOT the
+        /// cell below, so the interior row just inside the north wall stays walkable (placing it below
+        /// would shrink the room by a row on its north edge). Halls only (igroom walls carry a recorded
+        /// WallKind; the water collision routes to the UnseenCollision layer there).
+        /// </summary>
+        private void PaintIgroomWallUnderlay(RoomGrid grid, BiomeConfig config)
+        {
+            var collision = WaterCollisionTilemap(config);
+            if (collision == null) return;
+
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[x, y] != CellType.Wall) continue;           // actual igroom wall cells only
+                    if (!grid.TryGetWallKind(x, y, out var k)) continue; // need the kind to skip south walls
+                    if (k == WallKind.South) continue;                   // straight south walls only (corners keep it)
+                    collision.SetTile(new Vector3Int(originCell.x + x, originCell.y + y, 0),
+                        config.WaterTileAt(RoomSeed.CellHash(grid.VariantSeed, x, y)));
+                }
+        }
+
         private static WallKind EdgeWallKind(Cardinal edge) => edge switch
         {
             Cardinal.North => WallKind.North,
@@ -257,6 +485,270 @@ namespace TRV
                 }
         }
 
+        /// <summary>
+        /// Scatter 2–3 floor decor columns (Halls) on the ExtrasFrontOfPlayer layer: a vertical tile
+        /// strip (<see cref="BiomeConfig.FloorDecorColumn"/>, authored TOP→BOTTOM) stood on a FIELD floor
+        /// cell (bottom on the floor, rising up). The bottom cell also gets a water tile on the collision
+        /// layer (UnseenCollision in Halls), so the base BLOCKS movement. Valid spots are scanned
+        /// exhaustively (the constraints make them sparse, so random sampling would often come up short),
+        /// shuffled deterministically (VariantSeed), then placed greedily up to the target with spacing.
+        /// Off unless the column is assigned (Halls).
+        /// </summary>
+        private List<Vector2Int> PaintFloorDecor(RoomGrid grid, BiomeConfig config)
+        {
+            var placed = new List<Vector2Int>();
+            var col = config.FloorDecorColumn;
+            if (extrasFrontOfPlayerTilemap == null || col == null || col.Length == 0) return placed;
+
+            int h = col.Length;
+            if (h > grid.Height) return placed;
+            var rng = new System.Random(unchecked(grid.VariantSeed * 31 + 17)); // decoupled from the waterfall rng
+
+            // The 4 room door landings — keep the (solid-based) decor clear of them so it can't block a door.
+            var landings = new Vector2Int[4];
+            for (int d = 0; d < 4; d++) landings[d] = RoomDoors.Landing(config, grid, (Cardinal)d);
+
+            // Every valid bottom cell: field floor with FLOOR all around (its solid base can't pinch a
+            // corridor), with room above for the column, clear of the doors.
+            var candidates = new List<Vector2Int>();
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y <= grid.Height - h; y++)
+                    if (IsFieldFloor(grid, x, y) && SurroundedByFloor(grid, x, y)
+                        && !WithinChebyshev(landings, x, y, FloorDecorDoorClearance))
+                        candidates.Add(new Vector2Int(x, y));
+            rng.Shuffle(candidates);
+
+            int target = rng.Next(MinFloorDecor, MaxFloorDecor + 1);
+            var collision = WaterCollisionTilemap(config);
+
+            foreach (var c in candidates)
+            {
+                if (placed.Count >= target) break;
+                if (WithinChebyshev(placed, c.x, c.y, FloorDecorSpacing)) continue; // keep decors apart
+                placed.Add(c);
+
+                for (int t = 0; t < h; t++) // col[0] = top → highest cell, col[h-1] = bottom on the floor
+                {
+                    if (col[t] == null) continue;
+                    extrasFrontOfPlayerTilemap.SetTile(
+                        new Vector3Int(originCell.x + c.x, originCell.y + c.y + (h - 1 - t), 0), col[t]);
+                }
+
+                if (collision != null) // base blocks movement: a water collision tile under the bottom cell
+                    collision.SetTile(new Vector3Int(originCell.x + c.x, originCell.y + c.y, 0),
+                        config.WaterTileAt(RoomSeed.CellHash(grid.VariantSeed, c.x, c.y)));
+            }
+            return placed;
+        }
+
+        /// <summary>
+        /// Place 2–3 3×3 cube patches (<see cref="BiomeConfig.CubePatch"/>) split across two layers —
+        /// never all on one (2 → 1 behind + 1 front, 3 → 2/1). Behind cubes (ExtrasBehind) anchor their
+        /// bottom-middle on an igroom SOUTH corner (the one farthest from that room's stairs); front
+        /// cubes (ExtrasFrontOfPlayer) sit with their bottom edge on the room's south edge (y = 0),
+        /// never on an igroom or a door. Cubes only need to not OVERLAP each other or the floor decor
+        /// columns — they may sit right next to one another. <see cref="MinCubeCount"/> is guaranteed:
+        /// if the split placement comes up short, a fallback fills from ANY igroom south corner.
+        /// Deterministic (VariantSeed). Off unless the cube patch is assigned (Halls).
+        /// </summary>
+        private void PaintCubePatches(RoomGrid grid, BiomeConfig config, List<Vector2Int> floorDecor)
+        {
+            var tiles = config.CubePatch;
+            if (tiles == null || tiles.Length < CubeSize * CubeSize) return;
+            if (extrasBehindTilemap == null && extrasFrontOfPlayerTilemap == null) return;
+
+            var rng = new System.Random(unchecked(grid.VariantSeed * 131 + 7)); // decoupled from the other passes
+
+            // 2–3 cubes total, split across the two layers but NEVER all on one: 2 → 1 behind + 1 front,
+            // 3 → 2/1 (randomly which layer gets the pair).
+            int total = rng.Next(MinCubeCount, MaxCubeCount + 1);
+            int behindTarget = total == 3 ? (rng.Next(0, 2) == 0 ? 2 : 1) : 1;
+            int frontTarget = total - behindTarget;
+
+            // Cubes must not OVERLAP each other or the floor decor columns (close/adjacent is fine).
+            var occupied = new HashSet<Vector2Int>(floorDecor);
+            int placed = 0;
+
+            // Mode 1 (ExtrasBehind): bottom-middle on the igroom south corner farthest from its stairs.
+            int behindPlaced = 0;
+            if (extrasBehindTilemap != null && behindTarget > 0)
+            {
+                var corners = BehindCubeCorners(grid);
+                rng.Shuffle(corners);
+                foreach (var c in corners)
+                {
+                    if (behindPlaced >= behindTarget) break;
+                    if (CubeHitsDoor(grid, c.x - 1, c.y)) continue;          // never on a door
+                    if (TryPlaceCube(extrasBehindTilemap, c.x - 1, c.y, grid, tiles, occupied))
+                        behindPlaced++;
+                }
+            }
+
+            // Mode 2 (ExtrasFrontOfPlayer): bottom edge on the south edge; absorbs any unplaced behind cubes.
+            int frontGoal = frontTarget + (behindTarget - behindPlaced);
+            if (extrasFrontOfPlayerTilemap != null && frontGoal > 0)
+            {
+                var xs = new List<int>();
+                for (int x = 0; x <= grid.Width - CubeSize; x++) xs.Add(x);
+                rng.Shuffle(xs);
+                int frontPlaced = 0;
+                foreach (int x in xs)
+                {
+                    if (frontPlaced >= frontGoal) break;
+                    if (CubeHitsDoor(grid, x, 0) || CubeHitsIgroom(grid, x, 0)) continue; // never on a door/igroom
+                    if (TryPlaceCube(extrasFrontOfPlayerTilemap, x, 0, grid, tiles, occupied))
+                        frontPlaced++;
+                }
+                placed = behindPlaced + frontPlaced;
+            }
+            else
+            {
+                placed = behindPlaced;
+            }
+
+            // Guarantee at least MinCubeCount: if we came up short (e.g. the south edge was all
+            // igrooms/doors), fill the rest from ANY igroom south corner on the behind layer.
+            if (placed < MinCubeCount && extrasBehindTilemap != null)
+            {
+                var corners = AllSouthCorners(grid);
+                rng.Shuffle(corners);
+                foreach (var c in corners)
+                {
+                    if (placed >= MinCubeCount) break;
+                    if (CubeHitsDoor(grid, c.x - 1, c.y)) continue;
+                    if (TryPlaceCube(extrasBehindTilemap, c.x - 1, c.y, grid, tiles, occupied))
+                        placed++;
+                }
+            }
+        }
+
+        /// <summary>Stamp a 3×3 cube at bottom-left (bx,by) on <paramref name="map"/> if it fits in the
+        /// grid and none of its footprint cells are already occupied (so cubes never overlap each other
+        /// or the floor decor); marks the footprint occupied and returns true on success.</summary>
+        private bool TryPlaceCube(Tilemap map, int bx, int by, RoomGrid grid, TileBase[] tiles,
+                                  HashSet<Vector2Int> occupied)
+        {
+            if (bx < 0 || by < 0 || bx + CubeSize > grid.Width || by + CubeSize > grid.Height) return false;
+            for (int dx = 0; dx < CubeSize; dx++)
+                for (int dy = 0; dy < CubeSize; dy++)
+                    if (occupied.Contains(new Vector2Int(bx + dx, by + dy))) return false; // would overlap
+
+            StampGroup(map, new PatchPlacement(bx, by, 0), CubeSize, CubeSize, tiles);
+            for (int dx = 0; dx < CubeSize; dx++)
+                for (int dy = 0; dy < CubeSize; dy++)
+                    occupied.Add(new Vector2Int(bx + dx, by + dy));
+            return true;
+        }
+
+        /// <summary>Every igroom SOUTH corner (SW/SE), any row — the broad candidate pool for the
+        /// minimum-count fallback.</summary>
+        private static List<Vector2Int> AllSouthCorners(RoomGrid grid)
+        {
+            var corners = new List<Vector2Int>();
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                    if (grid.TryGetWallKind(x, y, out var k)
+                        && (k == WallKind.SouthWest || k == WallKind.SouthEast))
+                        corners.Add(new Vector2Int(x, y));
+            return corners;
+        }
+
+        /// <summary>
+        /// One behind-cube anchor per igroom: the SOUTH corner (SW or SE) FARTHEST from that igroom's
+        /// stairs (its doorway). Reconstructs each igroom's rect from its corner wall kinds (SW + nearest
+        /// SE on the same bottom row + nearest NW up the same left column), then averages the entrance
+        /// cells that fall inside it for the stairs position and keeps the farther of the two south
+        /// corners. Only igrooms whose south corner is off the bottom <see cref="CubeBehindMinRow"/> rows
+        /// qualify (so behind cubes stay away from the front ones at the south edge, with most of the map
+        /// still available). If a room has no recorded stairs, its SW corner.
+        /// </summary>
+        private static List<Vector2Int> BehindCubeCorners(RoomGrid grid)
+        {
+            var sw = new List<Vector2Int>();
+            var se = new List<Vector2Int>();
+            var nw = new List<Vector2Int>();
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                    if (grid.TryGetWallKind(x, y, out var k))
+                    {
+                        if (k == WallKind.SouthWest) sw.Add(new Vector2Int(x, y));
+                        else if (k == WallKind.SouthEast) se.Add(new Vector2Int(x, y));
+                        else if (k == WallKind.NorthWest) nw.Add(new Vector2Int(x, y));
+                    }
+
+            var result = new List<Vector2Int>();
+            foreach (var a in sw) // a = SW corner (x0, y0 = bottom)
+            {
+                if (a.y < CubeBehindMinRow) continue; // keep the south corner off the bottom rows (away from front cubes)
+
+                int x1 = int.MaxValue; // SE corner: nearest to the right on the same bottom row
+                foreach (var b in se) if (b.y == a.y && b.x > a.x && b.x < x1) x1 = b.x;
+                if (x1 == int.MaxValue) continue;
+
+                int y1 = int.MaxValue; // NW corner: nearest above on the same left column → top row
+                foreach (var c in nw) if (c.x == a.x && c.y > a.y && c.y < y1) y1 = c.y;
+                if (y1 == int.MaxValue) continue;
+
+                var swCorner = a;
+                var seCorner = new Vector2Int(x1, a.y);
+
+                // Stairs centroid: average the entrance cells inside this igroom's rect.
+                int sx = 0, sy = 0, n = 0;
+                foreach (var (gx, gy, _, _) in grid.Entrances)
+                    if (gx >= a.x && gx <= x1 && gy >= a.y && gy <= y1) { sx += gx; sy += gy; n++; }
+
+                if (n == 0) { result.Add(swCorner); continue; }
+                float cx = sx / (float)n, cy = sy / (float)n;
+                float dSW = Sq(swCorner.x - cx) + Sq(swCorner.y - cy);
+                float dSE = Sq(seCorner.x - cx) + Sq(seCorner.y - cy);
+                result.Add(dSE > dSW ? seCorner : swCorner);
+            }
+            return result;
+        }
+
+        private static float Sq(float v) => v * v;
+
+        /// <summary>True if any cell of the 3×3 cube footprint (bottom-left bx,by) is a Door cell.</summary>
+        private static bool CubeHitsDoor(RoomGrid grid, int bx, int by)
+        {
+            for (int dx = 0; dx < CubeSize; dx++)
+                for (int dy = 0; dy < CubeSize; dy++)
+                    if (grid.Get(bx + dx, by + dy) == CellType.Door) return true;
+            return false;
+        }
+
+        /// <summary>True if any cell of the footprint belongs to an igroom — its interior room-floor or
+        /// its recorded wall border. Keeps the FRONT cubes off igrooms entirely.</summary>
+        private static bool CubeHitsIgroom(RoomGrid grid, int bx, int by)
+        {
+            for (int dx = 0; dx < CubeSize; dx++)
+                for (int dy = 0; dy < CubeSize; dy++)
+                {
+                    int x = bx + dx, y = by + dy;
+                    if (grid.IsRoomFloor(x, y) || grid.TryGetWallKind(x, y, out _)) return true;
+                }
+            return false;
+        }
+
+        /// <summary>True if (x, y) is within <paramref name="radius"/> cells (Chebyshev) of any of the
+        /// given points.</summary>
+        private static bool WithinChebyshev(IReadOnlyList<Vector2Int> points, int x, int y, int radius)
+        {
+            for (int i = 0; i < points.Count; i++)
+                if (Mathf.Abs(x - points[i].x) <= radius && Mathf.Abs(y - points[i].y) <= radius) return true;
+            return false;
+        }
+
+        /// <summary>True if the cell and all 8 neighbours are Floor — a fully open spot, so making the
+        /// cell solid can't pinch a 1-wide corridor.</summary>
+        private static bool SurroundedByFloor(RoomGrid grid, int x, int y)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dy = -1; dy <= 1; dy++)
+                    if (grid.Get(x + dx, y + dy) != CellType.Floor) return false;
+            return true;
+        }
+
         /// <summary>Stamp the 2×3 water decor groups over open water (ExtrasFrontOfPlayer — in front
         /// of the player).</summary>
         private void PaintWaterDecor(RoomGrid grid, BiomeConfig config)
@@ -270,22 +762,23 @@ namespace TRV
         }
 
         /// <summary>
-        /// Fill the ExtrasBehind layer (whole width) with fixed horizontal bands from beneath the north
-        /// edge down to the south: TWO NorthBehind rows, one Transition1 row, one Transition2 row, then
-        /// Blank fills the rest to the bottom. The top north-edge row keeps its water backdrop
+        /// Fill the ExtrasFullBehind layer (whole width) with fixed horizontal bands from beneath the
+        /// north edge down to the south: TWO NorthBehind rows, one Transition1 row, one Transition2 row,
+        /// then Blank fills the rest to the bottom. The top north-edge row keeps its water backdrop
         /// (this starts one cell below it). Off unless <see cref="BiomeConfig.NorthBehindTile"/> is
         /// assigned (so it only affects Halls). At WATER cells the band tile goes on the collision layer
-        /// instead (water would otherwise hide the ExtrasBehind tile) — it replaces the water tile and
+        /// instead (water would otherwise hide the backmost tile) — it replaces the water tile and
         /// carries that cell's collision, so the band tiles used over water need a collider type.
         /// </summary>
         private void PaintExtrasBehindBands(RoomGrid grid, BiomeConfig config)
         {
-            if (extrasBehindTilemap == null || config.NorthBehindTile == null) return;
+            if (extrasFullBehindTilemap == null || config.NorthBehindTile == null) return;
 
             int total = grid.Height - config.WallThickness; // banded rows: y in [0, total)
             if (total <= 0) return;
 
             const int north = 2; // two NorthBehind rows, then straight into the transition
+            var collision = WaterCollisionTilemap(config); // Halls water collision → UnseenCollision
 
             int topY = grid.Height - 1 - config.WallThickness; // first row beneath the north edge
             for (int depth = 0; depth < total; depth++)
@@ -296,10 +789,10 @@ namespace TRV
                     var tile = BandTile(config, grid, x, y, depth, north);
                     if (tile == null) continue;
                     var pos = new Vector3Int(originCell.x + x, originCell.y + y, 0);
-                    if (grid[x, y] == CellType.Water && wallsTilemap != null)
-                        wallsTilemap.SetTile(pos, tile); // over water → collision layer (keeps it solid)
+                    if (grid[x, y] == CellType.Water && collision != null)
+                        collision.SetTile(pos, tile); // over water → collision layer (keeps it solid)
                     else
-                        extrasBehindTilemap.SetTile(pos, tile);
+                        extrasFullBehindTilemap.SetTile(pos, tile);
                 }
             }
         }
@@ -477,11 +970,14 @@ namespace TRV
         public void Clear()
         {
             if (wallsTilemap) wallsTilemap.ClearAllTiles();
+            if (unseenCollisionTilemap) unseenCollisionTilemap.ClearAllTiles();
             if (mapTilemap) mapTilemap.ClearAllTiles();
             if (doorTilemap) doorTilemap.ClearAllTiles();
             if (extrasTilemap) extrasTilemap.ClearAllTiles();
             if (extrasBehindTilemap) extrasBehindTilemap.ClearAllTiles();
+            if (extrasFullBehindTilemap) extrasFullBehindTilemap.ClearAllTiles();
             if (extrasFrontOfPlayerTilemap) extrasFrontOfPlayerTilemap.ClearAllTiles();
+            if (frontOfEverythingTilemap) frontOfEverythingTilemap.ClearAllTiles();
         }
 
         /// <summary>Capture the room's current tiles + per-cell transforms (all layers) for later
@@ -497,11 +993,14 @@ namespace TRV
             {
                 Bounds = bounds,
                 Walls = CaptureLayer(wallsTilemap, bounds),
+                UnseenCollision = CaptureLayer(unseenCollisionTilemap, bounds),
                 Map = CaptureLayer(mapTilemap, bounds),
                 Door = CaptureLayer(doorTilemap, bounds),
                 Extras = CaptureLayer(extrasTilemap, bounds),
                 ExtrasBehind = CaptureLayer(extrasBehindTilemap, bounds),
+                ExtrasFullBehind = CaptureLayer(extrasFullBehindTilemap, bounds),
                 ExtrasFrontOfPlayer = CaptureLayer(extrasFrontOfPlayerTilemap, bounds),
+                FrontOfEverything = CaptureLayer(frontOfEverythingTilemap, bounds),
             };
         }
 
@@ -510,11 +1009,14 @@ namespace TRV
         {
             Clear();
             RestoreLayer(wallsTilemap, snap.Bounds, snap.Walls);
+            RestoreLayer(unseenCollisionTilemap, snap.Bounds, snap.UnseenCollision);
             RestoreLayer(mapTilemap, snap.Bounds, snap.Map);
             RestoreLayer(doorTilemap, snap.Bounds, snap.Door);
             RestoreLayer(extrasTilemap, snap.Bounds, snap.Extras);
             RestoreLayer(extrasBehindTilemap, snap.Bounds, snap.ExtrasBehind);
+            RestoreLayer(extrasFullBehindTilemap, snap.Bounds, snap.ExtrasFullBehind);
             RestoreLayer(extrasFrontOfPlayerTilemap, snap.Bounds, snap.ExtrasFrontOfPlayer);
+            RestoreLayer(frontOfEverythingTilemap, snap.Bounds, snap.FrontOfEverything);
         }
 
         private static LayerSnapshot CaptureLayer(Tilemap tilemap, BoundsInt bounds)

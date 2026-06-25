@@ -145,8 +145,9 @@ namespace TRV
                         "the corridor floor). Leave empty to reuse the regular Floor pool.")]
         [field: SerializeField] public TileBase[] RoomFloorTileVariants { get; private set; }
 
-        [field: Tooltip("Water pool (e.g. 5 tiles): every water cell — and the water backdrop " +
-                        "behind walls — picks one at random, all equal chance.")]
+        [field: Tooltip("Water pool: every water cell — and the water backdrop behind walls — picks one " +
+                        "at random, all equal chance. ONE entry = uniform water (use a single AnimatedTile " +
+                        "here for animated water).")]
         [field: SerializeField] public TileBase[] WaterTileVariants { get; private set; }
 
         [field: Tooltip("North-edge water tile: the water cells along the very top of the room (the " +
@@ -157,6 +158,35 @@ namespace TRV
         [field: Tooltip("UnderWall tile: painted on the Extras FRONT layer over a water cell that sits " +
                         "directly BENEATH a Building or Floor tile (the shadowed underside). Empty = off.")]
         [field: SerializeField] public TileBase UnderWallTile { get; private set; }
+
+        [field: Tooltip("Waterfall tile (Halls): 1–2 columns painted on the FrontOfEverything layer " +
+                        "(topmost, above all others) from the north edge down — through the first floor " +
+                        "block + the gap after it, landing on the next floor (igroom interior floor is " +
+                        "flowed over, stairs stop it). Use an AnimatedTile (e.g. 6 frames). Empty = off.")]
+        [field: SerializeField] public TileBase WaterfallTile { get; private set; }
+
+        [field: Tooltip("Waterfall ender tile (Halls): painted on the Map layer at the 2 tiles just below " +
+                        "where the igroom-threading waterfall stops (its middle tile) — the base/pool of " +
+                        "the fall. A 3×3 collision pad is also stamped centered on the first of them. Empty = off.")]
+        [field: SerializeField] public TileBase WaterfallEnderTile { get; private set; }
+
+        [field: Tooltip("Waterfall base patch (Halls): a 3×3 tile group (9 tiles row-major TOP row first) " +
+                        "painted on the COLLISION layer centred on the first waterfall ender tile (the " +
+                        "fall's base). Use tiles with a collider type so it blocks movement. Empty = off.")]
+        [field: SerializeField] public TileBase[] WaterfallBasePatch { get; private set; }
+
+        [field: Tooltip("Floor decor column (Halls): a vertical tile strip authored TOP→BOTTOM, placed " +
+                        "1–3 times on the field floor on the ExtrasFrontOfPlayer layer (bottom tile on the " +
+                        "floor, rising up). Its bottom cell gets a water collision tile on UnseenCollision " +
+                        "so the base blocks movement. Empty = off.")]
+        [field: SerializeField] public TileBase[] FloorDecorColumn { get; private set; }
+
+        [field: Tooltip("Cube patch (Halls): a 3×3 tile group, 9 tiles row-major TOP row first. 3 per " +
+                        "room, split across two layers (always 2/1, never all on one): some on " +
+                        "ExtrasBehind with the bottom-middle cell on an igroom's south corner, the rest on " +
+                        "ExtrasFrontOfPlayer with the bottom edge along the room's south edge (kept clear " +
+                        "of each other and the floor decor columns). Empty = off.")]
+        [field: SerializeField] public TileBase[] CubePatch { get; private set; }
 
         [field: Header("Tiles — Room doors (the 4 perimeter doors)")]
         [field: SerializeField] public TileBase DoorTile { get; private set; }

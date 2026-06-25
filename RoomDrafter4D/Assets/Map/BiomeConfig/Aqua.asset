@@ -25,9 +25,6 @@ MonoBehaviour:
   <ExtraCorridorNodes>k__BackingField: 1
   <HallMoatThickness>k__BackingField: 2
   <HallMainRoomSize>k__BackingField: 6
-  <HallExtraRooms>k__BackingField: 3
-  <HallRoomSizeRange>k__BackingField: {x: 2, y: 6}
-  <HallFloorGrowth>k__BackingField: 2
   <BuildingLeftTile>k__BackingField: {fileID: 11400000, guid: cb6f9f0d87e187a4a9f5a8d7a5cf4b48, type: 2}
   <BuildingMiddleTile>k__BackingField: {fileID: 11400000, guid: 089e2f9cc4bf60742b2478bc42b10067, type: 2}
   <BuildingRightTile>k__BackingField: {fileID: 11400000, guid: 390db4f8b4d79904e8628e114376c974, type: 2}
@@ -95,13 +92,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e65d4a2456bb607448aceb6c06bf9fb3, type: 2}
   <RoomFloorTileVariants>k__BackingField: []
   <WaterTileVariants>k__BackingField:
-  - {fileID: 11400000, guid: 366ac9b314974b145b3acfd6d9802292, type: 2}
-  - {fileID: 11400000, guid: f28d9388eb6e34b48874179779056b90, type: 2}
-  - {fileID: 11400000, guid: eb576360c8b82be4ea9631d87257cea0, type: 2}
-  - {fileID: 11400000, guid: 2d4bbeb50fa219b458dbc2067f4e9b9b, type: 2}
-  - {fileID: 11400000, guid: 101cf8310e285e047a3e96217bf61fae, type: 2}
+  - {fileID: 11400000, guid: 19ebc817119c9bb4f839ea47a1756934, type: 2}
   <NorthWaterTile>k__BackingField: {fileID: 0}
   <UnderWallTile>k__BackingField: {fileID: 11400000, guid: 6542c7abfbc8754438a88bb3c6249151, type: 2}
+  <WaterfallTile>k__BackingField: {fileID: 0}
   <DoorTile>k__BackingField: {fileID: 11400000, guid: 7174639161616fb48a1f7507292b6e69, type: 2}
   <LeftRoomDoorTile>k__BackingField: {fileID: 0}
   <RightRoomDoorTile>k__BackingField: {fileID: 0}

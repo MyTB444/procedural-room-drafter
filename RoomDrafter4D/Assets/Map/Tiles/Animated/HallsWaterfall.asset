@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13b75c95f34a00d4e8c04f76b73312e6, type: 3}
+  m_Name: HallsWaterfall
+  m_EditorClassIdentifier: Unity.2D.Tilemap.Extras::UnityEngine.Tilemaps.AnimatedTile
+  m_AnimatedSprites:
+  - {fileID: 21300000, guid: 23d1046d9e4e4ab4a80040eac9a5248e, type: 2}
+  - {fileID: 21300000, guid: 90f3dbdd7dd5a054f8bcdf97674ff238, type: 2}
+  - {fileID: 21300000, guid: f3af518036562f441ac7f5fba1e6aad3, type: 2}
+  - {fileID: 21300000, guid: ade15f6ff29ec57459f59d2882cb98b1, type: 2}
+  - {fileID: 21300000, guid: 2ae41784001a8344a802d8c27633a339, type: 2}
+  - {fileID: 21300000, guid: 6cc3e1b23820fa3469e0125aa30490cf, type: 2}
+  - {fileID: 21300000, guid: f4b89a66b6f7e0740b7dfd3e10cc6d7a, type: 2}
+  - {fileID: 21300000, guid: 579058b4ec2c1b1429f6eca1721f02e6, type: 2}
+  m_MinSpeed: 7
+  m_MaxSpeed: 7
+  m_AnimationStartTime: 0
+  m_AnimationStartFrame: 0
+  m_TileColliderType: 0
+  m_TileAnimationFlags: 0

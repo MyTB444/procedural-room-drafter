@@ -25,9 +25,6 @@ MonoBehaviour:
   <ExtraCorridorNodes>k__BackingField: 1
   <HallMoatThickness>k__BackingField: 1
   <HallMainRoomSize>k__BackingField: 6
-  <HallExtraRooms>k__BackingField: 8
-  <HallRoomSizeRange>k__BackingField: {x: 4, y: 6}
-  <HallFloorGrowth>k__BackingField: 2
   <BuildingLeftTile>k__BackingField: {fileID: 0}
   <BuildingMiddleTile>k__BackingField: {fileID: 0}
   <BuildingRightTile>k__BackingField: {fileID: 0}
@@ -53,6 +50,33 @@ MonoBehaviour:
   <WaterTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 2bf2b9006978ac343b220d1b338d9363, type: 2}
   <NorthWaterTile>k__BackingField: {fileID: 11400000, guid: 8c7175b094e9bb64db932b9ceeb20947, type: 2}
+  <UnderWallTile>k__BackingField: {fileID: 0}
+  <WaterfallTile>k__BackingField: {fileID: 11400000, guid: c1c53f2862e8cd94faa77bfeafe8907f, type: 2}
+  <WaterfallEnderTile>k__BackingField: {fileID: 11400000, guid: 2502fc60a0c88674fa3c6b5e527f30ab, type: 2}
+  <WaterfallBasePatch>k__BackingField:
+  - {fileID: 11400000, guid: 038e2b374ce0a454090334c870e65bd1, type: 2}
+  - {fileID: 11400000, guid: 56a3851276b9e7d419720c0d4f701d85, type: 2}
+  - {fileID: 11400000, guid: 61c5e3ff859292b498e0e611a4691a93, type: 2}
+  - {fileID: 11400000, guid: 854477b9d8a25524f928845fe3a2077a, type: 2}
+  - {fileID: 11400000, guid: 2502fc60a0c88674fa3c6b5e527f30ab, type: 2}
+  - {fileID: 11400000, guid: 398af59e94a9a58418fd4ddd80817cf7, type: 2}
+  - {fileID: 11400000, guid: d65b5565855698e46b24a5910bd83993, type: 2}
+  - {fileID: 11400000, guid: 18f043bd639f4064ba386393ce7b6cbd, type: 2}
+  - {fileID: 11400000, guid: 6c8e71b4f7c77b14e8021cde2568a1ca, type: 2}
+  <FloorDecorColumn>k__BackingField:
+  - {fileID: 11400000, guid: 4c39e412fef387f408254cc51b0e3073, type: 2}
+  - {fileID: 11400000, guid: 669d1fdf8d2530a48af2d801c3af4743, type: 2}
+  - {fileID: 11400000, guid: 2b7df12897da5324b84295b99866524a, type: 2}
+  <CubePatch>k__BackingField:
+  - {fileID: 11400000, guid: 8bc863ffd97b04e4889a382dbbe2671d, type: 2}
+  - {fileID: 11400000, guid: 5f9d043339789a240906bd247ea7e4c5, type: 2}
+  - {fileID: 11400000, guid: 184529af57858da43a98400bc54668be, type: 2}
+  - {fileID: 11400000, guid: 16e2a41720f37f54a8dd33f77dd0b49e, type: 2}
+  - {fileID: 11400000, guid: 139b4c7e70931ba4a9935132a421c199, type: 2}
+  - {fileID: 11400000, guid: fd2f853d51e81c744989d1bb5e75c057, type: 2}
+  - {fileID: 11400000, guid: 52407b1fafcc46d4da577b6320331e86, type: 2}
+  - {fileID: 11400000, guid: 2df421b25569b394ba0ed874fde49c24, type: 2}
+  - {fileID: 11400000, guid: f542b7166aaac4c42ba8d31a523441e0, type: 2}
   <DoorTile>k__BackingField: {fileID: 11400000, guid: 75d2d3a941a4d284781147a9ce880f9a, type: 2}
   <LeftRoomDoorTile>k__BackingField: {fileID: 11400000, guid: 1e9d155bfc893834c93145bb165fbcae, type: 2}
   <RightRoomDoorTile>k__BackingField: {fileID: 11400000, guid: 47058316ab1a6ce49ae3122d750f02f1, type: 2}
