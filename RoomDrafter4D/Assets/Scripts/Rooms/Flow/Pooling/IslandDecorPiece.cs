@@ -57,6 +57,9 @@ namespace TRV
             _onDestroyed?.Invoke(); // drop the placement so a revisited room won't respawn it
             _onDestroyed = null;    // fire once
 
+            // Maybe drop a collectable (optional component on the decor prefab; rolls its own chance).
+            if (TryGetComponent<CollectableDropper>(out var dropper)) dropper.TryDrop(transform.position);
+
             if (_collider != null) _collider.enabled = false;   // stop being hit / blocking at once
             if (_animator != null) _animator.SetTrigger(breakParam);
 

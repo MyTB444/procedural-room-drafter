@@ -61,6 +61,10 @@ namespace TRV
         /// <summary>8-way direction of the most recent attack, aimed at the cursor (independent of movement).</summary>
         public CharacterDirection AttackDirection { get; private set; } = CharacterDirection.South;
 
+        /// <summary>Fraction of the attack cooldown still remaining (1 = just attacked, 0 = ready to swing).
+        /// Reflects the CURRENT cooldown length, so it stays accurate if an effect changes it — for UI.</summary>
+        public float AttackCooldownRemaining01 => _attackCooldown.Remaining01;
+
         public event Action<CharacterDirection> FacingChanged;
         public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
         public event Action<CharacterDirection> Attacked;    // passes the aimed attack direction

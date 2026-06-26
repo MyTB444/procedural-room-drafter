@@ -29,6 +29,9 @@ namespace TRV
         [Tooltip("Pools/spawns enemies per room. Optional — auto-found if present.")]
         [SerializeField] private EnemyPool enemyPool;
 
+        [Tooltip("Pools collectables; cleared on room change. Optional — auto-found if present.")]
+        [SerializeField] private CollectablePool collectablePool;
+
         [Header("Start")]
         [Tooltip("Roll a fresh world seed every session so rooms differ run-to-run. Turn OFF to keep " +
                  "the fixed 'World Seed' below (reproducible rooms for debugging). Seeds are never " +
@@ -85,6 +88,7 @@ namespace TRV
             if (painter == null) painter = GetComponent<TilemapPainter>();
             if (decorPool == null) decorPool = FindFirstObjectByType<IslandDecorPool>();
             if (enemyPool == null) enemyPool = FindFirstObjectByType<EnemyPool>();
+            if (collectablePool == null) collectablePool = FindFirstObjectByType<CollectablePool>();
             if (player == null)
             {
                 var found = FindFirstObjectByType<TRVController>();
@@ -195,6 +199,7 @@ namespace TRV
             // Swap the pooled objects over to this room (each releases the previous room's first).
             if (decorPool != null) decorPool.Show(_currentIslandDecor, painter, roomBiome);
             if (enemyPool != null) enemyPool.Populate(enemyPositions, roomBiome);
+            if (collectablePool != null) collectablePool.ReleaseAll(); // clear any uncollected drops from the old room
 
             // Spawn in FRONT of the actual door on the entry edge (so doors can be anywhere on it).
             if (player != null)

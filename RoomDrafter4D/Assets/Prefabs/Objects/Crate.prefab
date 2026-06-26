@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4275382012419409805}
   - component: {fileID: 8029517998144892864}
   - component: {fileID: 4200734005851755383}
+  - component: {fileID: -4604061919407691698}
   m_Layer: 7
   m_Name: Crate
   m_TagString: Untagged
@@ -180,3 +181,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-4604061919407691698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8161980004430131537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1014ac554ba8b02458a889ed2837c58c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TRV.CollectableDropper
+  drops:
+  - Prefab: {fileID: 3143547847192703935, guid: e42826508708a214e9a0099d722b0102, type: 3}
+    Chance: 0.3
+  scatterRadius: 0.25

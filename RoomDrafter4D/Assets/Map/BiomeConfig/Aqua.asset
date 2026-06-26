@@ -59,7 +59,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 0
+  <EnemiesPerRoom>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
   - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
@@ -96,6 +96,10 @@ MonoBehaviour:
   <NorthWaterTile>k__BackingField: {fileID: 0}
   <UnderWallTile>k__BackingField: {fileID: 11400000, guid: 6542c7abfbc8754438a88bb3c6249151, type: 2}
   <WaterfallTile>k__BackingField: {fileID: 0}
+  <WaterfallEnderTile>k__BackingField: {fileID: 0}
+  <WaterfallBasePatch>k__BackingField: []
+  <FloorDecorColumn>k__BackingField: []
+  <CubePatch>k__BackingField: []
   <DoorTile>k__BackingField: {fileID: 11400000, guid: 7174639161616fb48a1f7507292b6e69, type: 2}
   <LeftRoomDoorTile>k__BackingField: {fileID: 0}
   <RightRoomDoorTile>k__BackingField: {fileID: 0}
