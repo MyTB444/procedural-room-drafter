@@ -19,6 +19,9 @@ namespace TRV
     ///   • Attack           (Trigger) — fired on each attack.
     ///   • DashX, DashY     (Float)   — unit vector of the dash direction (dash blend tree).
     ///   • Dash             (Trigger) — fired when a dash burst starts.
+    ///   • InteractX        (Float)   — horizontal sign of the interact (-1 left, +1 right); the
+    ///                                  interact is LEFT/RIGHT only, so pick the clip on its sign.
+    ///   • Interact         (Trigger) — fired on each interact.
     /// </summary>
     [RequireComponent(typeof(TRVController))]
     public class TRVAnimator : MonoBehaviour
@@ -41,9 +44,12 @@ namespace TRV
         [SerializeField] private string dashXParam = "DashX";
         [SerializeField] private string dashYParam = "DashY";
         [SerializeField] private string dashTriggerParam = "Dash";
+        [SerializeField] private string interactXParam = "InteractX";
+        [SerializeField] private string interactTriggerParam = "Interact";
 
         private AnimParam _lookX, _lookY, _isMoving, _speed, _attackX, _attackY, _attack;
         private AnimParam _dashX, _dashY, _dash;
+        private AnimParam _interactX, _interact;
 
         private void Awake()
         {
@@ -60,6 +66,8 @@ namespace TRV
             _dashX = new AnimParam(animator, dashXParam);
             _dashY = new AnimParam(animator, dashYParam);
             _dash = new AnimParam(animator, dashTriggerParam);
+            _interactX = new AnimParam(animator, interactXParam);
+            _interact = new AnimParam(animator, interactTriggerParam);
         }
 
         private void OnEnable()
@@ -67,6 +75,7 @@ namespace TRV
             if (controller == null) return;
             controller.Attacked += OnAttacked;
             controller.DashStarted += OnDashStarted;
+            controller.Interacted += OnInteracted;
         }
 
         private void OnDisable()
@@ -74,6 +83,7 @@ namespace TRV
             if (controller == null) return;
             controller.Attacked -= OnAttacked;
             controller.DashStarted -= OnDashStarted;
+            controller.Interacted -= OnInteracted;
         }
 
         private void Update()
@@ -104,6 +114,15 @@ namespace TRV
             _dashX.SetFloat(d.x);
             _dashY.SetFloat(d.y);
             _dash.SetTrigger();
+        }
+
+        // Interact is LEFT/RIGHT only — publish the horizontal sign, then fire the trigger. Negated so
+        // it matches the interact clips' orientation (the right-facing clip sits on the -1 side of the
+        // blend tree); flip this back if you instead swap the clips' thresholds in the Animator.
+        private void OnInteracted(float faceX)
+        {
+            _interactX.SetFloat(-faceX);
+            _interact.SetTrigger();
         }
     }
 }

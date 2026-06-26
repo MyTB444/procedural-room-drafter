@@ -47,6 +47,9 @@ namespace TRV
         private CharacterDirection _previousFacing = CharacterDirection.South;
         private float _facingSetTime = float.NegativeInfinity;
 
+        // Last horizontal facing sign for the left/right-only interact anim (default right).
+        private float _interactFaceX = 1f;
+
         // ── Runtime state others can read / subscribe to ──
         public bool IsAlive => _health != null && _health.IsAlive;
         public Vector2 MoveDirection { get; private set; } // last non-zero unit heading
@@ -68,6 +71,7 @@ namespace TRV
         public event Action<CharacterDirection> FacingChanged;
         public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
         public event Action<CharacterDirection> Attacked;    // passes the aimed attack direction
+        public event Action<float> Interacted;               // passes horizontal facing sign: -1 left, +1 right
 
         private void Awake()
         {
@@ -283,8 +287,14 @@ namespace TRV
         private void HandleInteract()
         {
             if (!IsAlive) return;
+
+            // The interact animation is left/right only — resolve the facing to a horizontal sign,
+            // keeping the last horizontal one when facing straight up/down (Facing.x == 0).
+            float x = CharacterDirectionUtil.ToVector(Facing).x;
+            if (!Mathf.Approximately(x, 0f)) _interactFaceX = Mathf.Sign(x);
+            Interacted?.Invoke(_interactFaceX);
+
             // Hook interaction logic here (open door, pick up item, talk...).
-            Debug.Log($"{stats.CharacterName} interacts ({Facing}).", this);
         }
 
         /// <summary><see cref="IKnockbackable"/> — shove TRV along a direction as a pure impulse:
