@@ -59,6 +59,23 @@ namespace TRV
         /// <summary>Snap an arbitrary input vector onto the nearest 8-way unit vector (magnitude 1).</summary>
         public static Vector2 Snap(Vector2 v) => ToVector(FromVector(v));
 
+        /// <summary>Snap a facing vector to the 4-way Horizontal/Vertical animation params, with diagonals
+        /// resolving to HORIZONTAL (|x| ≥ |y| → ±1 on horizontal else ±1 on vertical; one is ±1, other 0).
+        /// ~Zero input → both 0. Shared by the enemy animators and the directional collider.</summary>
+        public static void ToFourWay(Vector2 facing, out float horizontal, out float vertical)
+        {
+            horizontal = 0f;
+            vertical = 0f;
+            if (Mathf.Abs(facing.x) >= Mathf.Abs(facing.y))
+            {
+                if (Mathf.Abs(facing.x) > 0.0001f) horizontal = Mathf.Sign(facing.x);
+            }
+            else
+            {
+                vertical = Mathf.Sign(facing.y);
+            }
+        }
+
         /// <summary>True for the four diagonal directions (NE, NW, SW, SE). Their enum values are odd.</summary>
         public static bool IsDiagonal(CharacterDirection d) => ((int)d & 1) == 1;
 

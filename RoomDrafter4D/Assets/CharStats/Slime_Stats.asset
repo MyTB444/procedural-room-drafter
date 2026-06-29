@@ -19,11 +19,12 @@ MonoBehaviour:
   <Deceleration>k__BackingField: 70
   <Damage>k__BackingField: 15
   <AttackCooldown>k__BackingField: 2
-  <AttackRange>k__BackingField: 1.2
+  <AttackRange>k__BackingField: 0.8
   <AttackMoveMultiplier>k__BackingField: 0.5
   <AttackMoveSlowDuration>k__BackingField: 0.667
   <DetectionRadius>k__BackingField: 6
   <WanderSpeedMultiplier>k__BackingField: 0.5
   <IdleDurationRange>k__BackingField: {x: 0.8, y: 2}
   <WanderDurationRange>k__BackingField: {x: 0.6, y: 1.5}
+  <AttackWindup>k__BackingField: 0.1
   <AttackHaltDuration>k__BackingField: 2

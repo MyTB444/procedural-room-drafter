@@ -4,7 +4,8 @@ namespace TRV
 {
     /// <summary>
     /// A charging melee enemy: wanders/chases exactly like <see cref="EnemyController"/>, but its attack
-    /// is a 3-phase CHARGE instead of an instant swing — WINDUP (Start anim, stands still) → CHARGE
+    /// is a 3-phase CHARGE instead of an instant swing — WINDUP (Start anim, stands still, lasts
+    /// `chargeWindup`) → CHARGE
     /// (Attack-loop anim, lunges toward the player at <see cref="chargeSpeed"/> while its body deals
     /// damage via the child <see cref="AttackHitbox"/>, struck for the lunge so it sweeps through the
     /// player) → STOP (End anim, halts). The charge lunges in the EXACT direction toward the player at
@@ -17,7 +18,8 @@ namespace TRV
     public class ChargerEnemyController : EnemyController
     {
         [Header("Charge")]
-        [Tooltip("Wind-up before the lunge (seconds) — match the Start anim length.")]
+        [Tooltip("Wind-up before the lunge (seconds) — the wolf stands still (Start anim) this long " +
+                 "before charging. Set on this component.")]
         [SerializeField, Min(0f)] private float chargeWindup = 0.4f;
 
         [Tooltip("Lunge speed during the charge (units/sec). Set well above MoveSpeed.")]
@@ -48,7 +50,7 @@ namespace TRV
             _chargeDir = dir.sqrMagnitude > 0.0001f ? dir.normalized : Vector2.down; // lunge toward the player (any direction)
             FacingDirection = _chargeDir;
             _phase = Phase.Windup;
-            _phaseTimer = chargeWindup;
+            _phaseTimer = chargeWindup; // stand still this long (Start anim) before the lunge
             ChargeStarted?.Invoke(_chargeDir);
         }
 

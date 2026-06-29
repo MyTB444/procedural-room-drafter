@@ -26,4 +26,5 @@ MonoBehaviour:
   <WanderSpeedMultiplier>k__BackingField: 0.5
   <IdleDurationRange>k__BackingField: {x: 0.8, y: 2}
   <WanderDurationRange>k__BackingField: {x: 0.6, y: 1.5}
+  <AttackWindup>k__BackingField: 0
   <AttackHaltDuration>k__BackingField: 2

@@ -31,9 +31,15 @@ MonoBehaviour:
   <WaterDecorPatches>k__BackingField: []
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 0
+  - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
+  <EnemiesPerRoom>k__BackingField: 2
+  <MinibossPrefabs>k__BackingField:
+  - {fileID: 6191281873977571966, guid: 1260c57f6f8b88d4d994f755c988207d, type: 3}
+  <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField: []
+  <IslandDecorMinPerIsland>k__BackingField: 4
+  <IslandDecorMaxPerIsland>k__BackingField: 5
   <MinWaterForIsland>k__BackingField: 0
   <FloorPatches>k__BackingField: []
   <FloorPatchCoverage>k__BackingField: 0.9

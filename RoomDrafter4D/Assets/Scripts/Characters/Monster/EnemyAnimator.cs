@@ -46,17 +46,7 @@ namespace TRV
             if (controller == null) return;
 
             // Snap facing to 4-way, diagonals → horizontal (East/West).
-            Vector2 f = controller.FacingDirection;
-            float h = 0f, v = 0f;
-            if (Mathf.Abs(f.x) >= Mathf.Abs(f.y))
-            {
-                if (Mathf.Abs(f.x) > 0.0001f) h = Mathf.Sign(f.x);
-            }
-            else
-            {
-                v = Mathf.Sign(f.y);
-            }
-
+            CharacterDirectionUtil.ToFourWay(controller.FacingDirection, out float h, out float v);
             _horizontal.SetFloat(h);
             _vertical.SetFloat(v);
             _move.SetBool(controller.IsMoving);

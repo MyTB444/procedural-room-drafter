@@ -42,6 +42,9 @@ namespace TRV
         private Vector2 _wanderDir;
         private Collider2D _collider;
         private bool _dying;              // in the knockback + fade death sequence
+        private bool _seenPlayer;         // fired OnFirstDetected yet? (re-armed each spawn)
+        private float _strikeLeft;        // > 0 during an attack's windup, before the hitbox lands
+        private Vector2 _strikeDir;       // direction the pending strike was aimed
 
         private PrefabPool _pool;         // set when spawned from a pool; null if placed by hand
         private SpriteRenderer[] _renderers;
@@ -65,10 +68,7 @@ namespace TRV
         /// <summary>The melee hitbox (child), for archetype subclasses that drive their own attack.</summary>
         protected AttackHitbox AttackHitbox => attackHitbox;
 
-        private void Awake() => Setup();
-
-        /// <summary>One-time setup; <c>protected virtual</c> so subclasses can extend (call base.Setup()).</summary>
-        protected virtual void Setup()
+        private void Awake()
         {
             _body = GetComponent<Rigidbody2D>();
             _body.gravityScale = 0f;
@@ -115,11 +115,17 @@ namespace TRV
             if (_collider != null) _collider.enabled = true;
             RestoreColors();
             EnterIdle();
+            _seenPlayer = false;
+            _strikeLeft = 0f;
             OnInitialize();
         }
 
         /// <summary>Hook for subclasses to reset their own state on (re)activation (pool reuse).</summary>
         protected virtual void OnInitialize() { }
+
+        /// <summary>Called ONCE the first time the player enters DetectionRadius (re-armed on respawn).
+        /// Hook for an on-sight reaction, e.g. an intro ability animation.</summary>
+        protected virtual void OnFirstDetected() { }
 
         private void RestoreColors()
         {
@@ -157,29 +163,50 @@ namespace TRV
             float rate = targetVelocity.sqrMagnitude > 0.0001f ? stats.Acceleration : stats.Deceleration;
             _velocity = Vector2.MoveTowards(_velocity, targetVelocity, rate * dt);
             _body.linearVelocity = _velocity;
-            IsMoving = _velocity.sqrMagnitude > 0.01f;
+            // Drive IsMoving off the INTENT (target), not the eased velocity — otherwise it dips below the
+            // threshold during turns/reversals and while decelerating, flickering the Move bool and
+            // restarting the walk animation.
+            IsMoving = targetVelocity.sqrMagnitude > 0.0001f;
         }
 
         /// <summary>The state machine: returns the target velocity for this tick.</summary>
         private Vector2 DecideMovement(float dt)
         {
-            // Recover: stand still after an attack until the halt timer elapses.
+            // Attacking/recover: stand still through the attack — wait out the windup, THEN play the
+            // attack animation + land the hitbox, then finish the post-attack halt.
             if (_state == State.Recover)
             {
+                if (_strikeLeft > 0f)
+                {
+                    _strikeLeft -= dt;
+                    if (_strikeLeft <= 0f) FireAttack(_strikeDir); // windup done → attack anim + hit
+                }
                 _stateTimer -= dt;
                 if (_stateTimer > 0f) return Vector2.zero;
                 _state = State.Chase; // done — re-evaluate below
             }
 
-            bool detected = PlayerLocator.TryGetPosition(out Vector2 playerPos)
-                            && Vector2.Distance(transform.position, playerPos) <= stats.DetectionRadius;
+            bool hasPlayer = PlayerLocator.TryGetPosition(out Vector2 playerPos);
+
+            // First sight latches detection ON: once the enemy has seen the player it stays locked on
+            // (never loses detection from distance) for the rest of its life — only a dead/absent player
+            // (or respawn, which re-arms _seenPlayer) drops it.
+            if (hasPlayer && !_seenPlayer
+                && Vector2.Distance(transform.position, playerPos) <= stats.DetectionRadius)
+            {
+                _seenPlayer = true;
+                OnFirstDetected();
+            }
+
+            bool detected = hasPlayer && _seenPlayer;
 
             if (detected)
             {
                 Vector2 toPlayer = playerPos - (Vector2)transform.position;
 
-                // Within attack range → face the player and HOLD position: attack if ready, otherwise
-                // just wait out the cooldown (don't keep pushing into the player while it's on cooldown).
+                // Within attack range → face the player and HOLD position: attack if cooldown ready
+                // (the attack itself opens with a halt/windup, see DoAttack), otherwise wait out the
+                // cooldown (don't keep pushing into the player while it's on cooldown).
                 if (toPlayer.magnitude <= stats.AttackRange)
                 {
                     FacingDirection = toPlayer.normalized;
@@ -266,13 +293,23 @@ namespace TRV
         {
             FacingDirection = dir;
             BeginAttackCooldown();
-            OnAttack(dir);
-            AttackPerformed?.Invoke();
 
-            // Halt in place to recover.
+            // Windup FIRST: stand still (halt) for AttackWindup, THEN play the attack animation + land
+            // the hitbox together. Then hold the rest of AttackHaltDuration for the recovery.
+            _strikeDir = dir;
+            _strikeLeft = stats.AttackWindup;
+            if (_strikeLeft <= 0f) FireAttack(dir); // no windup → swing immediately
+
             _state = State.Recover;
-            _stateTimer = stats.AttackHaltDuration;
+            _stateTimer = stats.AttackWindup + stats.AttackHaltDuration;
             _velocity = Vector2.zero;
+        }
+
+        /// <summary>Play the attack animation and land the hitbox — fired after the windup.</summary>
+        private void FireAttack(Vector2 dir)
+        {
+            AttackPerformed?.Invoke();
+            OnAttack(dir);
         }
 
         /// <summary>Start the attack cooldown (so the next attack waits AttackCooldown seconds).</summary>
@@ -294,12 +331,16 @@ namespace TRV
             if (attackHitbox != null) attackHitbox.Strike(dir, stats.Damage, gameObject);
         }
 
+        /// <summary>Whether knockback moves this enemy. Override → false for an unstoppable enemy that's
+        /// immune to being pushed (also no death-slide).</summary>
+        protected virtual bool Knockbackable => true;
+
         /// <summary><see cref="IKnockbackable"/> — shove as a pure impulse (no stun). Damage is the
         /// <see cref="Health"/> component's job. Still applies during the death sequence so the
-        /// killing blow knocks the corpse back as it fades.</summary>
+        /// killing blow knocks the corpse back as it fades. No-op when <see cref="Knockbackable"/> is false.</summary>
         public void ApplyKnockback(Vector2 direction, float force)
         {
-            if (force <= 0f || direction.sqrMagnitude < 0.0001f) return;
+            if (!Knockbackable || force <= 0f || direction.sqrMagnitude < 0.0001f) return;
             if (!IsAlive && !_dying) return;
             _velocity = direction.normalized * force;
         }

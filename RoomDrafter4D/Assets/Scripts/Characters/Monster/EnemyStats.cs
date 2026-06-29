@@ -29,6 +29,13 @@ namespace TRV
         [field: SerializeField] public Vector2 WanderDurationRange { get; private set; } = new Vector2(0.6f, 1.5f);
 
         [field: Header("Attack")]
+        [field: Tooltip("The attack's opening HALT: the moment it attacks, the enemy stops and the attack " +
+                        "animation plays for this long before the hitbox lands (the windup is part of the " +
+                        "attack, not an idle pause). 0 = the hit lands immediately. Set the child " +
+                        "AttackHitbox's own delay to 0 and tune the windup here.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float AttackWindup { get; private set; } = 0.3f;
+
         [field: Tooltip("After attacking, the enemy halts (no movement) for this long — a recovery " +
                         "window before it can chase/attack again.")]
         [field: Min(0f)]

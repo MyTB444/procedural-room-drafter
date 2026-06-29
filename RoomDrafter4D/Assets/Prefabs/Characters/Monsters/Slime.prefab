@@ -23,7 +23,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5938671398849253609
 Transform:
   m_ObjectHideFlags: 0
@@ -290,8 +290,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TRV.AttackHitbox
   offset: 0.4
-  delay: 0.4
-  activeSeconds: 0.1
+  delay: 0.3
+  activeSeconds: 0.05
   knockback: 5
   hitMask:
     serializedVersion: 2

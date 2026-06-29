@@ -9,7 +9,8 @@ namespace TRV
     /// world Canvas serves every <see cref="Interactable"/> in the scene.
     ///
     /// Editor: put this on the world Canvas / a holder, with the "E" image/text as the <see cref="prompt"/>
-    /// child (the script moves this holder and toggles that child — don't put the script on the child).
+    /// child. The script moves ONLY the prompt (not its own holder), so it can safely share a canvas with
+    /// other world-space UI (e.g. the attack-cooldown indicator).
     /// </summary>
     public class InteractPromptUI : MonoBehaviour
     {
@@ -31,8 +32,10 @@ namespace TRV
                 : null;
 
             bool show = target != null;
-            if (prompt != null && prompt.activeSelf != show) prompt.SetActive(show);
-            if (show) transform.position = target.transform.position + worldOffset; // follow + sit on top
+            if (prompt == null) return;
+            if (prompt.activeSelf != show) prompt.SetActive(show);
+            // Move ONLY the prompt (not this holder), so other UI sharing the canvas isn't dragged along.
+            if (show) prompt.transform.position = target.transform.position + worldOffset; // follow + sit on top
         }
     }
 }
