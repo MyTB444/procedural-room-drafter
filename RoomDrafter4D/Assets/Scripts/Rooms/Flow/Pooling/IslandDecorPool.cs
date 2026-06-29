@@ -25,17 +25,30 @@ namespace TRV
         /// so a destroyed piece doesn't respawn when the player returns (the room's snapshot rides the
         /// same list).
         /// </summary>
+        /// <summary>Pre-instantiate a batch of each island-decor prefab (weights ignored — every type
+        /// can appear). Convenience overload over <see cref="PrefabPool.Prewarm"/>.</summary>
+        public void Prewarm(IslandDecorEntry[] entries)
+        {
+            if (entries == null) return;
+            var prefabs = new List<GameObject>(entries.Length);
+            foreach (var e in entries)
+                if (e != null && e.Prefab != null) prefabs.Add(e.Prefab);
+            Prewarm(prefabs);
+        }
+
         public void Show(List<PatchPlacement> placements, TilemapPainter painter, BiomeConfig biome)
         {
             ReleaseAll();
-            var prefabs = biome != null ? biome.IslandDecorObjects : null;
-            if (placements == null || painter == null || prefabs == null) return;
+            var entries = biome != null ? biome.IslandDecorObjects : null;
+            if (placements == null || painter == null || entries == null) return;
 
             foreach (var p in placements)
             {
-                if (p.PatchIndex < 0 || p.PatchIndex >= prefabs.Length) continue;
-                var go = Rent(prefabs[p.PatchIndex]);
-                if (go == null) continue; // empty prefab slot
+                if (p.PatchIndex < 0 || p.PatchIndex >= entries.Length) continue;
+                var prefab = entries[p.PatchIndex]?.Prefab;
+                if (prefab == null) continue; // empty entry
+                var go = Rent(prefab);
+                if (go == null) continue;
                 go.transform.position = painter.CellCenterWorld(p.X, p.Y);
                 var placement = p; // capture by value for the forget callback
                 go.GetComponent<IslandDecorPiece>().Activate(this, () => placements.Remove(placement));

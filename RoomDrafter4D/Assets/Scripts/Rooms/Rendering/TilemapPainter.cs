@@ -225,63 +225,26 @@ namespace TRV
         }
 
         /// <summary>
-        /// Drop 1–2 waterfall columns (Halls) on the FrontOfEverything layer (above all others): from a
-        /// random column's north edge straight DOWN, stamping <see cref="BiomeConfig.WaterfallTile"/>. It
-        /// passes THROUGH the first floor block and the non-floor gap after it, then stops at the NEXT
-        /// floor tile — so a fall cascades over a room/wall and lands on the field floor below. igroom
-        /// INTERIOR floor (room-floor) is ignored (treated as non-floor, so the fall flows over it); a
-        /// stair (Floor) is a valid landing, so the fall still never runs through one. Use an AnimatedTile
-        /// for the cycling look. Deterministic per room (seeded by VariantSeed); off unless assigned (Halls).
-        /// At least ONE fall always leads into a room: it pours down a column that lands on a 3×3
+        /// Drop 1–2 waterfall columns (Halls) on the FrontOfEverything layer (above all others). EVERY
+        /// fall leads INTO a room — none are stray: each pours down a column that lands on a 3×3
         /// <see cref="BiomeConfig.WaterfallBasePatch"/> placed fully INSIDE an igroom (off its walls), as
         /// far as possible from that room's stairs (see <see cref="PaintIgroomWaterfall"/> +
-        /// <see cref="IgroomPatchTargets"/>). When two falls are rolled, the second either leads to a
-        /// DIFFERENT room's patch or is a plain random fall (coin flip) — so a room gets 1 patch-fall,
-        /// 2 patch-falls, or 1 patch-fall + 1 plain. The rest flow to the field floor.
+        /// <see cref="IgroomPatchTargets"/>). 1–2 per room, each into a DIFFERENT room (capped by how many
+        /// rooms can host a patch). Use an AnimatedTile for the cycling look. Deterministic per room
+        /// (seeded by VariantSeed); off unless assigned (Halls), and no falls if no room can host one.
         /// </summary>
         private void PaintWaterfalls(RoomGrid grid, BiomeConfig config)
         {
             if (frontOfEverythingTilemap == null || config.WaterfallTile == null) return;
 
             var rng = new System.Random(grid.VariantSeed);
-            int count = rng.Next(MinWaterfalls, MaxWaterfalls + 1);
             var targets = IgroomPatchTargets(grid); // (patch-centre column, patch-centre row) per hostable igroom
+            if (targets.Count == 0) return;         // nothing to lead into → no waterfalls (never stray)
+
             rng.Shuffle(targets);
-            int patchIdx = 0;
-
+            int count = Mathf.Min(rng.Next(MinWaterfalls, MaxWaterfalls + 1), targets.Count);
             for (int i = 0; i < count; i++)
-            {
-                // The first fall always leads to a patch (when a room can host one); a later fall leads
-                // to a DIFFERENT room's patch, or — coin flip — is a plain random fall.
-                bool leadToPatch = patchIdx < targets.Count && (i == 0 || rng.Next(0, 2) == 0);
-                if (leadToPatch)
-                {
-                    var t = targets[patchIdx++];
-                    PaintIgroomWaterfall(grid, config, t.x, t.y);
-                }
-                else
-                {
-                    PaintFallingColumn(grid, config, rng.Next(0, grid.Width));
-                }
-            }
-        }
-
-        /// <summary>A free-falling waterfall column: from the north edge straight DOWN, through the first
-        /// floor block and the gap after it, stopping at the NEXT field-floor tile.</summary>
-        private void PaintFallingColumn(RoomGrid grid, BiomeConfig config, int x)
-        {
-            bool seenFloor = false, pastFloor = false; // pastFloor = exited the first floor block
-            for (int y = grid.Height - 1; y >= 0; y--)
-            {
-                bool isFloor = grid[x, y] == CellType.Floor && !grid.IsRoomFloor(x, y);
-                if (isFloor)
-                {
-                    if (pastFloor) break; // the next floor after the gap → land here, stop
-                    seenFloor = true;
-                }
-                else if (seenFloor) pastFloor = true; // left the first floor block
-                frontOfEverythingTilemap.SetTile(new Vector3Int(originCell.x + x, originCell.y + y, 0), config.WaterfallTile);
-            }
+                PaintIgroomWaterfall(grid, config, targets[i].x, targets[i].y);
         }
 
         /// <summary>
@@ -763,21 +726,20 @@ namespace TRV
 
         /// <summary>
         /// Fill the ExtrasFullBehind layer (whole width) with fixed horizontal bands from beneath the
-        /// north edge down to the south: TWO NorthBehind rows, one Transition1 row, one Transition2 row,
-        /// then Blank fills the rest to the bottom. The top north-edge row keeps its water backdrop
-        /// (this starts one cell below it). Off unless <see cref="BiomeConfig.NorthBehindTile"/> is
-        /// assigned (so it only affects Halls). At WATER cells the band tile goes on the collision layer
-        /// instead (water would otherwise hide the backmost tile) — it replaces the water tile and
+        /// north edge down to the south: one Transition1 row directly beneath the north edge, one
+        /// Transition2 row, then Blank fills the rest to the bottom. The top north-edge row keeps its
+        /// water backdrop (this starts one cell below it). Off unless <see cref="BiomeConfig.Transition1Tile"/>
+        /// is assigned (so it only affects Halls). At WATER cells the band tile goes on the collision
+        /// layer instead (water would otherwise hide the backmost tile) — it replaces the water tile and
         /// carries that cell's collision, so the band tiles used over water need a collider type.
         /// </summary>
         private void PaintExtrasBehindBands(RoomGrid grid, BiomeConfig config)
         {
-            if (extrasFullBehindTilemap == null || config.NorthBehindTile == null) return;
+            if (extrasFullBehindTilemap == null || config.Transition1Tile == null) return;
 
             int total = grid.Height - config.WallThickness; // banded rows: y in [0, total)
             if (total <= 0) return;
 
-            const int north = 2; // two NorthBehind rows, then straight into the transition
             var collision = WaterCollisionTilemap(config); // Halls water collision → UnseenCollision
 
             int topY = grid.Height - 1 - config.WallThickness; // first row beneath the north edge
@@ -786,7 +748,7 @@ namespace TRV
                 int y = topY - depth;
                 for (int x = 0; x < grid.Width; x++)
                 {
-                    var tile = BandTile(config, grid, x, y, depth, north);
+                    var tile = BandTile(config, grid, x, y, depth);
                     if (tile == null) continue;
                     var pos = new Vector3Int(originCell.x + x, originCell.y + y, 0);
                     if (grid[x, y] == CellType.Water && collision != null)
@@ -797,13 +759,11 @@ namespace TRV
             }
         }
 
-        private static TileBase BandTile(BiomeConfig config, RoomGrid grid, int x, int y, int depth, int north)
+        private static TileBase BandTile(BiomeConfig config, RoomGrid grid, int x, int y, int depth)
         {
-            if (depth < north) // NorthBehind
-                return BandEnd(config.NorthBehindTile, config.NorthBehindLeftEndTile, config.NorthBehindRightEndTile, grid, x, y);
-            if (depth == north) // Transition1
+            if (depth == 0) // Transition1, directly beneath the north edge
                 return BandEnd(config.Transition1Tile, config.Transition1LeftEndTile, config.Transition1RightEndTile, grid, x, y);
-            if (depth == north + 1) // Transition2
+            if (depth == 1) // Transition2
                 return config.Transition2Tile;
             return config.BlankBehindTile; // fills the rest to the bottom
         }

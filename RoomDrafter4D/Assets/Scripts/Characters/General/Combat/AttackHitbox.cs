@@ -59,6 +59,29 @@ namespace TRV
         /// </summary>
         public void Strike(Vector2 direction, float damage, GameObject owner)
         {
+            Aim(direction, damage, owner);
+            _delayLeft = delay;
+            _activeTimeLeft = delay > 0f ? 0f : activeSeconds;
+        }
+
+        /// <summary>Strike that stays live for a CUSTOM duration with no windup — for a sustained hit like
+        /// a charge (the hitbox follows the moving attacker and hits each target once over the window).</summary>
+        public void Strike(Vector2 direction, float damage, GameObject owner, float activeDuration)
+        {
+            Aim(direction, damage, owner);
+            _delayLeft = 0f;
+            _activeTimeLeft = Mathf.Max(0f, activeDuration);
+        }
+
+        /// <summary>Stop an in-progress swing immediately (e.g. the attacker dies mid-charge).</summary>
+        public void Cancel()
+        {
+            _delayLeft = 0f;
+            _activeTimeLeft = 0f;
+        }
+
+        private void Aim(Vector2 direction, float damage, GameObject owner)
+        {
             _owner = owner;
             _damage = damage;
             _strikeDir = direction.sqrMagnitude > 0.0001f ? direction.normalized : Vector2.right;
@@ -67,8 +90,6 @@ namespace TRV
             transform.right = _strikeDir; // rotate the authored +X shape toward the strike
 
             _hitThisSwing.Clear();
-            _delayLeft = delay;
-            _activeTimeLeft = delay > 0f ? 0f : activeSeconds;
         }
 
         private void Update()
@@ -88,7 +109,7 @@ namespace TRV
         /// <summary>Overlap the hitbox shape against the hit mask and damage each new target once.</summary>
         private void QueryHits()
         {
-            int count = Overlap(OverlapBuffer);
+            int count = HitboxQuery.Overlap(_collider, hitMask, OverlapBuffer);
             for (int i = 0; i < count; i++)
             {
                 var other = OverlapBuffer[i];
@@ -97,32 +118,6 @@ namespace TRV
                 if (!_hitThisSwing.Add(target)) continue; // already hit this swing
 
                 CombatHit.Apply(other.gameObject, new DamageInfo(_damage, _strikeDir, _owner), knockback);
-            }
-        }
-
-        /// <summary>Spatial overlap of the collider's shape at its current transform — independent of
-        /// the body's collision/exclude layers (which only affect simulation contacts, not queries).</summary>
-        private int Overlap(Collider2D[] results)
-        {
-            var filter = new ContactFilter2D { useTriggers = true };
-            filter.SetLayerMask(hitMask);
-
-            var t = transform;
-            Vector2 scale = new Vector2(Mathf.Abs(t.lossyScale.x), Mathf.Abs(t.lossyScale.y));
-
-            switch (_collider)
-            {
-                case BoxCollider2D box:
-                    return Physics2D.OverlapBox(
-                        t.TransformPoint(box.offset), Vector2.Scale(box.size, scale), t.eulerAngles.z, filter, results);
-                case CircleCollider2D circle:
-                    return Physics2D.OverlapCircle(
-                        t.TransformPoint(circle.offset), circle.radius * Mathf.Max(scale.x, scale.y), filter, results);
-                case CapsuleCollider2D cap:
-                    return Physics2D.OverlapCapsule(
-                        t.TransformPoint(cap.offset), Vector2.Scale(cap.size, scale), cap.direction, t.eulerAngles.z, filter, results);
-                default:
-                    return Physics2D.OverlapBox(t.position, Vector2.one, t.eulerAngles.z, filter, results);
             }
         }
     }

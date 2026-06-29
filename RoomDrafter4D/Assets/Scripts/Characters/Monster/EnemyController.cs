@@ -55,11 +55,20 @@ namespace TRV
         // ── Runtime state others can read / subscribe to ──
         public bool IsAlive => _health != null && _health.IsAlive;
         public bool IsMoving { get; private set; }
-        public Vector2 FacingDirection { get; private set; } = Vector2.down;
+        public Vector2 FacingDirection { get; protected set; } = Vector2.down;
 
         public event Action AttackPerformed; // drives the Animator attack trigger
 
-        private void Awake()
+        /// <summary>The enemy's stats (for archetype subclasses).</summary>
+        protected EnemyStats Stats => stats;
+
+        /// <summary>The melee hitbox (child), for archetype subclasses that drive their own attack.</summary>
+        protected AttackHitbox AttackHitbox => attackHitbox;
+
+        private void Awake() => Setup();
+
+        /// <summary>One-time setup; <c>protected virtual</c> so subclasses can extend (call base.Setup()).</summary>
+        protected virtual void Setup()
         {
             _body = GetComponent<Rigidbody2D>();
             _body.gravityScale = 0f;
@@ -106,7 +115,11 @@ namespace TRV
             if (_collider != null) _collider.enabled = true;
             RestoreColors();
             EnterIdle();
+            OnInitialize();
         }
+
+        /// <summary>Hook for subclasses to reset their own state on (re)activation (pool reuse).</summary>
+        protected virtual void OnInitialize() { }
 
         private void RestoreColors()
         {
@@ -129,6 +142,16 @@ namespace TRV
             }
 
             if (!IsAlive) return;
+
+            // A subclass action (e.g. a charge) can take over movement for several frames, applying
+            // its velocity DIRECTLY (no accel/decel easing) and bypassing the normal FSM.
+            if (OverrideMovement(dt, out var forced))
+            {
+                _velocity = forced;
+                _body.linearVelocity = forced;
+                IsMoving = forced.sqrMagnitude > 0.01f;
+                return;
+            }
 
             Vector2 targetVelocity = DecideMovement(dt);
             float rate = targetVelocity.sqrMagnitude > 0.0001f ? stats.Acceleration : stats.Deceleration;
@@ -155,11 +178,12 @@ namespace TRV
             {
                 Vector2 toPlayer = playerPos - (Vector2)transform.position;
 
-                // In range → attack (face the player directly, not the path).
-                if (toPlayer.magnitude <= stats.AttackRange && _attackCooldown.IsReady)
+                // Within attack range → face the player and HOLD position: attack if ready, otherwise
+                // just wait out the cooldown (don't keep pushing into the player while it's on cooldown).
+                if (toPlayer.magnitude <= stats.AttackRange)
                 {
                     FacingDirection = toPlayer.normalized;
-                    DoAttack(toPlayer.normalized);
+                    if (_attackCooldown.IsReady) DoAttack(toPlayer.normalized);
                     return Vector2.zero;
                 }
 
@@ -234,10 +258,14 @@ namespace TRV
             _wanderDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
         }
 
-        private void DoAttack(Vector2 dir)
+        /// <summary>Triggered when the player is in range and the cooldown is ready. Default: an instant
+        /// melee swing + a recover halt. Override for a different attack (e.g. a multi-frame charge) —
+        /// then begin the cooldown via <see cref="BeginAttackCooldown"/> and drive the action through
+        /// <see cref="OverrideMovement"/>.</summary>
+        protected virtual void DoAttack(Vector2 dir)
         {
             FacingDirection = dir;
-            _attackCooldown.Begin(stats.AttackCooldown);
+            BeginAttackCooldown();
             OnAttack(dir);
             AttackPerformed?.Invoke();
 
@@ -245,6 +273,18 @@ namespace TRV
             _state = State.Recover;
             _stateTimer = stats.AttackHaltDuration;
             _velocity = Vector2.zero;
+        }
+
+        /// <summary>Start the attack cooldown (so the next attack waits AttackCooldown seconds).</summary>
+        protected void BeginAttackCooldown() => _attackCooldown.Begin(stats.AttackCooldown);
+
+        /// <summary>Lets a subclass take over movement for a multi-frame action (e.g. a charge): return
+        /// true and set <paramref name="velocity"/> to apply DIRECTLY this tick (no easing), skipping the
+        /// normal FSM. Default: no override.</summary>
+        protected virtual bool OverrideMovement(float dt, out Vector2 velocity)
+        {
+            velocity = Vector2.zero;
+            return false;
         }
 
         /// <summary>What an attack actually does. Default: swing the melee hitbox toward the player.

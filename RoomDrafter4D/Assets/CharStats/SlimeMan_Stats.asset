@@ -10,19 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f56a070ab2d261d4a90745e43e09475c, type: 3}
-  m_Name: Slime_Stats
+  m_Name: SlimeMan_Stats
   m_EditorClassIdentifier: Assembly-CSharp::TRV.EnemyStats
   <CharacterName>k__BackingField: Character
-  <MaxHealth>k__BackingField: 80
+  <MaxHealth>k__BackingField: 120
   <MoveSpeed>k__BackingField: 2
   <Acceleration>k__BackingField: 60
   <Deceleration>k__BackingField: 70
-  <Damage>k__BackingField: 15
-  <AttackCooldown>k__BackingField: 2
-  <AttackRange>k__BackingField: 1.2
+  <Damage>k__BackingField: 25
+  <AttackCooldown>k__BackingField: 3
+  <AttackRange>k__BackingField: 4
   <AttackMoveMultiplier>k__BackingField: 0.5
   <AttackMoveSlowDuration>k__BackingField: 0.667
-  <DetectionRadius>k__BackingField: 6
+  <DetectionRadius>k__BackingField: 10
   <WanderSpeedMultiplier>k__BackingField: 0.5
   <IdleDurationRange>k__BackingField: {x: 0.8, y: 2}
   <WanderDurationRange>k__BackingField: {x: 0.6, y: 1.5}

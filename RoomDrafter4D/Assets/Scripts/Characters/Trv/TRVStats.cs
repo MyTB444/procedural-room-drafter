@@ -53,5 +53,38 @@ namespace TRV
         [field: Tooltip("Minimum seconds between dashes (cooldown).")]
         [field: Min(0f)]
         [field: SerializeField] public float DashCooldown { get; private set; } = 0.6f;
+
+        // ─────────────────────────────────────────────────────────────
+        // STAMINA  (spent by actions, regenerates after a short delay)
+        // ─────────────────────────────────────────────────────────────
+        [field: Header("Stamina")]
+        [field: Tooltip("Maximum stamina. Actions spend stamina and are blocked when there isn't enough.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float MaxStamina { get; private set; } = 100f;
+
+        [field: Tooltip("Stamina an attack costs.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float AttackStaminaCost { get; private set; } = 20f;
+
+        [field: Tooltip("Stamina a dodge (dash) costs.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float DodgeStaminaCost { get; private set; } = 50f;
+
+        [field: Tooltip("Stamina regained per second once regen resumes (quick).")]
+        [field: Min(0f)]
+        [field: SerializeField] public float StaminaRegenPerSecond { get; private set; } = 40f;
+
+        [field: Tooltip("Delay AFTER an action ends before stamina starts regenerating (seconds). No " +
+                        "regen happens during an action either.")]
+        [field: Min(0f)]
+        [field: SerializeField] public float StaminaRegenDelay { get; private set; } = 0.6f;
+
+        [field: Tooltip("Below this stamina, regen runs at the low-stamina multiplier (faster).")]
+        [field: Min(0f)]
+        [field: SerializeField] public float LowStaminaThreshold { get; private set; } = 50f;
+
+        [field: Tooltip("Regen speed multiplier while below the low-stamina threshold (e.g. 2 = twice as fast).")]
+        [field: Min(1f)]
+        [field: SerializeField] public float LowStaminaRegenMultiplier { get; private set; } = 2f;
     }
 }

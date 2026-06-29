@@ -29,6 +29,10 @@ namespace TRV
         [Tooltip("Melee hitbox swung on attack. Auto-found in children if left empty.")]
         [SerializeField] private AttackHitbox attackHitbox;
 
+        [Tooltip("Optional: turns the body collider into a hitbox during the dash. Auto-found on this " +
+                 "object; leave the component off if the dash shouldn't deal damage.")]
+        [SerializeField] private DashHitbox dashHitbox;
+
         private Rigidbody2D _body;
         private Health _health;
         private Vector2 _velocity;        // our own smoothed velocity
@@ -50,6 +54,10 @@ namespace TRV
         // Last horizontal facing sign for the left/right-only interact anim (default right).
         private float _interactFaceX = 1f;
 
+        // ── Stamina (spent by actions, regenerates after a short delay) ──
+        private float _stamina;
+        private float _staminaRegenBlockLeft; // no regen while > 0 (covers the action + the brief after)
+
         // ── Runtime state others can read / subscribe to ──
         public bool IsAlive => _health != null && _health.IsAlive;
         public Vector2 MoveDirection { get; private set; } // last non-zero unit heading
@@ -67,6 +75,12 @@ namespace TRV
         /// <summary>Fraction of the attack cooldown still remaining (1 = just attacked, 0 = ready to swing).
         /// Reflects the CURRENT cooldown length, so it stays accurate if an effect changes it — for UI.</summary>
         public float AttackCooldownRemaining01 => _attackCooldown.Remaining01;
+
+        /// <summary>Current stamina (0..MaxStamina). Actions spend it; it regenerates after a short delay.</summary>
+        public float CurrentStamina => _stamina;
+
+        /// <summary>Maximum stamina (from stats). For UI.</summary>
+        public float MaxStamina => stats != null ? stats.MaxStamina : 0f;
 
         public event Action<CharacterDirection> FacingChanged;
         public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
@@ -89,6 +103,8 @@ namespace TRV
                 aimCamera = Camera.main;
             if (attackHitbox == null)
                 attackHitbox = GetComponentInChildren<AttackHitbox>(true);
+            if (dashHitbox == null)
+                dashHitbox = GetComponent<DashHitbox>(); // optional — dash deals damage only if present
         }
 
         private void OnEnable()
@@ -120,6 +136,7 @@ namespace TRV
                 return;
             }
             _health.Init(stats.MaxHealth);
+            _stamina = stats.MaxStamina;
         }
 
         private void FixedUpdate()
@@ -127,6 +144,9 @@ namespace TRV
             if (stats == null || input == null) return;
 
             _health.Invincible = IsInvincible; // dash i-frames gate Health.TakeDamage
+            TickStamina(Time.fixedDeltaTime);
+            // The body collider deals damage while dashing (re-arms on the rising edge, deduped per dash).
+            if (dashHitbox != null) dashHitbox.SetActive(IsDashing, gameObject, stats.Damage);
 
             // -0.5) Dash windup: a short pause after pressing dash before the burst fires. Movement
             //       stays normal during it (no i-frames yet); when it elapses the burst begins.
@@ -220,6 +240,7 @@ namespace TRV
         {
             if (!IsAlive || IsDashing || _dashWindupLeft > 0f || !_dashCooldown.IsReady
                 || _attackSlowTimeLeft > 0f) return;
+            if (!TrySpendStamina(stats.DodgeStaminaCost)) return; // not enough stamina → no dodge
 
             // Lock in the dash direction and face it now; the burst (and i-frames) fire after a
             // short windup. Dash toward current movement; if standing still, dash where we face.
@@ -246,6 +267,7 @@ namespace TRV
         private void HandleAttack()
         {
             if (!IsAlive || !_attackCooldown.IsReady) return;
+            if (!TrySpendStamina(stats.AttackStaminaCost)) return; // not enough stamina → no attack
             _attackCooldown.Begin(stats.AttackCooldown);
 
             // Aim at the cursor, fully independent of movement direction.
@@ -288,13 +310,63 @@ namespace TRV
         {
             if (!IsAlive) return;
 
+            // Interact only works when next to an available interactable (proximity, no hitbox).
+            var interactable = Interactable.FindNearestAvailable(transform.position);
+            if (interactable == null) return;
+
             // The interact animation is left/right only — resolve the facing to a horizontal sign,
             // keeping the last horizontal one when facing straight up/down (Facing.x == 0).
             float x = CharacterDirectionUtil.ToVector(Facing).x;
             if (!Mathf.Approximately(x, 0f)) _interactFaceX = Mathf.Sign(x);
             Interacted?.Invoke(_interactFaceX);
 
-            // Hook interaction logic here (open door, pick up item, talk...).
+            interactable.Interact(this);
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // STAMINA
+        // ─────────────────────────────────────────────────────────────
+        /// <summary>Spend stamina for an action if there's enough; returns false (no spend) otherwise so
+        /// the caller blocks the action. A successful spend re-arms the post-action regen delay. When the
+        /// room is CLEARED of enemies, actions are free — no cost, never blocked.</summary>
+        private bool TrySpendStamina(float cost)
+        {
+            if (!EnemyPool.RoomHasEnemies) return true; // cleared room → free actions, no stamina spent
+            if (_stamina < cost) return false;
+            _stamina -= cost;
+            _staminaRegenBlockLeft = stats.StaminaRegenDelay;
+            return true;
+        }
+
+        /// <summary>Regenerate stamina — but NOT during an action (dash windup/burst or attack slow) nor
+        /// for <see cref="TRVStats.StaminaRegenDelay"/> after one ends; then quickly, and TWICE as fast
+        /// while below <see cref="TRVStats.LowStaminaThreshold"/>. In a CLEARED room actions don't
+        /// interrupt regen at all (it just keeps filling).</summary>
+        private void TickStamina(float dt)
+        {
+            if (EnemyPool.RoomHasEnemies)
+            {
+                bool inAction = IsDashing || _dashWindupLeft > 0f || _attackSlowTimeLeft > 0f;
+                if (inAction)
+                {
+                    _staminaRegenBlockLeft = stats.StaminaRegenDelay; // keep the "brief after" delay armed
+                    return;
+                }
+                if (_staminaRegenBlockLeft > 0f)
+                {
+                    _staminaRegenBlockLeft -= dt;
+                    return;
+                }
+            }
+            else
+            {
+                _staminaRegenBlockLeft = 0f; // cleared room → actions never cancel regen
+            }
+
+            if (_stamina >= stats.MaxStamina) return;
+            float rate = stats.StaminaRegenPerSecond;
+            if (_stamina < stats.LowStaminaThreshold) rate *= stats.LowStaminaRegenMultiplier;
+            _stamina = Mathf.Min(stats.MaxStamina, _stamina + rate * dt);
         }
 
         /// <summary><see cref="IKnockbackable"/> — shove TRV along a direction as a pure impulse:

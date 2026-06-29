@@ -13,6 +13,19 @@ namespace TRV
     // FloorPatch / WaterDecorPatch (the authored tile groups referenced below) live in
     // Model/TilePatches.cs. Island decor uses GameObject prefabs (IslandDecorObjects), not tiles.
 
+    /// <summary>One island-decor prefab plus its independent chance to appear. (Class so new inspector
+    /// entries default to Chance = 1.) NOTE: this [Serializable] name is asset data — renaming it loses
+    /// assignments.</summary>
+    [System.Serializable]
+    public class IslandDecorEntry
+    {
+        [Tooltip("The decor prefab spawned on islands (pooled at runtime).")]
+        public GameObject Prefab;
+
+        [Tooltip("Independent chance (0–1) this type appears on a decor cell. 1 = always, 0 = never.")]
+        [Range(0f, 1f)] public float Chance = 1f;
+    }
+
     /// <summary>
     /// All tunable data + tile references for one biome's room generation. A ScriptableObject so
     /// each biome is just an asset (Create ▸ TRV ▸ Biome Config), mirroring the CharacterStats pattern.
@@ -109,15 +122,30 @@ namespace TRV
         [field: Min(0)]
         [field: SerializeField] public int EnemiesPerRoom { get; private set; } = 3;
 
+        [field: Tooltip("Optional miniboss prefab(s). At most ONE miniboss spawns per room, taking one of " +
+                        "the EnemiesPerRoom slots (the rest are EnemyPrefabs); random pick if several. Empty = none.")]
+        [field: SerializeField] public GameObject[] MinibossPrefabs { get; private set; }
+
+        [field: Tooltip("Chance (0–1) a room actually spawns its one miniboss (when MinibossPrefabs is set).")]
+        [field: Range(0f, 1f)]
+        [field: SerializeField] public float MinibossChance { get; private set; } = 1f;
+
         [field: Tooltip("Enemies won't spawn within this many cells of the door the player enters from.")]
         [field: Min(0)]
         [field: SerializeField] public int EnemySpawnSafeRadius { get; private set; } = 4;
 
         [field: Header("Island decor (pooled objects)")]
-        [field: Tooltip("Prefabs scattered as real GameObjects on top of each island (4–5 per " +
-                        "island, random pick). Spawned/reused from IslandDecorPool at runtime — not " +
-                        "painted to a tilemap.")]
-        [field: SerializeField] public GameObject[] IslandDecorObjects { get; private set; }
+        [field: Tooltip("Decor prefabs scattered on each island, each with a relative pick chance " +
+                        "(weight). Spawned/reused from IslandDecorPool at runtime — not painted to a tilemap.")]
+        [field: SerializeField] public IslandDecorEntry[] IslandDecorObjects { get; private set; }
+
+        [field: Tooltip("How many decor objects per island (random in [min, max] inclusive). Capped by " +
+                        "the free island floor cells.")]
+        [field: Min(0)]
+        [field: SerializeField] public int IslandDecorMinPerIsland { get; private set; } = 4;
+
+        [field: Min(0)]
+        [field: SerializeField] public int IslandDecorMaxPerIsland { get; private set; } = 5;
 
         [field: Header("Water island")]
         [field: Tooltip("If the room's largest water body has at least this many cells, a strictly " +
