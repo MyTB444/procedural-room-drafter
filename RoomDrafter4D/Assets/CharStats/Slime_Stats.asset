@@ -19,7 +19,7 @@ MonoBehaviour:
   <Deceleration>k__BackingField: 70
   <Damage>k__BackingField: 15
   <AttackCooldown>k__BackingField: 2
-  <AttackRange>k__BackingField: 0.8
+  <AttackRange>k__BackingField: 0.6
   <AttackMoveMultiplier>k__BackingField: 0.5
   <AttackMoveSlowDuration>k__BackingField: 0.667
   <DetectionRadius>k__BackingField: 6

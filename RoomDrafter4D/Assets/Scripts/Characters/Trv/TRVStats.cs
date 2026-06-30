@@ -86,5 +86,14 @@ namespace TRV
         [field: Tooltip("Regen speed multiplier while below the low-stamina threshold (e.g. 2 = twice as fast).")]
         [field: Min(1f)]
         [field: SerializeField] public float LowStaminaRegenMultiplier { get; private set; } = 2f;
+
+        // ─────────────────────────────────────────────────────────────
+        // HEALTH REGEN  (passive; 0 by default — grant/boost it with upgrades)
+        // ─────────────────────────────────────────────────────────────
+        [field: Header("Health regen")]
+        [field: Tooltip("Passive HP regenerated per second. Base is 0 (no regen) — upgrades scale or ADD " +
+                        "to it (an Add upgrade grants regen from 0).")]
+        [field: Min(0f)]
+        [field: SerializeField] public float HealthRegenPerSecond { get; private set; } = 0f;
     }
 }

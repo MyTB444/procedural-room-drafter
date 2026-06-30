@@ -35,6 +35,7 @@ namespace TRV
 
         private Rigidbody2D _body;
         private Health _health;
+        private PlayerUpgrades _upgrades; // runtime stat multipliers + ability unlocks (auto-added)
         private Vector2 _velocity;        // our own smoothed velocity
         private Cooldown _attackCooldown;
 
@@ -79,8 +80,12 @@ namespace TRV
         /// <summary>Current stamina (0..MaxStamina). Actions spend it; it regenerates after a short delay.</summary>
         public float CurrentStamina => _stamina;
 
-        /// <summary>Maximum stamina (from stats). For UI.</summary>
-        public float MaxStamina => stats != null ? stats.MaxStamina : 0f;
+        /// <summary>Maximum stamina (base stat with the MaxStamina upgrade applied). For UI.</summary>
+        public float MaxStamina => Effective(PlayerUpgrades.Stat.MaxStamina, stats != null ? stats.MaxStamina : 0f);
+
+        /// <summary>A stat with its upgrades applied (base × multiplier + bonus); the base when no upgrades.</summary>
+        private float Effective(PlayerUpgrades.Stat stat, float baseValue) =>
+            _upgrades != null ? _upgrades.Apply(stat, baseValue) : baseValue;
 
         public event Action<CharacterDirection> FacingChanged;
         public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
@@ -96,6 +101,9 @@ namespace TRV
 
             _health = GetComponent<Health>();
             if (_health == null) _health = gameObject.AddComponent<Health>();
+
+            _upgrades = GetComponent<PlayerUpgrades>();
+            if (_upgrades == null) _upgrades = gameObject.AddComponent<PlayerUpgrades>();
 
             if (input == null)
                 input = GetComponent<TRVInput>();
@@ -136,7 +144,7 @@ namespace TRV
                 return;
             }
             _health.Init(stats.MaxHealth);
-            _stamina = stats.MaxStamina;
+            _stamina = MaxStamina;
         }
 
         private void FixedUpdate()
@@ -145,6 +153,7 @@ namespace TRV
 
             _health.Invincible = IsInvincible; // dash i-frames gate Health.TakeDamage
             TickStamina(Time.fixedDeltaTime);
+            TickHealthRegen(Time.fixedDeltaTime);
             // The body collider deals damage while dashing (re-arms on the rising edge, deduped per dash).
             if (dashHitbox != null) dashHitbox.SetActive(IsDashing, gameObject, stats.Damage);
 
@@ -240,6 +249,7 @@ namespace TRV
         {
             if (!IsAlive || IsDashing || _dashWindupLeft > 0f || !_dashCooldown.IsReady
                 || _attackSlowTimeLeft > 0f) return;
+            if (_upgrades == null || !_upgrades.IsUnlocked(PlayerUpgrades.Ability.Dash)) return; // dash is locked until the upgrade
             if (!TrySpendStamina(stats.DodgeStaminaCost)) return; // not enough stamina → no dodge
 
             // Lock in the dash direction and face it now; the burst (and i-frames) fire after a
@@ -267,8 +277,8 @@ namespace TRV
         private void HandleAttack()
         {
             if (!IsAlive || !_attackCooldown.IsReady) return;
-            if (!TrySpendStamina(stats.AttackStaminaCost)) return; // not enough stamina → no attack
-            _attackCooldown.Begin(stats.AttackCooldown);
+            if (!TrySpendStamina(Effective(PlayerUpgrades.Stat.AttackStaminaCost, stats.AttackStaminaCost))) return;
+            _attackCooldown.Begin(Effective(PlayerUpgrades.Stat.AttackCooldown, stats.AttackCooldown));
 
             // Aim at the cursor, fully independent of movement direction.
             AttackDirection = CharacterDirectionUtil.FromVector(GetAimDirection());
@@ -363,10 +373,20 @@ namespace TRV
                 _staminaRegenBlockLeft = 0f; // cleared room → actions never cancel regen
             }
 
-            if (_stamina >= stats.MaxStamina) return;
-            float rate = stats.StaminaRegenPerSecond;
+            float max = MaxStamina;
+            if (_stamina >= max) return;
+            float rate = Effective(PlayerUpgrades.Stat.StaminaRegen, stats.StaminaRegenPerSecond);
             if (_stamina < stats.LowStaminaThreshold) rate *= stats.LowStaminaRegenMultiplier;
-            _stamina = Mathf.Min(stats.MaxStamina, _stamina + rate * dt);
+            _stamina = Mathf.Min(max, _stamina + rate * dt);
+        }
+
+        /// <summary>Passively regenerate HP at the effective <see cref="TRVStats.HealthRegenPerSecond"/>
+        /// (base 0 — upgrades grant/boost it). No-op at full health or when the base+upgrades are 0.</summary>
+        private void TickHealthRegen(float dt)
+        {
+            if (_health == null || !_health.IsAlive || _health.Current >= _health.Max) return;
+            float rate = Effective(PlayerUpgrades.Stat.HealthRegen, stats.HealthRegenPerSecond);
+            if (rate > 0f) _health.Heal(rate * dt);
         }
 
         /// <summary><see cref="IKnockbackable"/> — shove TRV along a direction as a pure impulse:

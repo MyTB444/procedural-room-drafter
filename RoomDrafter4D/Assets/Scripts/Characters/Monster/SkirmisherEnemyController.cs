@@ -42,6 +42,10 @@ namespace TRV
         [Tooltip("Flee speed = MoveSpeed × this.")]
         [SerializeField, Min(0f)] private float fleeSpeedMultiplier = 1f;
 
+        [Tooltip("If it's run into a wall (barely moving while fleeing) for this long, it stops fleeing " +
+                 "and switches to the aggressive stance.")]
+        [SerializeField, Min(0f)] private float fleeWallSwapTime = 0.2f;
+
         [Tooltip("Seconds it pauses to play the intro ability anim the first time it sees the player.")]
         [SerializeField, Min(0f)] private float abilityDuration = 0.6f;
 
@@ -55,6 +59,8 @@ namespace TRV
         private float _fleeTimer;
         private float _abilityTimer;
         private Vector2 _fleeDir = Vector2.down;
+        private Vector2 _fleeLastPos;     // for wall-stuck detection while fleeing
+        private float _fleeStuckTime;
 
         /// <summary>Which attack fired: 0 = melee (state 2), 1 = skirmish (state 1) — drives the animator.</summary>
         public event System.Action<int> Attacked;
@@ -71,6 +77,7 @@ namespace TRV
             _meleeRecoverTimer = 0f;
             _skirmishHoldTimer = 0f;
             _fleeTimer = 0f;
+            _fleeStuckTime = 0f;
             _abilityTimer = 0f;
         }
 
@@ -151,19 +158,36 @@ namespace TRV
                     _fleeDir = PlayerLocator.TryGetPosition(out var pp)
                         ? SafeDir((Vector2)transform.position - pp)
                         : _fleeDir;
+                    _fleeLastPos = transform.position;
+                    _fleeStuckTime = 0f;
                 }
                 return true; // hold during the attack 2 animation
             }
 
-            // Skirmish flee: run away from the player for fleeDuration, then go aggressive.
+            // Skirmish flee: run away from the player for fleeDuration; if it runs INTO A WALL (barely
+            // moving) for fleeWallSwapTime, stop early and go aggressive. Either way → aggressive at the end.
             if (_fleeTimer > 0f)
             {
                 _fleeTimer -= dt;
                 if (PlayerLocator.TryGetPosition(out var p))
                     _fleeDir = SafeDir((Vector2)transform.position - p); // keep fleeing the CURRENT position
+
+                Vector2 pos = transform.position;
+                float expected = Stats.MoveSpeed * fleeSpeedMultiplier * dt;
+                if (Vector2.Distance(pos, _fleeLastPos) < expected * 0.5f) _fleeStuckTime += dt;
+                else _fleeStuckTime = 0f;
+                _fleeLastPos = pos;
+
+                if (_fleeTimer <= 0f || _fleeStuckTime >= fleeWallSwapTime)
+                {
+                    _fleeTimer = 0f;
+                    _stance = Stance.Aggressive;
+                    _aggressiveCount = 0;
+                    return true; // stop this tick (velocity stays zero)
+                }
+
                 FacingDirection = _fleeDir;
                 velocity = _fleeDir * (Stats.MoveSpeed * fleeSpeedMultiplier);
-                if (_fleeTimer <= 0f) { _stance = Stance.Aggressive; _aggressiveCount = 0; }
                 return true;
             }
 

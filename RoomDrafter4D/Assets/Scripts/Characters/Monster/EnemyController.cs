@@ -53,6 +53,7 @@ namespace TRV
         // ── Chase pathfinding (routes around water/walls via RoomNav) ──
         private const float RepathInterval = 0.25f;
         private List<Vector2Int> _path;
+        private int _pathIndex;        // which waypoint we're currently steering toward
         private float _repathTimer;
 
         // ── Runtime state others can read / subscribe to ──
@@ -260,13 +261,16 @@ namespace TRV
             {
                 _repathTimer = RepathInterval;
                 _path = nav.FindPath(nav.CellOf(here), nav.CellOf(playerPos));
+                _pathIndex = 0;
             }
 
-            // path[0] is our current cell; steer toward the next cell's centre.
-            if (_path != null && _path.Count >= 2)
-                return Heading((Vector2)nav.WorldOf(_path[1]) - here);
+            if (_path == null || _path.Count == 0) return Heading(playerPos - here); // unreachable → straight
 
-            return Heading(playerPos - here); // same cell, or unreachable
+            // Advance past waypoints we've reached, then steer toward the next — so we keep flowing along
+            // the path instead of stalling on a waypoint between repaths.
+            Vector2Int cell = nav.CellOf(here);
+            while (_pathIndex < _path.Count - 1 && _path[_pathIndex] == cell) _pathIndex++;
+            return Heading((Vector2)nav.WorldOf(_path[_pathIndex]) - here);
         }
 
         private static Vector2 Heading(Vector2 v) => v.sqrMagnitude > 0.0001f ? v.normalized : Vector2.zero;

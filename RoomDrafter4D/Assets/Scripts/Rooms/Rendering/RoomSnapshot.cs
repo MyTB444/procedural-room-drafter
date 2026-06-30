@@ -24,6 +24,12 @@ namespace TRV
         public LayerSnapshot FrontOfEverything;
         public List<PatchPlacement> IslandDecor;
         public BiomeConfig Biome; // which biome generated this room (decor indices map into its arrays)
+
+        // Rolled main-room content (Halls big igroom). Re-spawned on revisit so the room stays consistent.
+        public RectInt MainArea;          // interior of the big main igroom (width 0 = none)
+        public int MainUpgradeIndex = -1; // index into Biome.MainRoomUpgrades, or -1
+        public int MainFillerIndex = -1;  // index into Biome.MainRoomFillers, or -1
+        public List<Vector2Int> MainFillerCells; // cells still holding an unbroken filler (breaks persist)
     }
 
     /// <summary>One tilemap layer's tiles plus their per-cell transform matrices (parallel arrays).</summary>

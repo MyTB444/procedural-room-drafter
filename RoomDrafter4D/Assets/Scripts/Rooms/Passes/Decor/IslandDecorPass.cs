@@ -23,6 +23,7 @@ namespace TRV
             int max = System.Math.Max(min, config.IslandDecorMaxPerIsland);
             if (max == 0) return;
 
+            // Aqua: every 4×4 island.
             foreach (var (ax, ay) in grid.IslandAnchors)
             {
                 var cells = new List<(int x, int y)>();
@@ -30,19 +31,37 @@ namespace TRV
                     for (int y = ay; y < ay + IslandSize; y++)
                         if (grid[x, y] == CellType.Floor)
                             cells.Add((x, y));
-                rng.Shuffle(cells);
+                PlaceDecor(grid, rng, objects, min, max, cells);
+            }
 
-                // Each shuffled cell is unique, so taking the first N never overlaps.
-                int target = rng.Next(min, max + 1);
-                int placed = 0;
-                foreach (var (x, y) in cells)
-                {
-                    if (placed >= target) break;
-                    int index = PickByChance(rng, objects);
-                    if (index < 0) continue; // no type rolled in for this cell → leave it empty
-                    grid.IslandDecor.Add(new PatchPlacement(x, y, index));
-                    placed++;
-                }
+            // Halls: the SMALL igrooms' interiors (the big main room is excluded by HallPass).
+            foreach (var area in grid.IgroomDecorAreas)
+            {
+                var cells = new List<(int x, int y)>();
+                for (int x = area.xMin; x < area.xMax; x++)
+                    for (int y = area.yMin; y < area.yMax; y++)
+                        if (grid[x, y] == CellType.Floor)
+                            cells.Add((x, y));
+                PlaceDecor(grid, rng, objects, min, max, cells);
+            }
+        }
+
+        /// <summary>Record up to a random [min, max] decor on distinct cells of <paramref name="cells"/>,
+        /// each cell's prefab chosen by per-type chance (a cell where nothing rolls in stays empty). The
+        /// final on-collision check happens at spawn time in <see cref="IslandDecorPool"/>.</summary>
+        private static void PlaceDecor(RoomGrid grid, System.Random rng, IslandDecorEntry[] objects,
+                                       int min, int max, List<(int x, int y)> cells)
+        {
+            rng.Shuffle(cells); // each shuffled cell is unique, so taking the first N never overlaps
+            int target = rng.Next(min, max + 1);
+            int placed = 0;
+            foreach (var (x, y) in cells)
+            {
+                if (placed >= target) break;
+                int index = PickByChance(rng, objects);
+                if (index < 0) continue; // no type rolled in for this cell → leave it empty
+                grid.IslandDecor.Add(new PatchPlacement(x, y, index));
+                placed++;
             }
         }
 

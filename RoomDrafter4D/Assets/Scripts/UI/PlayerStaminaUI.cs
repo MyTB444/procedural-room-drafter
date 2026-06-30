@@ -39,7 +39,9 @@ namespace TRV
                 slider.value = current;
             }
             if (text != null)
-                text.text = $"{Mathf.CeilToInt(current)} / {Mathf.CeilToInt(max)}";
+                // RoundToInt, not CeilToInt: an upgrade multiplier like ×1.2 makes max ≈ 120.0000047
+                // (float epsilon), which CeilToInt would show as 121.
+                text.text = $"{Mathf.RoundToInt(current)} / {Mathf.RoundToInt(max)}";
         }
     }
 }

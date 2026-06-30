@@ -4,20 +4,14 @@ using UnityEngine.InputSystem;
 namespace TRV
 {
     /// <summary>
-    /// Picks the biome for the NEXT room with the number keys: press 0 → biome index 0, 1 → index 1,
-    /// and so on (via <see cref="RoomManager.SelectBiome(int)"/>). Out-of-range digits are ignored.
-    /// Drop this on the RoomManager object. (Placeholder selector until a real in-game UI exists.)
+    /// TESTING hotkeys for the NEXT room's biome — bypasses the KeyHolder/key requirement: press 0 → the
+    /// Aqua (Corridors) biome, 1 → the Halls biome (found BY LAYOUT in <see cref="RoomManager.Biomes"/>,
+    /// so list order doesn't matter), via <see cref="RoomManager.SelectBiome(BiomeConfig)"/>. Drop this on
+    /// the RoomManager object. (Placeholder selector until a real in-game flow exists.)
     /// </summary>
     [RequireComponent(typeof(RoomManager))]
     public class BiomeHotkeys : MonoBehaviour
     {
-        // Index i = the digit-row key that selects biome i (Key.Digit0 isn't adjacent to Digit1).
-        private static readonly Key[] DigitKeys =
-        {
-            Key.Digit0, Key.Digit1, Key.Digit2, Key.Digit3, Key.Digit4,
-            Key.Digit5, Key.Digit6, Key.Digit7, Key.Digit8, Key.Digit9,
-        };
-
         private RoomManager _rooms;
 
         private void Awake() => _rooms = GetComponent<RoomManager>();
@@ -27,16 +21,21 @@ namespace TRV
             var keyboard = Keyboard.current;
             if (keyboard == null || _rooms == null) return;
 
-            for (int i = 0; i < DigitKeys.Length; i++)
+            if (keyboard[Key.Digit0].wasPressedThisFrame) SelectByLayout(BiomeLayout.Corridors); // Aqua
+            else if (keyboard[Key.Digit1].wasPressedThisFrame) SelectByLayout(BiomeLayout.Halls);
+        }
+
+        private void SelectByLayout(BiomeLayout layout)
+        {
+            var biomes = _rooms.Biomes;
+            for (int i = 0; i < biomes.Count; i++)
             {
-                if (!keyboard[DigitKeys[i]].wasPressedThisFrame) continue;
-                if (i < _rooms.Biomes.Count && _rooms.Biomes[i] != null)
-                {
-                    _rooms.SelectBiome(i);
-                    Debug.Log($"[Biome] Next room → biome {i} ({_rooms.Biomes[i].name}).", this);
-                }
-                break;
+                if (biomes[i] == null || biomes[i].Layout != layout) continue;
+                _rooms.SelectBiome(biomes[i]);
+                Debug.Log($"[Biome] Next room → {layout} ({biomes[i].name}).", this);
+                return;
             }
+            Debug.LogWarning($"[Biome] No {layout} biome in RoomManager's biomes list.", this);
         }
     }
 }

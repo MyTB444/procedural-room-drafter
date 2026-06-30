@@ -32,9 +32,10 @@ namespace TRV
             ReleaseAll();
             if (positions == null || positions.Count == 0 || biome == null) return;
 
-            // At most ONE miniboss per room — pick which slot (if any) gets it.
+            // At most ONE miniboss per room — it takes slot 0, which RoomManager fills with the room's
+            // LARGEST open walking space (so the miniboss spawns where it has the most room).
             var miniboss = PickMiniboss(biome);
-            int minibossSlot = miniboss != null ? Random.Range(0, positions.Count) : -1;
+            int minibossSlot = miniboss != null ? 0 : -1;
 
             for (int i = 0; i < positions.Count; i++)
             {

@@ -74,6 +74,21 @@ namespace TRV
         // so a cached room re-spawns the same decor without re-running generation.
         private List<PatchPlacement> _currentIslandDecor;
 
+        // Rolled main-room content for the room currently shown (Halls big igroom): the interior rect
+        // and which option won (one of upgrade/filler index is >= 0, or both -1 = nothing). Saved into
+        // the snapshot on leave so a revisited room re-spawns the same content.
+        private RectInt _currentMainArea;
+        private int _currentMainUpgradeIndex = -1;
+        private int _currentMainFillerIndex = -1;
+        private List<Vector2Int> _currentMainFillerCells; // unbroken filler cells (breaks persist via this list)
+        private GameObject _mainUpgradeInstance; // the spawned upgrade pickup (destroyed on room change)
+        private PlayerUpgrades _playerUpgrades;
+
+        // The player's runtime upgrade ledger (lazy — auto-added to the player by TRVController).
+        private PlayerUpgrades PlayerUpgrades =>
+            _playerUpgrades != null ? _playerUpgrades :
+            (_playerUpgrades = player != null ? player.GetComponent<PlayerUpgrades>() : null);
+
         // Visited rooms, captured on leave and restored on return (includes the hand-made start room).
         private readonly RoomCache _cache = new RoomCache();
 
@@ -181,6 +196,10 @@ namespace TRV
             var snapshot = painter.Capture(_currentBiome.Width, _currentBiome.Height);
             snapshot.IslandDecor = _currentIslandDecor;
             snapshot.Biome = _currentBiome;
+            snapshot.MainArea = _currentMainArea;
+            snapshot.MainUpgradeIndex = _currentMainUpgradeIndex;
+            snapshot.MainFillerIndex = _currentMainFillerIndex;
+            snapshot.MainFillerCells = _currentMainFillerCells; // remembers which fillers are still intact
             _cache.Save(_coord, snapshot);
 
             // Did a KeyHolder set the door we're exiting through to lead to Halls?
@@ -215,6 +234,10 @@ namespace TRV
                 painter.Restore(snapshot);
                 _currentIslandDecor = snapshot.IslandDecor;
                 roomBiome = snapshot.Biome != null ? snapshot.Biome : _nextBiome;
+                _currentMainArea = snapshot.MainArea;            // re-spawn the same main-room content
+                _currentMainUpgradeIndex = snapshot.MainUpgradeIndex;
+                _currentMainFillerIndex = snapshot.MainFillerIndex;
+                _currentMainFillerCells = snapshot.MainFillerCells; // already-broken fillers stay gone
             }
             else
             {
@@ -223,6 +246,9 @@ namespace TRV
                 painter.Paint(grid, roomBiome);
                 _currentIslandDecor = grid.IslandDecor;
                 enemyPositions = PickEnemyPositions(grid, roomBiome, enterFrom);
+                _currentMainArea = grid.MainIgroomArea;          // roll the big igroom's content (fresh only)
+                DecideMainContent(grid.MainIgroomArea, roomBiome, out _currentMainUpgradeIndex, out _currentMainFillerIndex);
+                _currentMainFillerCells = _currentMainFillerIndex >= 0 ? BuildFillerCells(_currentMainArea) : null;
             }
             _currentBiome = roomBiome;
 
@@ -232,6 +258,7 @@ namespace TRV
 
             // Swap the pooled objects over to this room (each releases the previous room's first).
             if (decorPool != null) decorPool.Show(_currentIslandDecor, painter, roomBiome);
+            SpawnMainContent(roomBiome); // big-igroom upgrade/filler — AFTER Show (filler adds to the pool)
             if (enemyPool != null) enemyPool.Populate(enemyPositions, roomBiome);
             if (collectablePool != null) collectablePool.ReleaseAll(); // clear any uncollected drops from the old room
 
@@ -253,6 +280,101 @@ namespace TRV
             // Fresh room: clear the door overrides and (re)place a KeyHolder in front of each door.
             for (int i = 0; i < 4; i++) _doorBiomeOverride[i] = null;
             SetupKeyHolders(roomBiome);
+        }
+
+        /// <summary>Roll the big main igroom's content for a FRESH Halls room. Equal chance among each
+        /// still-uncollected one-per-run upgrade (<see cref="BiomeConfig.MainRoomUpgrades"/>) AND each
+        /// filler prefab (<see cref="BiomeConfig.MainRoomFillers"/> — crates/vases). Outputs the chosen
+        /// index into ONE array (the other stays -1); both -1 = nothing (no main area / nothing configured).
+        /// Once all upgrades are collected this run, only the fillers remain in the pool.</summary>
+        private void DecideMainContent(RectInt area, BiomeConfig biome, out int upgradeIndex, out int fillerIndex)
+        {
+            upgradeIndex = -1;
+            fillerIndex = -1;
+            if (area.width <= 0 || biome == null) return;
+
+            // Equal-chance pool of (isUpgrade, index) — one entry per still-available option.
+            var options = new List<(bool upgrade, int index)>();
+
+            var upgrades = biome.MainRoomUpgrades;
+            if (upgrades != null)
+                for (int i = 0; i < upgrades.Length; i++)
+                {
+                    if (upgrades[i] == null) continue;
+                    // An upgrade collected this run can't appear again.
+                    if (upgrades[i].TryGetComponent<Upgrade>(out var up) &&
+                        PlayerUpgrades != null && PlayerUpgrades.HasCollected(up.Id))
+                        continue;
+                    options.Add((true, i));
+                }
+
+            var fillers = biome.MainRoomFillers;
+            if (fillers != null)
+                for (int i = 0; i < fillers.Length; i++)
+                    if (fillers[i] != null) options.Add((false, i));
+
+            if (options.Count == 0) return;
+            var pick = options[Random.Range(0, options.Count)];
+            if (pick.upgrade) upgradeIndex = pick.index;
+            else fillerIndex = pick.index;
+        }
+
+        /// <summary>Spawn the current room's rolled big-igroom content: a single upgrade pickup at the
+        /// room centre, OR fill the interior with the chosen filler decor (crates/vases). Destroys the
+        /// previous room's upgrade instance first; an upgrade collected since the room was generated is
+        /// not re-spawned. Uses the cached area/indices (fresh on generation, restored from the snapshot
+        /// on revisit). No-op for non-Halls rooms (no main area).</summary>
+        private void SpawnMainContent(BiomeConfig biome)
+        {
+            if (_mainUpgradeInstance != null) { Destroy(_mainUpgradeInstance); _mainUpgradeInstance = null; }
+            if (_currentMainArea.width <= 0 || biome == null || painter == null) return;
+
+            if (_currentMainUpgradeIndex >= 0)
+            {
+                var upgrades = biome.MainRoomUpgrades;
+                if (upgrades == null || _currentMainUpgradeIndex >= upgrades.Length) return;
+                var prefab = upgrades[_currentMainUpgradeIndex];
+                if (prefab == null) return;
+                // Don't re-spawn an upgrade collected since this room was first generated.
+                if (prefab.TryGetComponent<Upgrade>(out var up) &&
+                    PlayerUpgrades != null && PlayerUpgrades.HasCollected(up.Id))
+                    return;
+                int cx = _currentMainArea.xMin + _currentMainArea.width / 2;
+                int cy = _currentMainArea.yMin + _currentMainArea.height / 2;
+                _mainUpgradeInstance = Instantiate(prefab);
+                _mainUpgradeInstance.transform.position = painter.CellCenterWorld(cx, cy);
+            }
+            else if (_currentMainFillerIndex >= 0)
+            {
+                var fillers = biome.MainRoomFillers;
+                if (fillers == null || _currentMainFillerIndex >= fillers.Length) return;
+                var prefab = fillers[_currentMainFillerIndex];
+                if (prefab == null || decorPool == null || _currentMainFillerCells == null) return;
+                // Fill mutates the cell list (drops a cell when its crate breaks); the snapshot rides
+                // the same list, so a smashed crate stays gone when the player returns to the room.
+                decorPool.Fill(prefab, _currentMainFillerCells, painter);
+            }
+        }
+
+        /// <summary>A scattered HALF of the main igroom's interior cells to hold fillers (skips collision
+        /// tiles). Shuffled and halved so crates/vases are sparse and randomly placed, not a packed wall.</summary>
+        private List<Vector2Int> BuildFillerCells(RectInt area)
+        {
+            var cells = new List<Vector2Int>(area.width * area.height);
+            for (int x = area.xMin; x < area.xMax; x++)
+                for (int y = area.yMin; y < area.yMax; y++)
+                    if (painter == null || !painter.HasSolidAt(x, y))
+                        cells.Add(new Vector2Int(x, y));
+
+            // Fisher–Yates shuffle, then keep half — random subset = scattered locations.
+            for (int i = cells.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (cells[i], cells[j]) = (cells[j], cells[i]);
+            }
+            int keep = cells.Count / 2;
+            if (cells.Count > keep) cells.RemoveRange(keep, cells.Count - keep);
+            return cells;
         }
 
         /// <summary>True if the room on the other side of the current room's <paramref name="edge"/> door
@@ -329,16 +451,67 @@ namespace TRV
                 }
 
             var pickFrom = eligible.Count > 0 ? eligible : floor; // tiny room → fall back to any floor
-            for (int i = pickFrom.Count - 1; i > 0; i--) // Fisher–Yates
+            if (pickFrom.Count == 0) return positions;
+
+            // Slot 0 spawns in the LARGEST open walking space (where a miniboss, if any, goes); the rest
+            // are random. (A normal enemy harmlessly takes slot 0 when no miniboss spawns.)
+            var prime = LargestSpaceCell(grid, pickFrom);
+            pickFrom.Remove(prime);
+            for (int i = pickFrom.Count - 1; i > 0; i--) // Fisher–Yates on the remainder
             {
                 int j = Random.Range(0, i + 1);
                 (pickFrom[i], pickFrom[j]) = (pickFrom[j], pickFrom[i]);
             }
 
-            int n = Mathf.Min(biome.EnemiesPerRoom, pickFrom.Count);
-            for (int i = 0; i < n; i++)
+            int n = Mathf.Min(biome.EnemiesPerRoom, pickFrom.Count + 1);
+            positions.Add(painter.CellCenterWorld(prime.x, prime.y));
+            for (int i = 0; i < n - 1; i++)
                 positions.Add(painter.CellCenterWorld(pickFrom[i].x, pickFrom[i].y));
             return positions;
+        }
+
+        /// <summary>Among <paramref name="candidates"/>, the cell with the MOST open space around it — the
+        /// max Chebyshev distance to the nearest non-walkable cell (a multi-source BFS distance transform
+        /// from every wall/water/building). Used to drop the miniboss where it has the most room.</summary>
+        private static Vector2Int LargestSpaceCell(RoomGrid grid, List<Vector2Int> candidates)
+        {
+            int w = grid.Width, h = grid.Height;
+            var clearance = new int[w, h];
+            var queue = new Queue<Vector2Int>();
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                {
+                    if (grid[x, y].IsWalkable())
+                    {
+                        clearance[x, y] = int.MaxValue;
+                    }
+                    else
+                    {
+                        clearance[x, y] = 0; // obstacle = BFS source
+                        queue.Enqueue(new Vector2Int(x, y));
+                    }
+                }
+
+            while (queue.Count > 0)
+            {
+                var c = queue.Dequeue();
+                int next = clearance[c.x, c.y] + 1;
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dy = -1; dy <= 1; dy++)
+                    {
+                        if (dx == 0 && dy == 0) continue;
+                        int nx = c.x + dx, ny = c.y + dy;
+                        if (nx < 0 || ny < 0 || nx >= w || ny >= h || clearance[nx, ny] <= next) continue;
+                        clearance[nx, ny] = next;
+                        queue.Enqueue(new Vector2Int(nx, ny));
+                    }
+            }
+
+            Vector2Int best = candidates[0];
+            int bestClear = -1;
+            foreach (var c in candidates)
+                if (clearance[c.x, c.y] > bestClear) { bestClear = clearance[c.x, c.y]; best = c; }
+            return best;
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace TRV
 {
@@ -40,6 +41,9 @@ namespace TRV
                 CarveRoom(grid, r.x, r.y, r.fw, r.fh);
             foreach (var r in rooms)
                 OpenDoorway(grid, r.x, r.y, r.fw, r.fh, t, rng);
+
+            // Record interiors of the SMALL igrooms (everything but the big main room) for decor.
+            RecordDecorAreas(grid, rooms);
 
             // Close the room boundary with WATER (as Halls always did) — any perimeter cell still open
             // floor becomes water; igroom walls that reached the edge stay as the edge tile there.
@@ -124,6 +128,28 @@ namespace TRV
                     grid[x, y] = CellType.Wall;
                     grid.SetWallKind(x, y, CornerOrEdge(left, right, bottom, top));
                 }
+        }
+
+        /// <summary>Record the INTERIOR rect of each igroom EXCEPT the largest (the main room, which gets
+        /// no decor for now) onto <see cref="RoomGrid.IgroomDecorAreas"/> — interior = footprint minus the
+        /// 1-cell wall border.</summary>
+        private static void RecordDecorAreas(RoomGrid grid, List<(int x, int y, int fw, int fh)> rooms)
+        {
+            if (rooms.Count == 0) return;
+
+            int mainIdx = 0; // the big main room = the largest footprint
+            for (int i = 1; i < rooms.Count; i++)
+                if (rooms[i].fw * rooms[i].fh > rooms[mainIdx].fw * rooms[mainIdx].fh) mainIdx = i;
+
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                var r = rooms[i];
+                int iw = r.fw - 2, ih = r.fh - 2; // interior (drop the wall border)
+                if (iw <= 0 || ih <= 0) continue;
+                var interior = new RectInt(r.x + 1, r.y + 1, iw, ih);
+                if (i == mainIdx) grid.MainIgroomArea = interior; // the big main room → main-room content
+                else grid.IgroomDecorAreas.Add(interior);        // small igrooms → scattered decor
+            }
         }
 
         private static WallKind CornerOrEdge(bool left, bool right, bool bottom, bool top)

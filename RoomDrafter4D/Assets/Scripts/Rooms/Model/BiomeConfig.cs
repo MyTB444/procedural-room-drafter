@@ -147,6 +147,16 @@ namespace TRV
         [field: Min(0)]
         [field: SerializeField] public int IslandDecorMaxPerIsland { get; private set; } = 5;
 
+        [field: Header("Main room content (Halls big igroom)")]
+        [field: Tooltip("Upgrade prefabs (each an Upgrade with an Id) that can fill the big main igroom — " +
+                        "each offered ONCE per run, removed once collected. RoomManager rolls ONE of " +
+                        "{the still-available upgrades + the fillers below} at equal chance.")]
+        [field: SerializeField] public GameObject[] MainRoomUpgrades { get; private set; }
+
+        [field: Tooltip("Filler decor prefabs (e.g. crates, vases) — rolling one FILLS the big main igroom " +
+                        "with that breakable prefab. Each is one equal-chance option alongside the upgrades.")]
+        [field: SerializeField] public GameObject[] MainRoomFillers { get; private set; }
+
         [field: Header("Water island")]
         [field: Tooltip("If the room's largest water body has at least this many cells, a strictly " +
                         "2-wide path is carved from the nearest floor to its middle, ending in a 4×4 " +

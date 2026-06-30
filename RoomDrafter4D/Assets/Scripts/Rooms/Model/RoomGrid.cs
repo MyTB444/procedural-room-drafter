@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace TRV
 {
@@ -20,6 +21,14 @@ namespace TRV
 
         /// <summary>Bottom-left cell of every 4×4 island carved by IslandPass.</summary>
         public List<(int x, int y)> IslandAnchors { get; } = new List<(int x, int y)>();
+
+        /// <summary>Interior rects of the SMALL Halls igrooms (excludes the big main room) — where
+        /// IslandDecorPass scatters decor objects (same field/count as islands). Filled by HallPass.</summary>
+        public List<RectInt> IgroomDecorAreas { get; } = new List<RectInt>();
+
+        /// <summary>Interior rect of the BIG main Halls igroom (width 0 = none) — RoomManager fills it with
+        /// the rolled main-room content (an upgrade, or crates/vases). Filled by HallPass.</summary>
+        public RectInt MainIgroomArea { get; set; }
 
         /// <summary>Island decor object placements — X/Y = cell, PatchIndex into
         /// <see cref="BiomeConfig.IslandDecorObjects"/> (filled by IslandDecorPass, spawned by
