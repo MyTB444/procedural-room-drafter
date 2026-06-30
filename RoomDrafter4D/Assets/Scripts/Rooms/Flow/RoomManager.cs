@@ -249,6 +249,8 @@ namespace TRV
                 _currentMainArea = grid.MainIgroomArea;          // roll the big igroom's content (fresh only)
                 DecideMainContent(grid.MainIgroomArea, roomBiome, out _currentMainUpgradeIndex, out _currentMainFillerIndex);
                 _currentMainFillerCells = _currentMainFillerIndex >= 0 ? BuildFillerCells(_currentMainArea) : null;
+                // An upgrade room also gets the small-igroom scatter decor (kept off the upgrade's centre).
+                if (_currentMainUpgradeIndex >= 0) _currentIslandDecor.AddRange(grid.MainIgroomDecor);
             }
             _currentBiome = roomBiome;
 
@@ -372,7 +374,7 @@ namespace TRV
                 int j = Random.Range(0, i + 1);
                 (cells[i], cells[j]) = (cells[j], cells[i]);
             }
-            int keep = cells.Count / 2;
+            int keep = cells.Count / 4; // sparse: a quarter of the interior gets a filler
             if (cells.Count > keep) cells.RemoveRange(keep, cells.Count - keep);
             return cells;
         }

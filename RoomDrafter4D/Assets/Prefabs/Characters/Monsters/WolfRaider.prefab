@@ -229,7 +229,7 @@ MonoBehaviour:
   deathFadeDuration: 0.5
   meleeAttack:
     Hitbox: {fileID: 8404639371001990061}
-    Damage: 30
+    Damage: 20
   skirmishAttack:
     Hitbox: {fileID: 8282722714656037632}
     Damage: 10

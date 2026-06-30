@@ -31,7 +31,7 @@ namespace TRV
                     for (int y = ay; y < ay + IslandSize; y++)
                         if (grid[x, y] == CellType.Floor)
                             cells.Add((x, y));
-                PlaceDecor(grid, rng, objects, min, max, cells);
+                PlaceDecor(grid.IslandDecor, rng, objects, min, max, cells);
             }
 
             // Halls: the SMALL igrooms' interiors (the big main room is excluded by HallPass).
@@ -42,25 +42,42 @@ namespace TRV
                     for (int y = area.yMin; y < area.yMax; y++)
                         if (grid[x, y] == CellType.Floor)
                             cells.Add((x, y));
-                PlaceDecor(grid, rng, objects, min, max, cells);
+                PlaceDecor(grid.IslandDecor, rng, objects, min, max, cells);
+            }
+
+            // Halls big main room: same count/type as the small igrooms, but recorded SEPARATELY (only used
+            // when the room's content is an upgrade — RoomManager appends it then). Keep the 3×3 around the
+            // interior centre clear so it never lands on the upgrade pickup placed there.
+            var main = grid.MainIgroomArea;
+            if (main.width > 0 && main.height > 0)
+            {
+                int cx = main.xMin + main.width / 2, cy = main.yMin + main.height / 2;
+                var cells = new List<(int x, int y)>();
+                for (int x = main.xMin; x < main.xMax; x++)
+                    for (int y = main.yMin; y < main.yMax; y++)
+                        if (grid[x, y] == CellType.Floor &&
+                            (System.Math.Abs(x - cx) > 1 || System.Math.Abs(y - cy) > 1)) // off the upgrade spot
+                            cells.Add((x, y));
+                PlaceDecor(grid.MainIgroomDecor, rng, objects, min, max, cells);
             }
         }
 
-        /// <summary>Record up to a random [min, max] decor on distinct cells of <paramref name="cells"/>,
-        /// each cell's prefab chosen by per-type chance (a cell where nothing rolls in stays empty). The
-        /// final on-collision check happens at spawn time in <see cref="IslandDecorPool"/>.</summary>
-        private static void PlaceDecor(RoomGrid grid, System.Random rng, IslandDecorEntry[] objects,
+        /// <summary>Record up to a random [min, max] decor on distinct cells of <paramref name="cells"/>
+        /// into <paramref name="target"/>, each cell's prefab chosen by per-type chance (a cell where
+        /// nothing rolls in stays empty). The final on-collision check happens at spawn time in
+        /// <see cref="IslandDecorPool"/>.</summary>
+        private static void PlaceDecor(List<PatchPlacement> target, System.Random rng, IslandDecorEntry[] objects,
                                        int min, int max, List<(int x, int y)> cells)
         {
             rng.Shuffle(cells); // each shuffled cell is unique, so taking the first N never overlaps
-            int target = rng.Next(min, max + 1);
+            int count = rng.Next(min, max + 1);
             int placed = 0;
             foreach (var (x, y) in cells)
             {
-                if (placed >= target) break;
+                if (placed >= count) break;
                 int index = PickByChance(rng, objects);
                 if (index < 0) continue; // no type rolled in for this cell → leave it empty
-                grid.IslandDecor.Add(new PatchPlacement(x, y, index));
+                target.Add(new PatchPlacement(x, y, index));
                 placed++;
             }
         }

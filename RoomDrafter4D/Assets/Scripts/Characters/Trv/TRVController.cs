@@ -38,6 +38,7 @@ namespace TRV
         private PlayerUpgrades _upgrades; // runtime stat multipliers + ability unlocks (auto-added)
         private Vector2 _velocity;        // our own smoothed velocity
         private Cooldown _attackCooldown;
+        private bool _controlsEnabled = true; // false while the pause menu is open or the player is dead
 
         // ── Dash state ──
         private float _dashWindupLeft;    // > 0 during the pre-dash windup (no i-frames yet)
@@ -151,6 +152,15 @@ namespace TRV
         {
             if (stats == null || input == null) return;
 
+            // Frozen by the pause menu or death: stand still, ignore all input.
+            if (!_controlsEnabled)
+            {
+                _velocity = Vector2.zero;
+                _body.linearVelocity = Vector2.zero;
+                IsMoving = false;
+                return;
+            }
+
             _health.Invincible = IsInvincible; // dash i-frames gate Health.TakeDamage
             TickStamina(Time.fixedDeltaTime);
             TickHealthRegen(Time.fixedDeltaTime);
@@ -247,7 +257,7 @@ namespace TRV
         // ─────────────────────────────────────────────────────────────
         private void HandleDash()
         {
-            if (!IsAlive || IsDashing || _dashWindupLeft > 0f || !_dashCooldown.IsReady
+            if (!_controlsEnabled || !IsAlive || IsDashing || _dashWindupLeft > 0f || !_dashCooldown.IsReady
                 || _attackSlowTimeLeft > 0f) return;
             if (_upgrades == null || !_upgrades.IsUnlocked(PlayerUpgrades.Ability.Dash)) return; // dash is locked until the upgrade
             if (!TrySpendStamina(stats.DodgeStaminaCost)) return; // not enough stamina → no dodge
@@ -276,7 +286,7 @@ namespace TRV
 
         private void HandleAttack()
         {
-            if (!IsAlive || !_attackCooldown.IsReady) return;
+            if (!_controlsEnabled || !IsAlive || !_attackCooldown.IsReady) return;
             if (!TrySpendStamina(Effective(PlayerUpgrades.Stat.AttackStaminaCost, stats.AttackStaminaCost))) return;
             _attackCooldown.Begin(Effective(PlayerUpgrades.Stat.AttackCooldown, stats.AttackCooldown));
 
@@ -318,7 +328,7 @@ namespace TRV
 
         private void HandleInteract()
         {
-            if (!IsAlive) return;
+            if (!_controlsEnabled || !IsAlive) return;
 
             // Interact only works when next to an available interactable (proximity, no hitbox).
             var interactable = Interactable.FindNearestAvailable(transform.position);
@@ -387,6 +397,24 @@ namespace TRV
             if (_health == null || !_health.IsAlive || _health.Current >= _health.Max) return;
             float rate = Effective(PlayerUpgrades.Stat.HealthRegen, stats.HealthRegenPerSecond);
             if (rate > 0f) _health.Heal(rate * dt);
+        }
+
+        /// <summary>Freeze/unfreeze player control. Disabling stops the body immediately and cancels any
+        /// in-progress dash/attack; movement and dash/attack/interact are all ignored until re-enabled.
+        /// Used by the pause menu (Escape) and on death, so a frozen or dead player can't act or slide.</summary>
+        public void SetControlsEnabled(bool value)
+        {
+            _controlsEnabled = value;
+            if (value) return;
+
+            // Cancel any in-progress action and stop dead.
+            _dashWindupLeft = 0f;
+            _dashTimeLeft = 0f;
+            _attackSlowTimeLeft = 0f;
+            _velocity = Vector2.zero;
+            if (_body != null) _body.linearVelocity = Vector2.zero;
+            IsMoving = false;
+            if (dashHitbox != null) dashHitbox.SetActive(false, gameObject, 0f);
         }
 
         /// <summary><see cref="IKnockbackable"/> — shove TRV along a direction as a pure impulse:

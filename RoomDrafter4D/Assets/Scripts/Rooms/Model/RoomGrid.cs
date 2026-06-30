@@ -30,6 +30,11 @@ namespace TRV
         /// the rolled main-room content (an upgrade, or crates/vases). Filled by HallPass.</summary>
         public RectInt MainIgroomArea { get; set; }
 
+        /// <summary>Decor placements for the BIG main igroom (same count/type as small igrooms, but kept
+        /// clear of the upgrade's centre cell) — recorded by IslandDecorPass, but only USED by RoomManager
+        /// when the room's main content is an UPGRADE (a filler room fills the interior itself instead).</summary>
+        public List<PatchPlacement> MainIgroomDecor { get; } = new List<PatchPlacement>();
+
         /// <summary>Island decor object placements — X/Y = cell, PatchIndex into
         /// <see cref="BiomeConfig.IslandDecorObjects"/> (filled by IslandDecorPass, spawned by
         /// <see cref="IslandDecorPool"/>).</summary>
