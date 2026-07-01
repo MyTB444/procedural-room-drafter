@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f8a0c9bf8b1d4b42a5889739c0abb35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TRV.AttackHitbox
-  offset: 0.4
+  offset: 0
   delay: 0.4
   activeSeconds: 0.1
   knockback: 5
