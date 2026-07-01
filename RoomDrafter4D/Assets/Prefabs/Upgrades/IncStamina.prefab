@@ -106,6 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TRV.StatUpgrade
   interactRange: 1.5
   id: 2
+  message: Max stamina, stamina regeneration and health regeneration are increased!
   modifiers:
   - Stat: 2
     Op: 0

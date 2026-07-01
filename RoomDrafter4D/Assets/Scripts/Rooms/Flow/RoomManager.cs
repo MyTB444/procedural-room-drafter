@@ -284,41 +284,46 @@ namespace TRV
             SetupKeyHolders(roomBiome);
         }
 
-        /// <summary>Roll the big main igroom's content for a FRESH Halls room. Equal chance among each
-        /// still-uncollected one-per-run upgrade (<see cref="BiomeConfig.MainRoomUpgrades"/>) AND each
-        /// filler prefab (<see cref="BiomeConfig.MainRoomFillers"/> — crates/vases). Outputs the chosen
-        /// index into ONE array (the other stays -1); both -1 = nothing (no main area / nothing configured).
-        /// Once all upgrades are collected this run, only the fillers remain in the pool.</summary>
+        /// <summary>Roll the big main igroom's content for a FRESH Halls room. Upgrades take PRIORITY:
+        /// while ANY one-per-run upgrade (<see cref="BiomeConfig.MainRoomUpgrades"/>) is still uncollected,
+        /// the room is ALWAYS an upgrade room (random among the uncollected ones). Only once EVERY upgrade
+        /// has been collected does it fall back to a random filler (<see cref="BiomeConfig.MainRoomFillers"/>
+        /// — crates/vases). Outputs the chosen index into ONE array (the other stays -1); both -1 = nothing
+        /// (no main area / nothing configured).</summary>
         private void DecideMainContent(RectInt area, BiomeConfig biome, out int upgradeIndex, out int fillerIndex)
         {
             upgradeIndex = -1;
             fillerIndex = -1;
             if (area.width <= 0 || biome == null) return;
 
-            // Equal-chance pool of (isUpgrade, index) — one entry per still-available option.
-            var options = new List<(bool upgrade, int index)>();
-
+            // Still-uncollected upgrades — one entry each. If any exist, the room is guaranteed an upgrade.
+            var upgradeIndices = new List<int>();
             var upgrades = biome.MainRoomUpgrades;
             if (upgrades != null)
                 for (int i = 0; i < upgrades.Length; i++)
                 {
                     if (upgrades[i] == null) continue;
-                    // An upgrade collected this run can't appear again.
                     if (upgrades[i].TryGetComponent<Upgrade>(out var up) &&
                         PlayerUpgrades != null && PlayerUpgrades.HasCollected(up.Id))
-                        continue;
-                    options.Add((true, i));
+                        continue; // collected this run — can't appear again
+                    upgradeIndices.Add(i);
                 }
 
+            if (upgradeIndices.Count > 0)
+            {
+                upgradeIndex = upgradeIndices[Random.Range(0, upgradeIndices.Count)];
+                return;
+            }
+
+            // Every upgrade collected → a random filler instead.
+            var fillerIndices = new List<int>();
             var fillers = biome.MainRoomFillers;
             if (fillers != null)
                 for (int i = 0; i < fillers.Length; i++)
-                    if (fillers[i] != null) options.Add((false, i));
+                    if (fillers[i] != null) fillerIndices.Add(i);
 
-            if (options.Count == 0) return;
-            var pick = options[Random.Range(0, options.Count)];
-            if (pick.upgrade) upgradeIndex = pick.index;
-            else fillerIndex = pick.index;
+            if (fillerIndices.Count > 0)
+                fillerIndex = fillerIndices[Random.Range(0, fillerIndices.Count)];
         }
 
         /// <summary>Spawn the current room's rolled big-igroom content: a single upgrade pickup at the
@@ -446,6 +451,7 @@ namespace TRV
                 for (int y = 0; y < grid.Height; y++)
                 {
                     if (grid[x, y] != CellType.Floor) continue; // open floor only — not doors/buildings/water
+                    if (painter != null && painter.HasSolidAt(x, y)) continue; // skip painted collision (e.g. the waterfall base patch)
                     var c = new Vector2Int(x, y);
                     floor.Add(c);
                     int dx = x - entry.x, dy = y - entry.y;

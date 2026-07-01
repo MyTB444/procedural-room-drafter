@@ -106,4 +106,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TRV.AbilityUpgrade
   interactRange: 1.5
   id: 0
+  message: Shift to shield charge!
   ability: 0

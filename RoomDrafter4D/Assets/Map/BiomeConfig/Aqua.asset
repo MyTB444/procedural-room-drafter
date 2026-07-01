@@ -66,9 +66,9 @@ MonoBehaviour:
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
   - Prefab: {fileID: 2277051634198294532, guid: 166c7c13ea6b4104ba5fe5153cffef16, type: 3}
-    Chance: 0.2
+    Chance: 0.4
   - Prefab: {fileID: 8161980004430131537, guid: 1515b6e95fb9d10459e11abf13d71939, type: 3}
-    Chance: 0.8
+    Chance: 0.6
   <IslandDecorMinPerIsland>k__BackingField: 4
   <IslandDecorMaxPerIsland>k__BackingField: 5
   <MainRoomUpgrades>k__BackingField: []
