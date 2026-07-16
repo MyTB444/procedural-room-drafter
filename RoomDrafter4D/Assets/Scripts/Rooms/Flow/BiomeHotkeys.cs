@@ -5,9 +5,10 @@ namespace TRV
 {
     /// <summary>
     /// TESTING hotkeys for the NEXT room's biome — bypasses the KeyHolder/key requirement: press 0 → the
-    /// Aqua (Corridors) biome, 1 → the Halls biome (found BY LAYOUT in <see cref="RoomManager.Biomes"/>,
-    /// so list order doesn't matter), via <see cref="RoomManager.SelectBiome(BiomeConfig)"/>. Drop this on
-    /// the RoomManager object. (Placeholder selector until a real in-game flow exists.)
+    /// Aqua (Corridors) biome, 1 → the Halls biome, 2 → the Anubis (Open) biome (found BY LAYOUT in
+    /// <see cref="RoomManager.Biomes"/>, so list order doesn't matter), via
+    /// <see cref="RoomManager.SelectBiome(BiomeConfig)"/>. Drop this on the RoomManager object.
+    /// (Placeholder selector until a real in-game flow exists.)
     /// </summary>
     [RequireComponent(typeof(RoomManager))]
     public class BiomeHotkeys : MonoBehaviour
@@ -23,6 +24,7 @@ namespace TRV
 
             if (keyboard[Key.Digit0].wasPressedThisFrame) SelectByLayout(BiomeLayout.Corridors); // Aqua
             else if (keyboard[Key.Digit1].wasPressedThisFrame) SelectByLayout(BiomeLayout.Halls);
+            else if (keyboard[Key.Digit2].wasPressedThisFrame) SelectByLayout(BiomeLayout.Open); // Anubis
         }
 
         private void SelectByLayout(BiomeLayout layout)

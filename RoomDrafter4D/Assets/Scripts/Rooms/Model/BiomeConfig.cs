@@ -8,6 +8,7 @@ namespace TRV
     {
         Corridors = 0, // open water crossed by a random connected walkway network (CorridorPass)
         Halls = 1,     // one big walled inner room ("igroom") ringed by water (HallPass)
+        Open = 2,      // one fully-walkable floor field, no water (OpenFieldPass — Anubis)
     }
 
     // FloorPatch / WaterDecorPatch (the authored tile groups referenced below) live in
@@ -35,7 +36,8 @@ namespace TRV
     {
         [field: Header("Layout")]
         [field: Tooltip("Corridors = open water crossed by a random connected network of 2-/4-wide " +
-                        "walkways (Aqua). Halls = one big walled igroom ringed by water.")]
+                        "walkways (Aqua). Halls = one big walled igroom ringed by water. " +
+                        "Open = one fully-walkable floor field, no water (Anubis).")]
         [field: SerializeField] public BiomeLayout Layout { get; private set; } = BiomeLayout.Corridors;
 
         [field: Header("Grid (cells)")]
@@ -227,6 +229,8 @@ namespace TRV
         [field: SerializeField] public TileBase[] CubePatch { get; private set; }
 
         [field: Header("Tiles — Room doors (the 4 perimeter doors)")]
+        [field: Tooltip("Unused in the Open layout (Anubis) — those doors paint a random floor " +
+                        "variant instead, so they're visually just ground.")]
         [field: SerializeField] public TileBase DoorTile { get; private set; }
 
         [field: Tooltip("Left half of the 2-wide ROOM door (the 4 perimeter doors), on the Door layer, " +

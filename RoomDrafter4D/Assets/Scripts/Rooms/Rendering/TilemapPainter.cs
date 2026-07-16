@@ -186,7 +186,11 @@ namespace TRV
                             }
                             else
                             {
-                                doorTilemap.SetTile(pos, config.DoorTile);
+                                // Open (Anubis): the door is VISUALLY just ground — a random floor
+                                // variant. Its trigger comes from ForceDoorColliders, not the tile.
+                                doorTilemap.SetTile(pos, config.Layout == BiomeLayout.Open
+                                    ? config.FloorTileAt(cellHash)
+                                    : config.DoorTile);
                             }
                             break;
                         }
@@ -220,8 +224,26 @@ namespace TRV
             PaintDoors(grid, config);
             PaintWaterfalls(grid, config);
             PaintCubePatches(grid, config, floorDecor); // after floor decor so cubes stay clear of it
+            ForceDoorColliders(new BoundsInt(originCell, new Vector3Int(grid.Width, grid.Height, 1)));
             // Island decor is no longer painted — it's spawned as pooled GameObjects by
             // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
+        }
+
+        /// <summary>
+        /// Force a full-cell (Grid) collider on every painted Door-layer cell — the door trigger must
+        /// fire regardless of the tile's own collider type (Anubis doors are plain floor tiles, which
+        /// carry none). Re-applied after Restore too, because SetTilesBlock resets per-cell overrides.
+        /// </summary>
+        private void ForceDoorColliders(BoundsInt bounds)
+        {
+            if (doorTilemap == null) return;
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
+                for (int x = bounds.xMin; x < bounds.xMax; x++)
+                {
+                    var pos = new Vector3Int(x, y, bounds.zMin);
+                    if (doorTilemap.HasTile(pos))
+                        doorTilemap.SetColliderType(pos, Tile.ColliderType.Grid);
+                }
         }
 
         /// <summary>
@@ -364,11 +386,19 @@ namespace TRV
                     var edge = NearestEdge(x, y, grid.Width, grid.Height);
                     var inward = InwardStep(edge);
                     var kind = EdgeWallKind(edge);
+                    // Open (Anubis): the east/west/south boundary is water, not walls — back those
+                    // doors with more water so the doorway reads as a crossing, not a wall gap.
+                    bool waterBacked = config.Layout == BiomeLayout.Open && edge != Cardinal.North;
                     for (int d = 1; d <= DoorBackingDepth; d++)
                     {
                         int gx = x - inward.x * d, gy = y - inward.y * d; // step outward
                         var pos = new Vector3Int(originCell.x + gx, originCell.y + gy, 0);
                         int cellHash = RoomSeed.CellHash(grid.VariantSeed, gx, gy);
+                        if (waterBacked)
+                        {
+                            wallsTilemap.SetTile(pos, config.WaterTileAt(cellHash));
+                            continue;
+                        }
                         wallsTilemap.SetTile(pos, config.WallTileFor(kind, cellHash));
                         if (TryGetWallRotation(kind, config, out var rotation))
                             wallsTilemap.SetTransformMatrix(pos, rotation);
@@ -977,6 +1007,7 @@ namespace TRV
             RestoreLayer(extrasFullBehindTilemap, snap.Bounds, snap.ExtrasFullBehind);
             RestoreLayer(extrasFrontOfPlayerTilemap, snap.Bounds, snap.ExtrasFrontOfPlayer);
             RestoreLayer(frontOfEverythingTilemap, snap.Bounds, snap.FrontOfEverything);
+            ForceDoorColliders(snap.Bounds); // SetTilesBlock reset the per-cell collider overrides
         }
 
         private static LayerSnapshot CaptureLayer(Tilemap tilemap, BoundsInt bounds)

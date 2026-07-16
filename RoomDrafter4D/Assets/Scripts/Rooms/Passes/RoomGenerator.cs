@@ -34,6 +34,7 @@ namespace TRV
         private static IRoomPass LayoutPass(BiomeLayout layout) => layout switch
         {
             BiomeLayout.Halls => new HallPass(),
+            BiomeLayout.Open => new OpenFieldPass(), // Anubis: fully-walkable floor field
             _ => new CorridorPass(),
         };
 
