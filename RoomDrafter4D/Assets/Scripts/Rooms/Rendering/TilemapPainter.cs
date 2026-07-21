@@ -148,6 +148,20 @@ namespace TRV
                             break;
                         }
                         case CellType.Water:
+                            // Open (Anubis) INTERIOR water — the moat around the high-ground
+                            // corridors: the water sprite goes on the BACKMOST layer (so high-ground
+                            // edge sprites on Map draw over it), while the blocking collider comes
+                            // from the same tile on UnseenCollision (the Halls water pattern —
+                            // HasSolidAt reads that layer, so physics AND nav both block).
+                            if (config.Layout == BiomeLayout.Open &&
+                                grid.IsInterior(x, y, config.WallThickness))
+                            {
+                                if (extrasFullBehindTilemap)
+                                    extrasFullBehindTilemap.SetTile(pos, config.WaterTileAt(cellHash));
+                                if (unseenCollisionTilemap)
+                                    unseenCollisionTilemap.SetTile(pos, config.WaterTileAt(cellHash));
+                                break;
+                            }
                             // North-edge water (the top of the room's water border) gets its own tile.
                             // In Halls this lands on the UnseenCollision layer instead of Walls.
                             waterTilemap.SetTile(pos, northEdge
@@ -155,14 +169,22 @@ namespace TRV
                                 : config.WaterTileAt(cellHash));
                             break;
                         case CellType.Floor:
-                            // Igroom interiors get the distinct room-floor tiles; corridors the regular floor.
-                            mapTilemap.SetTile(pos, grid.IsRoomFloor(x, y)
-                                ? config.RoomFloorTileAt(cellHash)
-                                : config.FloorTileAt(cellHash));
+                            // High ground (Open/Anubis) wins; then igroom interiors get the distinct
+                            // room-floor tiles; everything else the regular floor.
+                            mapTilemap.SetTile(pos, grid.IsHighGround(x, y)
+                                ? config.HighGroundTileAt(cellHash)
+                                : grid.IsRoomFloor(x, y)
+                                    ? config.RoomFloorTileAt(cellHash)
+                                    : config.FloorTileAt(cellHash));
                             break;
                         case CellType.Door:
                         {
-                            mapTilemap.SetTile(pos, config.FloorTileAt(cellHash)); // walkable floor under the door
+                            // A door bordering high ground (Open/Anubis north band) shows the
+                            // high-ground look, so it blends with the ground it opens onto.
+                            var groundTile = TouchesHighGround(grid, x, y)
+                                ? config.HighGroundTileAt(cellHash)
+                                : config.FloorTileAt(cellHash);
+                            mapTilemap.SetTile(pos, groundTile); // walkable floor under the door
                             if (config.LeftRoomDoorTile != null) // Halls: 2-wide left/right door, rotated to its edge
                             {
                                 var edge = NearestEdge(x, y, grid.Width, grid.Height);
@@ -186,10 +208,10 @@ namespace TRV
                             }
                             else
                             {
-                                // Open (Anubis): the door is VISUALLY just ground — a random floor
-                                // variant. Its trigger comes from ForceDoorColliders, not the tile.
+                                // Open (Anubis): the door is VISUALLY just ground — the same variant
+                                // as painted beneath it. Trigger comes from ForceDoorColliders.
                                 doorTilemap.SetTile(pos, config.Layout == BiomeLayout.Open
-                                    ? config.FloorTileAt(cellHash)
+                                    ? groundTile
                                     : config.DoorTile);
                             }
                             break;
@@ -228,6 +250,12 @@ namespace TRV
             // Island decor is no longer painted — it's spawned as pooled GameObjects by
             // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
         }
+
+        /// <summary>True when any 4-neighbour of the cell is flagged high ground — used so a door
+        /// cell (in the ring, never flagged itself) paints the ground look it opens onto.</summary>
+        private static bool TouchesHighGround(RoomGrid grid, int x, int y) =>
+            grid.IsHighGround(x - 1, y) || grid.IsHighGround(x + 1, y) ||
+            grid.IsHighGround(x, y - 1) || grid.IsHighGround(x, y + 1);
 
         /// <summary>
         /// Force a full-cell (Grid) collider on every painted Door-layer cell — the door trigger must

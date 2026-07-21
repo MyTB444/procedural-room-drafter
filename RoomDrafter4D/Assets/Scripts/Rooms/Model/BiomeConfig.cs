@@ -185,6 +185,11 @@ namespace TRV
                         "the corridor floor). Leave empty to reuse the regular Floor pool.")]
         [field: SerializeField] public TileBase[] RoomFloorTileVariants { get; private set; }
 
+        [field: Tooltip("High-ground pool (Open/Anubis): the second floor look carved over the base " +
+                        "field by HighGroundPass — the north band + its south-running corridors. " +
+                        "Leave empty to reuse the regular Floor pool.")]
+        [field: SerializeField] public TileBase[] HighGroundTileVariants { get; private set; }
+
         [field: Tooltip("Water pool: every water cell — and the water backdrop behind walls — picks one " +
                         "at random, all equal chance. ONE entry = uniform water (use a single AnimatedTile " +
                         "here for animated water).")]
@@ -333,6 +338,14 @@ namespace TRV
 
         /// <summary>Floor tile for a cell — random pick from the pool, equal chance.</summary>
         public TileBase FloorTileAt(int cellHash) => PickVariant(FloorTileVariants, cellHash);
+
+        /// <summary>High-ground floor tile (Open/Anubis) — picks from the high-ground pool, or falls
+        /// back to the regular floor pool when it's empty (so the flag is invisible until tiles are
+        /// assigned).</summary>
+        public TileBase HighGroundTileAt(int cellHash) =>
+            HighGroundTileVariants != null && HighGroundTileVariants.Length > 0
+                ? PickVariant(HighGroundTileVariants, cellHash)
+                : FloorTileAt(cellHash);
 
         /// <summary>Floor tile for an igroom INTERIOR cell — picks from the room-floor pool, or falls
         /// back to the regular floor pool when that pool is empty (so biomes that don't set it look

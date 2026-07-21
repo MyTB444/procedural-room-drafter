@@ -107,6 +107,21 @@ namespace TRV
 
         public bool IsRoomFloor(int x, int y) => _roomFloors != null && _roomFloors.Contains((x, y));
 
+        /// <summary>
+        /// Cells flagged as "high ground" (Anubis/Open): still ordinary walkable Floor, but the
+        /// painter paves them with the biome's high-ground tile pool instead of the base floor.
+        /// Sparse: recorded by <see cref="HighGroundPass"/>; everything else paints as base floor.
+        /// </summary>
+        private HashSet<(int x, int y)> _highGround;
+
+        public void MarkHighGround(int x, int y)
+        {
+            _highGround ??= new HashSet<(int x, int y)>();
+            _highGround.Add((x, y));
+        }
+
+        public bool IsHighGround(int x, int y) => _highGround != null && _highGround.Contains((x, y));
+
         public RoomGrid(int width, int height)
         {
             Width = width;
