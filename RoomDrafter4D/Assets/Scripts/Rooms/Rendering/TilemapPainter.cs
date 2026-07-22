@@ -17,6 +17,19 @@ namespace TRV
         [Tooltip("UnseenCollision — in Halls the water-boundary collision blocks (NOT igroom walls) go " +
                  "here instead of the Walls layer. Needs a TilemapCollider2D; assign for Halls.")]
         [SerializeField] private Tilemap unseenCollisionTilemap;
+        [Tooltip("Collision2 — overflow for cells needing TWO wall tiles (e.g. a floor-edge corner " +
+                 "with water on two sides): the second tile paints here. Mirror the Collision " +
+                 "tilemap's setup (renderer + TilemapCollider2D). Optional — unassigned = the " +
+                 "second tile is skipped.")]
+        [SerializeField] private Tilemap collision2Tilemap;
+        [Tooltip("Collision3 — the high ground's FIRST surrounding wall layer (Open/Anubis): tiles " +
+                 "painted on the cell just OUTSIDE a high-ground edge (left/right). Mirror the " +
+                 "Collision tilemap's setup. Optional — unassigned = that layer is skipped.")]
+        [SerializeField] private Tilemap collision3Tilemap;
+        [Tooltip("Collision4 — the high ground's SECOND surrounding wall layer (Open/Anubis): " +
+                 "stacked on the SAME cells as the first layer. Mirror the Collision tilemap's " +
+                 "setup. Optional — unassigned = that layer is skipped.")]
+        [SerializeField] private Tilemap collision4Tilemap;
         [SerializeField] private Tilemap mapTilemap;
         [SerializeField] private Tilemap doorTilemap;
         [Tooltip("Front decor layer (your 'ExtrasFront') — igroom doors, leading tiles, UnderWall, " +
@@ -63,6 +76,10 @@ namespace TRV
         // front cubes at the south edge while leaving most of the map available).
         private const int CubeBehindMinRow = 5;
 
+        /// <summary>Tilemap position of a room-grid cell (grid space + originCell offset).</summary>
+        private Vector3Int CellPos(int gridX, int gridY) =>
+            new Vector3Int(originCell.x + gridX, originCell.y + gridY, 0);
+
         /// <summary>World position of the centre of a grid cell — for placing the player on a landing.</summary>
         public Vector3 CellCenterWorld(int gridX, int gridY)
         {
@@ -84,7 +101,10 @@ namespace TRV
         {
             var pos = new Vector3Int(originCell.x + gridX, originCell.y + gridY, 0);
             return (wallsTilemap != null && wallsTilemap.HasTile(pos))
-                || (unseenCollisionTilemap != null && unseenCollisionTilemap.HasTile(pos));
+                || (unseenCollisionTilemap != null && unseenCollisionTilemap.HasTile(pos))
+                || (collision2Tilemap != null && collision2Tilemap.HasTile(pos))
+                || (collision3Tilemap != null && collision3Tilemap.HasTile(pos))
+                || (collision4Tilemap != null && collision4Tilemap.HasTile(pos));
         }
 
         /// <summary>Where a water-collision tile goes: the UnseenCollision layer in Halls (so the water
@@ -113,9 +133,14 @@ namespace TRV
                     {
                         case CellType.Wall:
                         {
+                            // Open (Anubis): positional classification ONLY — no door-flank rule,
+                            // so the cells beside the north door stay regular north wall (the
+                            // biome has no East/West wall tiles and no special flank tiles).
                             var kind = grid.TryGetWallKind(x, y, out var k)
                                 ? k
-                                : WallKindUtil.Classify(grid, x, y, config.WallThickness);
+                                : config.Layout == BiomeLayout.Open
+                                    ? WallKindUtil.Classify(x, y, grid.Width, grid.Height, config.WallThickness)
+                                    : WallKindUtil.Classify(grid, x, y, config.WallThickness);
                             var wallTile = config.WallTileFor(kind, cellHash);
                             // A building run's end FRAMING wall (an interior wall with a Building beside it,
                             // placed where the run stops against water) gets the north-door flank tiles
@@ -235,6 +260,9 @@ namespace TRV
             }
 
             PaintExtrasBehindBands(grid, config);
+            PaintHighGroundEndPatches(grid, config);
+            PaintFloorEdges(grid, config);
+            PaintStairsPatches(grid, config); // after edges: stairs win any overlap on Collision2
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
             var floorDecor = PaintFloorDecor(grid, config);
@@ -249,6 +277,348 @@ namespace TRV
             ForceDoorColliders(new BoundsInt(originCell, new Vector3Int(grid.Width, grid.Height, 1)));
             // Island decor is no longer painted — it's spawned as pooled GameObjects by
             // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
+        }
+
+        // ---- Edge walls (Open/Anubis) --------------------------------------------------------
+        // Shared cell tests for the whole edge system. "Regular look" = plain floor or a door
+        // painted like the field; "high look" = flagged floor or a door painted like high ground.
+
+        private static bool RegularGround(RoomGrid grid, int x, int y)
+        {
+            var c = grid.Get(x, y);
+            if (c != CellType.Floor && c != CellType.Door) return false;
+            if (grid.IsHighGround(x, y)) return false;
+            return c != CellType.Door || !TouchesHighGround(grid, x, y);
+        }
+
+        private static bool HighLook(RoomGrid grid, int x, int y)
+        {
+            var c = grid.Get(x, y);
+            return (c == CellType.Floor && grid.IsHighGround(x, y)) ||
+                   (c == CellType.Door && TouchesHighGround(grid, x, y));
+        }
+
+        private static bool RegularDoorAt(RoomGrid grid, int x, int y) =>
+            grid.Get(x, y) == CellType.Door && RegularGround(grid, x, y);
+
+        /// <summary>High-ground FLOOR (doors excluded) — the cells that emit surround layers.</summary>
+        private static bool FloorHighAt(RoomGrid grid, int x, int y) =>
+            grid.Get(x, y) == CellType.Floor && grid.IsHighGround(x, y);
+
+        /// <summary>A cell carrying the high-ground BOTTOM rim: high-look with GROUND (not water)
+        /// below — or a corridor's END row, which always carries it. Stair mouths stay open.</summary>
+        private static bool BottomRim(RoomGrid grid, int x, int y) =>
+            HighLook(grid, x, y) && !IsStairMouth(grid, x, y) &&
+            (IsCorridorEnd(grid, x, y) ||
+             (!HighLook(grid, x, y - 1) && grid.Get(x, y - 1) != CellType.Water));
+
+        /// <summary>Cells receiving a LEFT/RIGHT surround tile: the non-high cell just outside a
+        /// high-ground floor tile's exposed side.</summary>
+        private static bool SurroundLeftAt(RoomGrid grid, int x, int y) =>
+            !HighLook(grid, x, y) && FloorHighAt(grid, x + 1, y);
+
+        private static bool SurroundRightAt(RoomGrid grid, int x, int y) =>
+            !HighLook(grid, x, y) && FloorHighAt(grid, x - 1, y);
+
+        /// <summary>Up to two stacked wall tiles for one cell: the first paints on Collision, the
+        /// second on the Collision2 overflow (two walls can never share one tilemap cell; after
+        /// the thin-floor erosion no cell can need more than two).</summary>
+        private struct EdgeStack
+        {
+            public TileBase First, Second;
+            public Matrix4x4 FirstRot, SecondRot;
+
+            public void Add(TileBase tile, Matrix4x4 rot)
+            {
+                if (tile == null) return;
+                if (First == null) { First = tile; FirstRot = rot; }
+                else if (Second == null) { Second = tile; SecondRot = rot; }
+            }
+        }
+
+        /// <summary>
+        /// Thin edge walls (Open/Anubis), fully data-driven from the biome's FloorEdge/HighGround
+        /// slots: regular ground gets shoreline rims + corners (Collision, overflow on Collision2);
+        /// high ground gets its bottom rim (same layers), surround wall layers on the cells OUTSIDE
+        /// its exposed sides (Collision3 + Collision4 stacked), corner caps where rim meets
+        /// surround (Collision4), a bare-cell rim fixup with corner re-check, and the north door's
+        /// first-layer surrounds. See each helper for the exact rules.
+        /// </summary>
+        private void PaintFloorEdges(RoomGrid grid, BiomeConfig config)
+        {
+            if (wallsTilemap == null) return;
+            if (config.FloorEdgeLeftTile == null && config.FloorEdgeRightTile == null &&
+                config.FloorEdgeBottomTile == null && config.FloorEdgeCornerTile == null &&
+                config.HighGroundEdgeBottomTile == null &&
+                config.HighGroundFirstLayerLeftTile == null &&
+                config.HighGroundFirstLayerRightTile == null &&
+                config.HighGroundSecondLayerLeftTile == null &&
+                config.HighGroundSecondLayerRightTile == null) return;
+
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                    PaintEdgeCell(grid, config, x, y);
+
+            PaintHighGroundCorners(grid, config, fixedRims: null);
+            var fixedRims = FixupBareRims(grid, config);
+            if (fixedRims.Count > 0)
+                PaintHighGroundCorners(grid, config, fixedRims);
+            PaintNorthDoorSurrounds(grid, config);
+        }
+
+        /// <summary>One cell of the edge scan: regular-look ground collects shoreline rims and
+        /// corners into an <see cref="EdgeStack"/> (Collision + Collision2); high-look ground
+        /// collects its bottom rim, emits the surround layers, and (for doors) paints its
+        /// shoreline walls on Collision3.</summary>
+        private void PaintEdgeCell(RoomGrid grid, BiomeConfig config, int x, int y)
+        {
+            bool regular = RegularGround(grid, x, y);
+            bool high = !regular && HighLook(grid, x, y);
+            if (!regular && !high) return;
+
+            var stack = new EdgeStack();
+            if (regular)
+            {
+                AddRegularEdges(grid, config, x, y, ref stack);
+            }
+            else
+            {
+                if (config.HighGroundEdgeBottomTile != null && BottomRim(grid, x, y))
+                    stack.Add(config.HighGroundEdgeBottomTile, Matrix4x4.identity);
+                PaintSurroundLayers(grid, config, x, y);
+                PaintHighLookDoorEdges(grid, config, x, y);
+            }
+            if (stack.First == null) return;
+
+            var pos = CellPos(x, y);
+            wallsTilemap.SetTile(pos, stack.First);
+            wallsTilemap.SetTransformMatrix(pos, stack.FirstRot);
+            if (stack.Second != null && collision2Tilemap != null)
+            {
+                collision2Tilemap.SetTile(pos, stack.Second);
+                collision2Tilemap.SetTransformMatrix(pos, stack.SecondRot);
+            }
+        }
+
+        /// <summary>Regular-look shoreline: water directly beside → that side's edge tile (water
+        /// ABOVE reuses the bottom tile rotated 180° — no separate top slot). Water DIAGONALLY
+        /// adjacent with both facing neighbours regular → the corner tile, authored for the
+        /// bottom-right diagonal; the rest are rotations (bottom-left 90° right, top-right 90°
+        /// left, top-left 180°). Door exception: a regular-look door right under the band gets its
+        /// top corner on the room-side cell even though HIGH ground (not regular) sits above.</summary>
+        private static void AddRegularEdges(RoomGrid grid, BiomeConfig config, int x, int y, ref EdgeStack stack)
+        {
+            if (grid.Get(x - 1, y) == CellType.Water) stack.Add(config.FloorEdgeLeftTile, Matrix4x4.identity);
+            if (grid.Get(x + 1, y) == CellType.Water) stack.Add(config.FloorEdgeRightTile, Matrix4x4.identity);
+            if (grid.Get(x, y + 1) == CellType.Water) stack.Add(config.FloorEdgeBottomTile, Rot180); // top
+            if (grid.Get(x, y - 1) == CellType.Water) stack.Add(config.FloorEdgeBottomTile, Matrix4x4.identity);
+
+            if (config.FloorEdgeCornerTile == null) return;
+            if (RegularGround(grid, x, y - 1))
+            {
+                if (grid.Get(x + 1, y - 1) == CellType.Water && RegularGround(grid, x + 1, y))
+                    stack.Add(config.FloorEdgeCornerTile, Matrix4x4.identity);
+                if (grid.Get(x - 1, y - 1) == CellType.Water && RegularGround(grid, x - 1, y))
+                    stack.Add(config.FloorEdgeCornerTile, RotRight90);
+            }
+            if (RegularGround(grid, x, y + 1))
+            {
+                if (grid.Get(x + 1, y + 1) == CellType.Water && RegularGround(grid, x + 1, y))
+                    stack.Add(config.FloorEdgeCornerTile, RotLeft90);
+                if (grid.Get(x - 1, y + 1) == CellType.Water && RegularGround(grid, x - 1, y))
+                    stack.Add(config.FloorEdgeCornerTile, Rot180);
+            }
+            else if (HighLook(grid, x, y + 1))
+            {
+                if (grid.Get(x + 1, y + 1) == CellType.Water && RegularDoorAt(grid, x + 1, y))
+                    stack.Add(config.FloorEdgeCornerTile, RotLeft90);
+                if (grid.Get(x - 1, y + 1) == CellType.Water && RegularDoorAt(grid, x - 1, y))
+                    stack.Add(config.FloorEdgeCornerTile, Rot180);
+            }
+        }
+
+        /// <summary>Surrounding wall layers: the neighbour cell just OUTSIDE a high-ground FLOOR
+        /// tile's exposed left/right side gets the FIRST layer on Collision3 and the SECOND stacked
+        /// on the SAME cell on Collision4. Doors don't emit these (their neighbours are ring
+        /// walls/water), but a high-look door counts as covered via <see cref="HighLook"/>.</summary>
+        private void PaintSurroundLayers(RoomGrid grid, BiomeConfig config, int x, int y)
+        {
+            if (!FloorHighAt(grid, x, y)) return;
+
+            if (!HighLook(grid, x - 1, y))
+            {
+                var side = CellPos(x - 1, y);
+                if (collision3Tilemap != null && config.HighGroundFirstLayerLeftTile != null)
+                    collision3Tilemap.SetTile(side, config.HighGroundFirstLayerLeftTile);
+                if (collision4Tilemap != null && config.HighGroundSecondLayerLeftTile != null)
+                    collision4Tilemap.SetTile(side, config.HighGroundSecondLayerLeftTile);
+            }
+            if (!HighLook(grid, x + 1, y))
+            {
+                var side = CellPos(x + 1, y);
+                if (collision3Tilemap != null && config.HighGroundFirstLayerRightTile != null)
+                    collision3Tilemap.SetTile(side, config.HighGroundFirstLayerRightTile);
+                if (collision4Tilemap != null && config.HighGroundSecondLayerRightTile != null)
+                    collision4Tilemap.SetTile(side, config.HighGroundSecondLayerRightTile);
+            }
+        }
+
+        /// <summary>High-ground-look DOORS get the regular shoreline walls — the same FloorEdge
+        /// tiles/rules as a regular-floor door — but painted on Collision3, their high-ground wall
+        /// layer. A door bottom cell level with a corridor's LAST line (an end-row tile right
+        /// beside it) continues the high-ground END rim across the door instead.</summary>
+        private void PaintHighLookDoorEdges(RoomGrid grid, BiomeConfig config, int x, int y)
+        {
+            if (grid[x, y] != CellType.Door || collision3Tilemap == null) return;
+
+            var pos = CellPos(x, y);
+            if (config.FloorEdgeLeftTile != null && grid.Get(x - 1, y) == CellType.Water)
+                collision3Tilemap.SetTile(pos, config.FloorEdgeLeftTile);
+            if (config.FloorEdgeRightTile != null && grid.Get(x + 1, y) == CellType.Water)
+                collision3Tilemap.SetTile(pos, config.FloorEdgeRightTile);
+            if (grid.Get(x, y - 1) == CellType.Water)
+            {
+                bool besideCorridorEnd = IsCorridorEnd(grid, x - 1, y) || IsCorridorEnd(grid, x + 1, y);
+                var bottomTile = besideCorridorEnd && config.HighGroundEdgeBottomTile != null
+                    ? config.HighGroundEdgeBottomTile
+                    : config.FloorEdgeBottomTile;
+                if (bottomTile != null) collision3Tilemap.SetTile(pos, bottomTile);
+            }
+            if (config.FloorEdgeBottomTile != null && grid.Get(x, y + 1) == CellType.Water)
+            {
+                collision3Tilemap.SetTile(pos, config.FloorEdgeBottomTile);
+                collision3Tilemap.SetTransformMatrix(pos, Rot180); // top = bottom, 180°
+            }
+        }
+
+        /// <summary>Second-layer wall corners (Collision4): cap the junctions where the bottom rim
+        /// meets a surround column — RightRight/LeftLeft = the band cell on a corridor junction's
+        /// right/left shoulder (surround BELOW), RightLeft/LeftRight = the bottom of a corridor's
+        /// left/right surround column beside its end rim (surround ABOVE — overwrites the straight
+        /// second-layer piece there). Pass <paramref name="fixedRims"/> to RE-CHECK after the
+        /// fixup: those cells count as rims too, and existing corners are kept. Gated on the rim
+        /// tile — no rim painted, nothing to join.</summary>
+        private void PaintHighGroundCorners(RoomGrid grid, BiomeConfig config, HashSet<(int x, int y)> fixedRims)
+        {
+            if (collision4Tilemap == null || config.HighGroundEdgeBottomTile == null) return;
+            if (config.HighGroundCornerRightRightTile == null && config.HighGroundCornerLeftLeftTile == null &&
+                config.HighGroundCornerRightLeftTile == null && config.HighGroundCornerLeftRightTile == null) return;
+
+            bool Rim(int cx, int cy) =>
+                BottomRim(grid, cx, cy) || (fixedRims != null && fixedRims.Contains((cx, cy)));
+
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    var pos = CellPos(x, y);
+                    if (fixedRims != null && collision4Tilemap.HasTile(pos)) continue; // keep 1st-pass corners
+
+                    bool rimLeft = Rim(x - 1, y), rimRight = Rim(x + 1, y);
+                    var corner =
+                        rimRight && SurroundRightAt(grid, x, y - 1) ? config.HighGroundCornerRightRightTile : // junction right shoulder
+                        rimLeft && SurroundLeftAt(grid, x, y - 1) ? config.HighGroundCornerLeftLeftTile :     // junction left shoulder
+                        rimRight && SurroundLeftAt(grid, x, y + 1) ? config.HighGroundCornerRightLeftTile :   // corridor end, left side
+                        rimLeft && SurroundRightAt(grid, x, y + 1) ? config.HighGroundCornerLeftRightTile : null; // corridor end, right side
+                    if (corner != null) collision4Tilemap.SetTile(pos, corner);
+                }
+        }
+
+        /// <summary>FIXUP: any high-ground FLOOR tile on the bottom boundary (nothing high-ground
+        /// below) that ended up with NO wall on any collision layer — even with water beneath,
+        /// which the rim rule skips (e.g. a band cell above a moat column with no corner on it) —
+        /// gets the bottom wall. Returns the fixed cells so the corners can be re-checked.</summary>
+        private HashSet<(int x, int y)> FixupBareRims(RoomGrid grid, BiomeConfig config)
+        {
+            var fixedRims = new HashSet<(int x, int y)>();
+            if (config.HighGroundEdgeBottomTile == null) return fixedRims;
+
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (!FloorHighAt(grid, x, y) || HighLook(grid, x, y - 1) || IsStairMouth(grid, x, y)) continue;
+                    var pos = CellPos(x, y);
+                    if (wallsTilemap.HasTile(pos) ||
+                        (collision2Tilemap != null && collision2Tilemap.HasTile(pos)) ||
+                        (collision3Tilemap != null && collision3Tilemap.HasTile(pos)) ||
+                        (collision4Tilemap != null && collision4Tilemap.HasTile(pos))) continue;
+                    wallsTilemap.SetTile(pos, config.HighGroundEdgeBottomTile);
+                    fixedRims.Add((x, y));
+                }
+            return fixedRims;
+        }
+
+        /// <summary>The NORTH door's flanking wall cells get the first-layer left/right surrounds
+        /// on Collision3 (stacked over the regular north wall), so the door reads as high ground
+        /// cutting through the north wall.</summary>
+        private void PaintNorthDoorSurrounds(RoomGrid grid, BiomeConfig config)
+        {
+            if (config.Layout != BiomeLayout.Open || collision3Tilemap == null) return;
+
+            int doorStart = grid.DoorStarts[(int)Cardinal.North];
+            int row = grid.Height - config.WallThickness;
+            if (config.HighGroundFirstLayerLeftTile != null)
+                collision3Tilemap.SetTile(CellPos(doorStart - 1, row), config.HighGroundFirstLayerLeftTile);
+            if (config.HighGroundFirstLayerRightTile != null)
+                collision3Tilemap.SetTile(CellPos(doorStart + config.DoorWidth, row), config.HighGroundFirstLayerRightTile);
+        }
+
+        /// <summary>Stairs patches (Open/Anubis): each 3×3 site recorded on
+        /// <see cref="RoomGrid.StairPatches"/> paints its LEFT and RIGHT columns (the rails) on the
+        /// Collision2 layer and its MIDDLE column (the steps) on the Extras FRONT layer — drawn
+        /// over the ground beneath, which stays walkable — linking the high-ground band to the
+        /// field beneath. Tiles authored row-major, TOP row first.</summary>
+        private void PaintStairsPatches(RoomGrid grid, BiomeConfig config)
+        {
+            var tiles = config.StairsPatch;
+            if (tiles == null || tiles.Length < 9) return;
+
+            foreach (var (bx, by) in grid.StairPatches)
+                for (int row = 0; row < 3; row++)      // row 0 = the authored TOP row
+                    for (int col = 0; col < 3; col++)
+                    {
+                        var tile = tiles[row * 3 + col];
+                        if (tile == null) continue;
+                        var target = col == 1 ? extrasTilemap : collision2Tilemap;
+                        if (target == null) continue;
+                        target.SetTile(new Vector3Int(originCell.x + bx + col,
+                                                      originCell.y + by + (2 - row), 0), tile);
+                    }
+        }
+
+        /// <summary>Patch A: the vertical strip (authored TOP tile first) hung beneath each
+        /// south-running high-ground corridor's end (Open/Anubis), on the ExtrasBehind layer —
+        /// over the moat water on ExtrasFullBehind, under everything else. On when the biome
+        /// assigns <see cref="BiomeConfig.HighGroundEndPatchA"/>.</summary>
+        private void PaintHighGroundEndPatches(RoomGrid grid, BiomeConfig config)
+        {
+            var tiles = config.HighGroundEndPatchA;
+            if (tiles == null || tiles.Length == 0 || extrasBehindTilemap == null) return;
+
+            foreach (var (cx, endY) in grid.HighGroundEnds)
+                for (int i = 0; i < tiles.Length; i++)
+                {
+                    if (tiles[i] == null) continue;
+                    var pos = new Vector3Int(originCell.x + cx, originCell.y + endY - 1 - i, 0);
+                    extrasBehindTilemap.SetTile(pos, tiles[i]);
+                }
+        }
+
+        /// <summary>True when (x, y) sits on the END row of a south-running high-ground corridor
+        /// (its last 3 tiles, centred on the recorded end) — those always carry the bottom rim.</summary>
+        private static bool IsCorridorEnd(RoomGrid grid, int x, int y)
+        {
+            foreach (var (cx, ey) in grid.HighGroundEnds)
+                if (y == ey && x >= cx - 1 && x <= cx + 1) return true;
+            return false;
+        }
+
+        /// <summary>True when (x, y) is the high-ground cell right above a stairs patch's MIDDLE
+        /// column — the stair mouth, kept free of the high-ground bottom rim.</summary>
+        private static bool IsStairMouth(RoomGrid grid, int x, int y)
+        {
+            foreach (var (bx, by) in grid.StairPatches)
+                if (x == bx + 1 && y == by + 2) return true;
+            return false;
         }
 
         /// <summary>True when any 4-neighbour of the cell is flagged high ground — used so a door
@@ -989,6 +1359,9 @@ namespace TRV
         {
             if (wallsTilemap) wallsTilemap.ClearAllTiles();
             if (unseenCollisionTilemap) unseenCollisionTilemap.ClearAllTiles();
+            if (collision2Tilemap) collision2Tilemap.ClearAllTiles();
+            if (collision3Tilemap) collision3Tilemap.ClearAllTiles();
+            if (collision4Tilemap) collision4Tilemap.ClearAllTiles();
             if (mapTilemap) mapTilemap.ClearAllTiles();
             if (doorTilemap) doorTilemap.ClearAllTiles();
             if (extrasTilemap) extrasTilemap.ClearAllTiles();
@@ -1012,6 +1385,9 @@ namespace TRV
                 Bounds = bounds,
                 Walls = CaptureLayer(wallsTilemap, bounds),
                 UnseenCollision = CaptureLayer(unseenCollisionTilemap, bounds),
+                Collision2 = CaptureLayer(collision2Tilemap, bounds),
+                Collision3 = CaptureLayer(collision3Tilemap, bounds),
+                Collision4 = CaptureLayer(collision4Tilemap, bounds),
                 Map = CaptureLayer(mapTilemap, bounds),
                 Door = CaptureLayer(doorTilemap, bounds),
                 Extras = CaptureLayer(extrasTilemap, bounds),
@@ -1028,6 +1404,9 @@ namespace TRV
             Clear();
             RestoreLayer(wallsTilemap, snap.Bounds, snap.Walls);
             RestoreLayer(unseenCollisionTilemap, snap.Bounds, snap.UnseenCollision);
+            RestoreLayer(collision2Tilemap, snap.Bounds, snap.Collision2);
+            RestoreLayer(collision3Tilemap, snap.Bounds, snap.Collision3);
+            RestoreLayer(collision4Tilemap, snap.Bounds, snap.Collision4);
             RestoreLayer(mapTilemap, snap.Bounds, snap.Map);
             RestoreLayer(doorTilemap, snap.Bounds, snap.Door);
             RestoreLayer(extrasTilemap, snap.Bounds, snap.Extras);

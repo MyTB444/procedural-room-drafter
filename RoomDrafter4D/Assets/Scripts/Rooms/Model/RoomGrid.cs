@@ -22,6 +22,17 @@ namespace TRV
         /// <summary>Bottom-left cell of every 4×4 island carved by IslandPass.</summary>
         public List<(int x, int y)> IslandAnchors { get; } = new List<(int x, int y)>();
 
+        /// <summary>The end of every south-running high-ground corridor (Open/Anubis) — x = the
+        /// corridor's centre column, y = its end (bottom) row. Recorded by HighGroundPass; the
+        /// painter hangs the end patch beneath these.</summary>
+        public List<(int x, int y)> HighGroundEnds { get; } = new List<(int x, int y)>();
+
+        /// <summary>Bottom-left cell of every 3×3 STAIRS patch (Open/Anubis) linking the high-ground
+        /// band to the field beneath — one per separated regular-floor area, placed at the band seam.
+        /// Recorded by HighGroundPass; the painter stamps rails (left/right columns) on Collision2
+        /// and the walkable steps (middle column) on Map.</summary>
+        public List<(int x, int y)> StairPatches { get; } = new List<(int x, int y)>();
+
         /// <summary>Interior rects of the SMALL Halls igrooms (excludes the big main room) — where
         /// IslandDecorPass scatters decor objects (same field/count as islands). Filled by HallPass.</summary>
         public List<RectInt> IgroomDecorAreas { get; } = new List<RectInt>();

@@ -32,7 +32,7 @@ MonoBehaviour:
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
   - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
-  <EnemiesPerRoom>k__BackingField: 2
+  <EnemiesPerRoom>k__BackingField: 0
   <MinibossPrefabs>k__BackingField: []
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
@@ -45,10 +45,39 @@ MonoBehaviour:
   <FloorPatches>k__BackingField: []
   <FloorPatchCoverage>k__BackingField: 0.9
   <FloorTileVariants>k__BackingField:
-  - {fileID: 11400000, guid: be5734828b4998146b369ddb38232659, type: 2}
-  - {fileID: 11400000, guid: c195e3c647b06fc41a35cd9ea5cc4c83, type: 2}
-  - {fileID: 11400000, guid: e65d4a2456bb607448aceb6c06bf9fb3, type: 2}
+  - {fileID: 11400000, guid: 53a0a891813faf4479b3182fcb86606f, type: 2}
+  - {fileID: 11400000, guid: 514b9bb0054d9c84ebbeb4ea14dd9d6f, type: 2}
+  - {fileID: 11400000, guid: 2ac15cddfb1f52549b4d08c763ccd80e, type: 2}
+  - {fileID: 11400000, guid: db0c46d25343aa847af52bbf7806362f, type: 2}
   <RoomFloorTileVariants>k__BackingField: []
+  <HighGroundTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 9cff6f831101a6f438373d5832d8f751, type: 2}
+  <FloorEdgeLeftTile>k__BackingField: {fileID: 11400000, guid: 20a7a8d5b80626e47b154700d236817c, type: 2}
+  <FloorEdgeRightTile>k__BackingField: {fileID: 11400000, guid: d00191f6491b7774693da527e476beed, type: 2}
+  <FloorEdgeBottomTile>k__BackingField: {fileID: 11400000, guid: 17a006a8726830e47b1d1151f17ba477, type: 2}
+  <HighGroundEdgeBottomTile>k__BackingField: {fileID: 11400000, guid: e1b09c9dda3640d40bc05bf97e32d676, type: 2}
+  <HighGroundFirstLayerLeftTile>k__BackingField: {fileID: 11400000, guid: d00191f6491b7774693da527e476beed, type: 2}
+  <HighGroundFirstLayerRightTile>k__BackingField: {fileID: 11400000, guid: 20a7a8d5b80626e47b154700d236817c, type: 2}
+  <HighGroundSecondLayerLeftTile>k__BackingField: {fileID: 11400000, guid: d3e1164a01f9fe349a6b23fbb7927be2, type: 2}
+  <HighGroundSecondLayerRightTile>k__BackingField: {fileID: 11400000, guid: d3e1164a01f9fe349a6b23fbb7927be2, type: 2}
+  <HighGroundCornerRightRightTile>k__BackingField: {fileID: 11400000, guid: 38058db4341866e488f20165bdb3fe73, type: 2}
+  <HighGroundCornerLeftLeftTile>k__BackingField: {fileID: 11400000, guid: 70ac8f0e4f502d54796db461ce6b9d58, type: 2}
+  <HighGroundCornerRightLeftTile>k__BackingField: {fileID: 11400000, guid: 73ef2619f206eec47869e45d72d2f970, type: 2}
+  <HighGroundCornerLeftRightTile>k__BackingField: {fileID: 11400000, guid: 7a8adff4aab88d34698ebff2be47ffa9, type: 2}
+  <FloorEdgeCornerTile>k__BackingField: {fileID: 11400000, guid: c868fb27ba8baf045b66df684ed513e2, type: 2}
+  <StairsPatch>k__BackingField:
+  - {fileID: 11400000, guid: 6647a7b04eae4184e854c65623fd4e3d, type: 2}
+  - {fileID: 11400000, guid: 137cc3f6fb05ab449a607a6e330cf0a8, type: 2}
+  - {fileID: 11400000, guid: 54a0db20ddf1ce54a82d076af3ca0f96, type: 2}
+  - {fileID: 11400000, guid: 0e9b5c61b33704349bdb62bed475e5c1, type: 2}
+  - {fileID: 11400000, guid: 143c9a01f2ce2224480e899defa7d52e, type: 2}
+  - {fileID: 11400000, guid: aff85740e5803674c9fc863878cd4333, type: 2}
+  - {fileID: 11400000, guid: d9c73466c315b6741bd1d6a864d8b74b, type: 2}
+  - {fileID: 11400000, guid: e954dccc19bdc7840baca82d227488af, type: 2}
+  - {fileID: 11400000, guid: fd8e2a2d23b94c041a272db334d6eea8, type: 2}
+  <HighGroundEndPatchA>k__BackingField:
+  - {fileID: 11400000, guid: db33c9e57f0bdfe499c4f094f391c592, type: 2}
+  - {fileID: 11400000, guid: 30a6aaf0f548f264d8d9dc11f571c9a3, type: 2}
   <WaterTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 8b5e55607a3f4e64caf2627313bb5ef2, type: 2}
   <NorthWaterTile>k__BackingField: {fileID: 0}
@@ -63,8 +92,8 @@ MonoBehaviour:
   <RightRoomDoorTile>k__BackingField: {fileID: 0}
   <LeftLeadingTile>k__BackingField: {fileID: 0}
   <RightLeadingTile>k__BackingField: {fileID: 0}
-  <NorthDoorLeftWallTile>k__BackingField: {fileID: 11400000, guid: bf480c2c398a73d469c3354d8175fad7, type: 2}
-  <NorthDoorRightWallTile>k__BackingField: {fileID: 11400000, guid: 04b5996aa1f020c49a4fd147ca11f7a5, type: 2}
+  <NorthDoorLeftWallTile>k__BackingField: {fileID: 0}
+  <NorthDoorRightWallTile>k__BackingField: {fileID: 0}
   <LeftStairTile>k__BackingField: {fileID: 0}
   <RightStairTile>k__BackingField: {fileID: 0}
   <LeftDoorTile>k__BackingField: {fileID: 0}
@@ -79,11 +108,11 @@ MonoBehaviour:
   <Transition1RightEndTile>k__BackingField: {fileID: 0}
   <RotateSouthWalls>k__BackingField: 1
   <NorthWallTileVariants>k__BackingField:
-  - {fileID: 11400000, guid: 8990ce40922412543a00b553479ad612, type: 2}
+  - {fileID: 11400000, guid: 8138c523ebed2b34ba1a0a7640bd613a, type: 2}
   <SouthWallTileVariants>k__BackingField: []
   <EastWallTile>k__BackingField: {fileID: 0}
   <WestWallTile>k__BackingField: {fileID: 0}
-  <NorthWestCornerTile>k__BackingField: {fileID: 11400000, guid: 87fc197e29ba194419d7f02d6e0e3717, type: 2}
-  <NorthEastCornerTile>k__BackingField: {fileID: 11400000, guid: 6cd3ce9015a415a4f93e8914f425b315, type: 2}
+  <NorthWestCornerTile>k__BackingField: {fileID: 11400000, guid: fd096d6e7b2af0741b4f4cc94ada6f2d, type: 2}
+  <NorthEastCornerTile>k__BackingField: {fileID: 11400000, guid: e0178b074ad3eb84b97c3b282d12b64f, type: 2}
   <SouthWestCornerTile>k__BackingField: {fileID: 0}
   <SouthEastCornerTile>k__BackingField: {fileID: 0}

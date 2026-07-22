@@ -190,6 +190,91 @@ namespace TRV
                         "Leave empty to reuse the regular Floor pool.")]
         [field: SerializeField] public TileBase[] HighGroundTileVariants { get; private set; }
 
+        [field: Tooltip("Thin shoreline wall painted ON TOP of a REGULAR floor cell (on the " +
+                        "Collision layer) when WATER lies directly to its LEFT (west). High-ground " +
+                        "floor gets its own edge tiles (separate slots, to come). A cell bordering " +
+                        "water on several sides paints ONE tile, picked in priority order " +
+                        "left/right/top/bottom (corner tiles to come). Empty = off. The tile's " +
+                        "Collider Type decides the physics: Sprite = a thin physical rim, None = " +
+                        "pure visual.")]
+        [field: SerializeField] public TileBase FloorEdgeLeftTile { get; private set; }
+
+        [field: Tooltip("Thin shoreline wall for a regular floor cell with WATER directly to its " +
+                        "RIGHT (east). Same rules as Floor Edge Left Tile.")]
+        [field: SerializeField] public TileBase FloorEdgeRightTile { get; private set; }
+
+        [field: Tooltip("Thin shoreline wall for a regular floor cell with WATER directly BELOW it " +
+                        "(south). Same rules as Floor Edge Left Tile. ALSO used for water directly " +
+                        "ABOVE (north): the painter paints this tile rotated 180° there, so no " +
+                        "separate top tile is needed (must not lock its transform).")]
+        [field: SerializeField] public TileBase FloorEdgeBottomTile { get; private set; }
+
+        [field: Tooltip("Thin wall painted ON a HIGH-GROUND floor cell (Collision layer) when the " +
+                        "cell below it is NOT high ground — the high ground's bottom rim. Skipped " +
+                        "on the cell right above the middle of a stairs patch, so the stair mouth " +
+                        "stays open. More high-ground directions to follow. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundEdgeBottomTile { get; private set; }
+
+        [field: Tooltip("High ground's FIRST surrounding wall layer, LEFT side: painted on the cell " +
+                        "just LEFT of every high-ground floor tile that has no high-ground floor to " +
+                        "its left — on the Collision3 layer (the neighbour cell, NOT the high-ground " +
+                        "tile itself). Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundFirstLayerLeftTile { get; private set; }
+
+        [field: Tooltip("High ground's FIRST surrounding wall layer, RIGHT side: painted on the cell " +
+                        "just RIGHT of every high-ground floor tile that has no high-ground floor to " +
+                        "its right — on the Collision3 layer. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundFirstLayerRightTile { get; private set; }
+
+        [field: Tooltip("High ground's SECOND surrounding wall layer, LEFT side: stacked on the SAME " +
+                        "cells as the first-layer left tile, on the Collision4 layer. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundSecondLayerLeftTile { get; private set; }
+
+        [field: Tooltip("High ground's SECOND surrounding wall layer, RIGHT side: stacked on the SAME " +
+                        "cells as the first-layer right tile, on the Collision4 layer. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundSecondLayerRightTile { get; private set; }
+
+        [field: Tooltip("Second-layer wall corner, version 1: painted (on Collision4) on the cell " +
+                        "that has a BOTTOM rim tile to its RIGHT and a RIGHT surround tile BELOW it " +
+                        "— e.g. the band cell on a corridor junction's right shoulder. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundCornerRightRightTile { get; private set; }
+
+        [field: Tooltip("Second-layer wall corner, version 2: bottom rim to its LEFT, LEFT surround " +
+                        "below it — the corridor junction's left shoulder. On Collision4. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundCornerLeftLeftTile { get; private set; }
+
+        [field: Tooltip("Second-layer wall corner, version 3: bottom rim to its RIGHT, LEFT surround " +
+                        "ABOVE it — the bottom of a corridor's left surround column, beside its end " +
+                        "rim (replaces the straight second-layer piece there). On Collision4. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundCornerRightLeftTile { get; private set; }
+
+        [field: Tooltip("Second-layer wall corner, version 4: bottom rim to its LEFT, RIGHT surround " +
+                        "ABOVE it — the bottom of a corridor's right surround column, beside its end " +
+                        "rim. On Collision4. Empty = off.")]
+        [field: SerializeField] public TileBase HighGroundCornerLeftRightTile { get; private set; }
+
+        [field: Tooltip("Corner rim joining two shoreline walls across a diagonal. Authored for " +
+                        "water diagonally BOTTOM-RIGHT of a regular floor cell (the right " +
+                        "neighbour's bottom wall meets the bottom neighbour's right wall); the " +
+                        "other diagonals paint it rotated — bottom-left 90° right, top-right 90° " +
+                        "left, top-left 180°. Must not lock its transform. Empty = off.")]
+        [field: SerializeField] public TileBase FloorEdgeCornerTile { get; private set; }
+
+        [field: Tooltip("Stairs patch (Open/Anubis): 3×3 tile group (9 tiles row-major, TOP row " +
+                        "first) linking the high-ground band to the field below — placed beneath " +
+                        "the band seam, one per separated regular-floor area (so every area sealed " +
+                        "off by moats is reachable through the high ground). LEFT and RIGHT columns " +
+                        "paint on the Collision2 layer (the rails — give those tiles a collider " +
+                        "type), the MIDDLE column on the Extras front layer (the steps, drawn over " +
+                        "the walkable ground). Empty = off.")]
+        [field: SerializeField] public TileBase[] StairsPatch { get; private set; }
+
+        [field: Tooltip("Patch A: vertical 2-tile strip hung beneath the END of every south-running " +
+                        "high-ground corridor (Open/Anubis), authored TOP tile first (fills the top " +
+                        "2 of the 3 foot-moat rows). Painted on ExtrasBehind — over the moat water " +
+                        "on ExtrasFullBehind, under everything else. Empty = off.")]
+        [field: SerializeField] public TileBase[] HighGroundEndPatchA { get; private set; }
+
         [field: Tooltip("Water pool: every water cell — and the water backdrop behind walls — picks one " +
                         "at random, all equal chance. ONE entry = uniform water (use a single AnimatedTile " +
                         "here for animated water).")]
