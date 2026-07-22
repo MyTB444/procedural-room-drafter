@@ -259,8 +259,10 @@ namespace TRV
 
         /// <summary>Ends in [minEnd, maxEnd] valid for a corridor at <paramref name="left"/>: at
         /// least <see cref="MinCorridorLength"/> rows long, the door-distance rule holds — right ON
-        /// a door (distance 1, the hug case) or ≥3 tiles clear (distance ≥4) — AND the planned moat
-        /// neither floods a door landing nor touches a door.</summary>
+        /// a door (distance 1, the hug case) or ≥3 tiles clear (distance ≥4) — the planned moat
+        /// neither floods a door landing nor touches a door, AND a door beside the corridor sits
+        /// either level with its end row or ≥2 above it (<see cref="DoorOneOffCorridorEnd"/> —
+        /// never the awkward 1-tile offset).</summary>
         private static void CollectValidEnds(RoomGrid grid, List<(int x, int y)> doorCells,
                                              HashSet<(int x, int y)> landingCells, int left,
                                              int minEnd, int maxEnd, int startY, List<int> ends)
@@ -272,8 +274,26 @@ namespace TRV
                 int doorDist = MinDoorDistance(doorCells, left, endY, startY);
                 if (doorDist != 1 && doorDist < 4) continue;
                 if (MoatBlocksDoor(grid, landingCells, left, endY, startY)) continue;
+                if (DoorOneOffCorridorEnd(grid, doorCells, left, endY)) continue;
                 ends.Add(endY);
             }
+        }
+
+        /// <summary>True when a door in one of the columns flanking the corridor has its BOTTOM
+        /// cell exactly 1 row above the corridor's end — the door would sit 1 tile from the
+        /// corridor's edge, which is never allowed (it must be level with the end row, or ≥2 rows
+        /// above it). Hug placements already force ≥2; this catches random edge corridors that
+        /// land against a door (door distance 1 permits any length otherwise).</summary>
+        private static bool DoorOneOffCorridorEnd(RoomGrid grid, List<(int x, int y)> doorCells,
+                                                  int left, int endY)
+        {
+            foreach (var (dx, dy) in doorCells)
+            {
+                if (dx != left - 1 && dx != left + CorridorWidth) continue; // not beside the corridor
+                if (grid.Get(dx, dy - 1) == CellType.Door) continue;       // only the door's BOTTOM cell
+                if (endY == dy - 1) return true;
+            }
+            return false;
         }
 
         /// <summary>Minimum Chebyshev distance from any door cell to the corridor's footprint rect
