@@ -269,6 +269,26 @@ namespace TRV
                         "the walkable ground). Empty = off.")]
         [field: SerializeField] public TileBase[] StairsPatch { get; private set; }
 
+        [field: Tooltip("High-ground decor patch A (Open/Anubis): 2 tiles authored TOP first. The " +
+                        "BOTTOM tile paints on the Collision5 layer (a solid base — give it a " +
+                        "collider type), the top one on the ExtrasFrontOfPlayer layer. Scattered " +
+                        "along the north edge and just above corridor ends — never ON a corridor's " +
+                        "end row (the rim walls live there). Empty = off.")]
+        [field: SerializeField] public TileBase[] HighGroundDecorPatchA { get; private set; }
+
+        [field: Tooltip("High-ground decor patch B (Open/Anubis): 3 tiles authored TOP first — " +
+                        "bottom on Collision5, upper two on ExtrasFrontOfPlayer. Placed ONCE per " +
+                        "room, on one random south corridor, exactly 1 tile behind its last middle " +
+                        "floor tile. Empty = off.")]
+        [field: SerializeField] public TileBase[] HighGroundDecorPatchB { get; private set; }
+
+        [field: Tooltip("High-ground decor patch C (Open/Anubis): 2×3 block, 6 tiles row-major TOP " +
+                        "row first, all painted on the Collision5 layer. Anchored on the high/low " +
+                        "seam: the top row's 2 tiles sit ON high-ground floor, the lower 4 on " +
+                        "regular floor. 0–2 per room depending on free seam space, never " +
+                        "overlapping the stairs. Empty = off.")]
+        [field: SerializeField] public TileBase[] HighGroundDecorPatchC { get; private set; }
+
         [field: Tooltip("Patch A: vertical 2-tile strip hung beneath the END of every south-running " +
                         "high-ground corridor (Open/Anubis), authored TOP tile first (fills the top " +
                         "2 of the 3 foot-moat rows). Painted on ExtrasBehind — over the moat water " +

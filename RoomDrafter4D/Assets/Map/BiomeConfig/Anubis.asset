@@ -75,6 +75,20 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d9c73466c315b6741bd1d6a864d8b74b, type: 2}
   - {fileID: 11400000, guid: e954dccc19bdc7840baca82d227488af, type: 2}
   - {fileID: 11400000, guid: fd8e2a2d23b94c041a272db334d6eea8, type: 2}
+  <HighGroundDecorPatchA>k__BackingField:
+  - {fileID: 11400000, guid: cb88a7573567d804a8e7b90087033fc5, type: 2}
+  - {fileID: 11400000, guid: 954f2ab60c4685f43b07ab23e26cd0d2, type: 2}
+  <HighGroundDecorPatchB>k__BackingField:
+  - {fileID: 11400000, guid: 569a44f12b728364e938ad7c6f7e1788, type: 2}
+  - {fileID: 11400000, guid: 4b9ba114c2ebdbc42a281d132ef23686, type: 2}
+  - {fileID: 11400000, guid: 08bc7fda9da9a3b4b92982a0db28d5b7, type: 2}
+  <HighGroundDecorPatchC>k__BackingField:
+  - {fileID: 11400000, guid: 9410ef4de22115e428535149d7d269b5, type: 2}
+  - {fileID: 11400000, guid: 12f3999a119adf3479081febdd491b91, type: 2}
+  - {fileID: 11400000, guid: 7502373c73bbb044982f222eb3f0ec41, type: 2}
+  - {fileID: 11400000, guid: 08510e9724dfc3b4d83dcc60af7fb1d4, type: 2}
+  - {fileID: 11400000, guid: 5edfa97639dd3cb409739a4b9906d6f4, type: 2}
+  - {fileID: 11400000, guid: 46df15988421ee84989e7ebb0a3c8a41, type: 2}
   <HighGroundEndPatchA>k__BackingField:
   - {fileID: 11400000, guid: db33c9e57f0bdfe499c4f094f391c592, type: 2}
   - {fileID: 11400000, guid: 30a6aaf0f548f264d8d9dc11f571c9a3, type: 2}

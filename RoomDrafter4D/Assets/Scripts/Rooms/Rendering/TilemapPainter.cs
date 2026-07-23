@@ -30,6 +30,10 @@ namespace TRV
                  "stacked on the SAME cells as the first layer. Mirror the Collision tilemap's " +
                  "setup. Optional — unassigned = that layer is skipped.")]
         [SerializeField] private Tilemap collision4Tilemap;
+        [Tooltip("Collision5 — the solid BASES of the high-ground decor patches (Open/Anubis); " +
+                 "their upper tiles go on ExtrasFrontOfPlayer. Mirror the Collision tilemap's " +
+                 "setup. Optional — unassigned = that decor is skipped.")]
+        [SerializeField] private Tilemap collision5Tilemap;
         [SerializeField] private Tilemap mapTilemap;
         [SerializeField] private Tilemap doorTilemap;
         [Tooltip("Front decor layer (your 'ExtrasFront') — igroom doors, leading tiles, UnderWall, " +
@@ -104,7 +108,8 @@ namespace TRV
                 || (unseenCollisionTilemap != null && unseenCollisionTilemap.HasTile(pos))
                 || (collision2Tilemap != null && collision2Tilemap.HasTile(pos))
                 || (collision3Tilemap != null && collision3Tilemap.HasTile(pos))
-                || (collision4Tilemap != null && collision4Tilemap.HasTile(pos));
+                || (collision4Tilemap != null && collision4Tilemap.HasTile(pos))
+                || (collision5Tilemap != null && collision5Tilemap.HasTile(pos));
         }
 
         /// <summary>Where a water-collision tile goes: the UnseenCollision layer in Halls (so the water
@@ -263,6 +268,7 @@ namespace TRV
             PaintHighGroundEndPatches(grid, config);
             PaintFloorEdges(grid, config);
             PaintStairsPatches(grid, config); // after edges: stairs win any overlap on Collision2
+            PaintHighGroundDecor(grid, config);
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
             var floorDecor = PaintFloorDecor(grid, config);
@@ -560,6 +566,150 @@ namespace TRV
                 collision3Tilemap.SetTile(CellPos(doorStart - 1, row), config.HighGroundFirstLayerLeftTile);
             if (config.HighGroundFirstLayerRightTile != null)
                 collision3Tilemap.SetTile(CellPos(doorStart + config.DoorWidth, row), config.HighGroundFirstLayerRightTile);
+        }
+
+        /// <summary>How many patch-A decors a room aims for (random in range, capped by free spots).</summary>
+        private const int MinHighGroundDecorA = 1;
+        private const int MaxHighGroundDecorA = 2;
+
+        /// <summary>Fewer free seam spots than this → the room is too cramped, no patch C at all.</summary>
+        private const int MinSeamDecorCandidates = 4;
+
+        /// <summary>
+        /// High-ground decor (Open/Anubis), two authored vertical patches whose BOTTOM tile is a
+        /// solid base on the Collision5 layer with the upper tile(s) on ExtrasFrontOfPlayer:
+        /// • Patch B (3 tall) places ONCE, on a random south corridor, its base exactly 1 tile
+        ///   behind the corridor's last middle floor tile.
+        /// • Patch A (2 tall) scatters 2–4 bases along the NORTH edge (top interior row, skipping
+        ///   the north door's columns so its mouth stays open) and on the row just ABOVE each
+        ///   corridor's end — never ON the end row itself, where the rim walls live.
+        /// Deterministic (VariantSeed-seeded rng, decoupled from the other decor passes) and
+        /// cache-stable; bases block movement/nav via Collision5 in HasSolidAt.
+        /// </summary>
+        private void PaintHighGroundDecor(RoomGrid grid, BiomeConfig config)
+        {
+            if (collision5Tilemap == null || extrasFrontOfPlayerTilemap == null) return;
+            var a = config.HighGroundDecorPatchA;
+            var b = config.HighGroundDecorPatchB;
+            var c = config.HighGroundDecorPatchC;
+            bool hasA = a != null && a.Length >= 2;
+            bool hasB = b != null && b.Length >= 3;
+            bool hasC = c != null && c.Length >= 6;
+            if (!hasA && !hasB && !hasC) return;
+
+            var rng = new System.Random(unchecked(grid.VariantSeed * 53 + 29)); // decoupled from the other passes
+            var occupied = new HashSet<(int x, int y)>();
+            int t = config.WallThickness;
+
+            // Corridors HUGGING a room edge get no decor at all — only interior corridors count
+            // (a hug's centre column sits right next to the boundary).
+            var decorEnds = new List<(int x, int y)>();
+            foreach (var (cx, endY) in grid.HighGroundEnds)
+                if (cx != t + 1 && cx != grid.Width - t - 2) decorEnds.Add((cx, endY));
+
+            // Patch B: once, 1 tile behind a random (non-hugging) corridor's last middle floor tile.
+            if (hasB && decorEnds.Count > 0)
+            {
+                var (cx, endY) = decorEnds[rng.Next(decorEnds.Count)];
+                collision5Tilemap.SetTile(CellPos(cx, endY + 1), b[2]);          // base (authored TOP first)
+                extrasFrontOfPlayerTilemap.SetTile(CellPos(cx, endY + 2), b[1]);
+                extrasFrontOfPlayerTilemap.SetTile(CellPos(cx, endY + 3), b[0]);
+                occupied.Add((cx, endY + 1));
+            }
+
+            if (hasA)
+            {
+                // Patch A candidate bases: high-ground floor on the top interior row (off the north
+                // door's columns), plus the row just above each (non-hugging) corridor end.
+                var candidates = new List<(int x, int y)>();
+                int topRow = grid.Height - t - 1;
+                int doorStart = grid.DoorStarts[(int)Cardinal.North];
+                for (int x = t; x < grid.Width - t; x++)
+                {
+                    if (x >= doorStart && x < doorStart + config.DoorWidth) continue; // door mouth stays open
+                    if (FloorHighAt(grid, x, topRow)) candidates.Add((x, topRow));
+                }
+                foreach (var (cx, endY) in decorEnds)
+                    for (int x = cx - 1; x <= cx + 1; x++)
+                        if (FloorHighAt(grid, x, endY + 1)) candidates.Add((x, endY + 1));
+
+                rng.Shuffle(candidates);
+                int target = rng.Next(MinHighGroundDecorA, MaxHighGroundDecorA + 1);
+                foreach (var (x, y) in candidates)
+                {
+                    if (target == 0) break;
+                    if (!occupied.Add((x, y))) continue;
+                    collision5Tilemap.SetTile(CellPos(x, y), a[1]);              // base (authored TOP first)
+                    extrasFrontOfPlayerTilemap.SetTile(CellPos(x, y + 1), a[0]);
+                    target--;
+                }
+            }
+
+            if (hasC)
+                PaintSeamDecor(grid, config, rng, occupied, c);
+        }
+
+        /// <summary>Patch C: a 2×3 block on the high/low seam — the top row's 2 tiles ON high-ground
+        /// floor, the lower 4 on regular floor, all on Collision5. Candidates keep clear of the
+        /// stairs patches, door landings, and everything already placed; a cramped room (fewer than
+        /// <see cref="MinSeamDecorCandidates"/> free spots) gets NONE, otherwise 1–2.</summary>
+        private void PaintSeamDecor(RoomGrid grid, BiomeConfig config, System.Random rng,
+                                    HashSet<(int x, int y)> occupied, TileBase[] tiles)
+        {
+            // Reserve the stairs footprints and every door's landing cells.
+            foreach (var (sx, sy) in grid.StairPatches)
+                for (int x = sx; x < sx + 3; x++)
+                    for (int y = sy; y < sy + 3; y++)
+                        occupied.Add((x, y));
+            int t = config.WallThickness;
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[x, y] != CellType.Door) continue;
+                    int ix = x < t ? 1 : x >= grid.Width - t ? -1 : 0; // inward step
+                    int iy = y < t ? 1 : y >= grid.Height - t ? -1 : 0;
+                    for (int k = 1; k <= config.LandingDepth; k++)
+                        occupied.Add((x + ix * k, y + iy * k));
+                }
+
+            // Candidate anchors = the patch's TOP-LEFT cell: top row (2 cells) high-ground floor,
+            // the 2×2 below regular floor, none of the 6 cells taken.
+            bool PlainFloor(int cx, int cy) =>
+                grid.Get(cx, cy) == CellType.Floor && !grid.IsHighGround(cx, cy);
+            bool Fits(int cx, int cy)
+            {
+                if (!FloorHighAt(grid, cx, cy) || !FloorHighAt(grid, cx + 1, cy)) return false;
+                for (int x = cx; x <= cx + 1; x++)
+                    for (int y = cy - 2; y < cy; y++)
+                        if (!PlainFloor(x, y)) return false;
+                for (int x = cx; x <= cx + 1; x++)
+                    for (int y = cy - 2; y <= cy; y++)
+                        if (occupied.Contains((x, y))) return false;
+                return true;
+            }
+
+            var candidates = new List<(int x, int y)>();
+            for (int x = 0; x < grid.Width - 1; x++)
+                for (int y = 2; y < grid.Height; y++)
+                    if (Fits(x, y)) candidates.Add((x, y));
+            if (candidates.Count < MinSeamDecorCandidates) return; // cramped room → no patch C
+
+            rng.Shuffle(candidates);
+            int target = rng.Next(1, 3); // 1 or 2
+            foreach (var (cx, cy) in candidates)
+            {
+                if (target == 0) break;
+                if (!Fits(cx, cy)) continue; // an earlier placement may have claimed cells
+                for (int col = 0; col < 2; col++)
+                    for (int row = 0; row < 3; row++) // row 0 = the authored TOP row
+                    {
+                        var tile = tiles[row * 2 + col];
+                        int x = cx + col, y = cy - row;
+                        if (tile != null) collision5Tilemap.SetTile(CellPos(x, y), tile);
+                        occupied.Add((x, y));
+                    }
+                target--;
+            }
         }
 
         /// <summary>Stairs patches (Open/Anubis): each 3×3 site recorded on
@@ -1362,6 +1512,7 @@ namespace TRV
             if (collision2Tilemap) collision2Tilemap.ClearAllTiles();
             if (collision3Tilemap) collision3Tilemap.ClearAllTiles();
             if (collision4Tilemap) collision4Tilemap.ClearAllTiles();
+            if (collision5Tilemap) collision5Tilemap.ClearAllTiles();
             if (mapTilemap) mapTilemap.ClearAllTiles();
             if (doorTilemap) doorTilemap.ClearAllTiles();
             if (extrasTilemap) extrasTilemap.ClearAllTiles();
@@ -1388,6 +1539,7 @@ namespace TRV
                 Collision2 = CaptureLayer(collision2Tilemap, bounds),
                 Collision3 = CaptureLayer(collision3Tilemap, bounds),
                 Collision4 = CaptureLayer(collision4Tilemap, bounds),
+                Collision5 = CaptureLayer(collision5Tilemap, bounds),
                 Map = CaptureLayer(mapTilemap, bounds),
                 Door = CaptureLayer(doorTilemap, bounds),
                 Extras = CaptureLayer(extrasTilemap, bounds),
@@ -1407,6 +1559,7 @@ namespace TRV
             RestoreLayer(collision2Tilemap, snap.Bounds, snap.Collision2);
             RestoreLayer(collision3Tilemap, snap.Bounds, snap.Collision3);
             RestoreLayer(collision4Tilemap, snap.Bounds, snap.Collision4);
+            RestoreLayer(collision5Tilemap, snap.Bounds, snap.Collision5);
             RestoreLayer(mapTilemap, snap.Bounds, snap.Map);
             RestoreLayer(doorTilemap, snap.Bounds, snap.Door);
             RestoreLayer(extrasTilemap, snap.Bounds, snap.Extras);

@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 namespace TRV
 {
     /// <summary>
-    /// TESTING hotkeys for the NEXT room's biome — bypasses the KeyHolder/key requirement: press 0 → the
+    /// TESTING hotkeys for the NEXT room's biome: press 0 → the
     /// Aqua (Corridors) biome, 1 → the Halls biome, 2 → the Anubis (Open) biome (found BY LAYOUT in
     /// <see cref="RoomManager.Biomes"/>, so list order doesn't matter), via
     /// <see cref="RoomManager.SelectBiome(BiomeConfig)"/>. Drop this on the RoomManager object.

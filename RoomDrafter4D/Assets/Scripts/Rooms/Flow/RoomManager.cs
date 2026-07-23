@@ -32,13 +32,6 @@ namespace TRV
         [Tooltip("Pools collectables; cleared on room change. Optional — auto-found if present.")]
         [SerializeField] private CollectablePool collectablePool;
 
-        [Tooltip("Interactable spawned in front of EACH door: spend a key on it to make that door lead " +
-                 "to a Halls room. Optional — leave empty to disable key holders.")]
-        [SerializeField] private GameObject keyHolderPrefab;
-
-        [Tooltip("Cells in FRONT of each door to place its KeyHolder.")]
-        [SerializeField] private int keyHolderInset = 1;
-
         [Header("Start")]
         [Tooltip("Roll a fresh world seed every session so rooms differ run-to-run. Turn OFF to keep " +
                  "the fixed 'World Seed' below (reproducible rooms for debugging). Seeds are never " +
@@ -53,7 +46,7 @@ namespace TRV
 
         private static RoomManager _instance;
 
-        /// <summary>The scene's room manager (fake-null re-finds it after a reload). For KeyHolders etc.</summary>
+        /// <summary>The scene's room manager (fake-null re-finds it after a reload).</summary>
         public static RoomManager Instance =>
             _instance != null ? _instance : (_instance = FindFirstObjectByType<RoomManager>());
 
@@ -62,13 +55,6 @@ namespace TRV
 
         private BiomeConfig _nextBiome;     // chosen by the player for the next NEW room
         private BiomeConfig _currentBiome;  // biome of the room currently shown
-
-        // Per-edge biome override for the CURRENT room's doors (set by a KeyHolder → Halls); null = none.
-        // Reset every room load; consumed when the player exits through that edge.
-        private readonly BiomeConfig[] _doorBiomeOverride = new BiomeConfig[4];
-
-        // One KeyHolder per door edge, repositioned + re-armed each room.
-        private readonly KeyHolder[] _keyHolders = new KeyHolder[4];
 
         // Island decor placements for the room currently shown — saved into its snapshot on leave,
         // so a cached room re-spawns the same decor without re-running generation.
@@ -162,8 +148,6 @@ namespace TRV
                     }
                 }
 
-            // The hand-made start room is already painted; place KeyHolders at its (painted) doors.
-            SetupKeyHolders(_currentBiome);
         }
 
         /// <summary>Called by a <see cref="DoorPortal"/> when the player steps onto a door tile.</summary>
@@ -202,11 +186,8 @@ namespace TRV
             snapshot.MainFillerCells = _currentMainFillerCells; // remembers which fillers are still intact
             _cache.Save(_coord, snapshot);
 
-            // Did a KeyHolder set the door we're exiting through to lead to Halls?
-            var forcedBiome = _doorBiomeOverride[(int)exitDir];
-
             _coord += exitDir.Offset();
-            LoadRoom(_coord, exitDir.Opposite(), forcedBiome); // arrive at the opposite door
+            LoadRoom(_coord, exitDir.Opposite()); // arrive at the opposite door
 
             if (fader != null) yield return fader.FadeIn();
 
@@ -214,9 +195,8 @@ namespace TRV
         }
 
         /// <summary>Generate + paint the room for a coord and place the player on the entry landing.
-        /// <paramref name="forcedBiome"/> (from a KeyHolder) overrides the player's selection for a FRESH
-        /// room; a cached room keeps its original biome.</summary>
-        private void LoadRoom(Vector2Int coord, Cardinal enterFrom, BiomeConfig forcedBiome = null)
+        /// A cached room keeps its original biome; a fresh one uses the selected next biome.</summary>
+        private void LoadRoom(Vector2Int coord, Cardinal enterFrom)
         {
             if (_nextBiome == null || painter == null)
             {
@@ -241,7 +221,7 @@ namespace TRV
             }
             else
             {
-                roomBiome = forcedBiome != null ? forcedBiome : _nextBiome; // KeyHolder forces Halls here
+                roomBiome = _nextBiome;
                 var grid = new RoomGenerator(roomBiome).Generate(RoomSeed.Rng(worldSeed, coord));
                 painter.Paint(grid, roomBiome);
                 _currentIslandDecor = grid.IslandDecor;
@@ -279,9 +259,6 @@ namespace TRV
                 }
             }
 
-            // Fresh room: clear the door overrides and (re)place a KeyHolder in front of each door.
-            for (int i = 0; i < 4; i++) _doorBiomeOverride[i] = null;
-            SetupKeyHolders(roomBiome);
         }
 
         /// <summary>Roll the big main igroom's content for a FRESH Halls room. Upgrades take PRIORITY:
@@ -382,56 +359,6 @@ namespace TRV
             int keep = cells.Count / 4; // sparse: a quarter of the interior gets a filler
             if (cells.Count > keep) cells.RemoveRange(keep, cells.Count - keep);
             return cells;
-        }
-
-        /// <summary>True if the room on the other side of the current room's <paramref name="edge"/> door
-        /// has already been generated (it's in the cache) — a KeyHolder there can't change it to Halls.</summary>
-        public bool NeighborRoomExists(Cardinal edge) => _cache.TryGet(_coord + edge.Offset(), out _);
-
-        /// <summary>Make the door on <paramref name="edge"/> of the CURRENT room always lead to a Halls
-        /// room — applied to the next FRESH room loaded through it. Called by a <see cref="KeyHolder"/>.</summary>
-        public void SetDoorToHalls(Cardinal edge)
-        {
-            var halls = FindBiome(BiomeLayout.Halls);
-            if (halls != null) _doorBiomeOverride[(int)edge] = halls;
-        }
-
-        private BiomeConfig FindBiome(BiomeLayout layout)
-        {
-            if (biomes == null) return null;
-            foreach (var b in biomes)
-                if (b != null && b.Layout == layout) return b;
-            return null;
-        }
-
-        /// <summary>Position the per-edge KeyHolders in front of each painted door of the current room
-        /// and re-arm them. Edges without a door (shouldn't happen) hide their holder.</summary>
-        private void SetupKeyHolders(BiomeConfig biome)
-        {
-            if (keyHolderPrefab == null || biome == null || painter == null) return;
-
-            for (int e = 0; e < 4; e++)
-            {
-                var edge = (Cardinal)e;
-                if (_keyHolders[e] == null)
-                {
-                    var spawned = Instantiate(keyHolderPrefab);
-                    _keyHolders[e] = spawned.GetComponent<KeyHolder>();
-                    if (_keyHolders[e] == null) { Destroy(spawned); continue; } // prefab missing a KeyHolder
-                }
-
-                var holder = _keyHolders[e];
-                if (painter.TryGetDoorSpawn(edge, biome.Width, biome.Height, keyHolderInset, out var pos))
-                {
-                    holder.transform.position = pos;
-                    holder.Configure(edge);
-                    holder.gameObject.SetActive(true);
-                }
-                else
-                {
-                    holder.gameObject.SetActive(false); // no door on that edge
-                }
-            }
         }
 
         /// <summary>Pick up to EnemiesPerRoom distinct open-Floor cells (world positions) to spawn on,

@@ -18,6 +18,7 @@ namespace TRV
         public LayerSnapshot Collision2;
         public LayerSnapshot Collision3;
         public LayerSnapshot Collision4;
+        public LayerSnapshot Collision5;
         public LayerSnapshot Map;
         public LayerSnapshot Door;
         public LayerSnapshot Extras;

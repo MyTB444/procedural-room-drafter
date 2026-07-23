@@ -3,7 +3,7 @@ using UnityEngine;
 namespace TRV
 {
     /// <summary>
-    /// An interactable UPGRADE pickup (like <see cref="KeyHolder"/>): the shared "E" prompt shows when the
+    /// An interactable UPGRADE pickup: the shared "E" prompt shows when the
     /// player is near, and interacting applies the upgrade to the player's <see cref="PlayerUpgrades"/>,
     /// then CONSUMES the object (disables it). One-time. Concrete upgrades define their effect in
     /// <see cref="Apply"/> — reuses the <see cref="Interactable"/> proximity/prompt system.
