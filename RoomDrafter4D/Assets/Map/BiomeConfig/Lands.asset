@@ -48,6 +48,63 @@ MonoBehaviour:
   <PathTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 5e4daad6fe4ff794c9d8bda5b8109c95, type: 2}
   - {fileID: 11400000, guid: 2e7d9f88dbbc7bd44a3222eae80d7757, type: 2}
+  <GrassFullTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: f5680ba0b3d688b4094b0969e9554e44, type: 2}
+  - {fileID: 11400000, guid: e88c9b7dbaaa25a40bc0a7c17fcc4d8d, type: 2}
+  - {fileID: 11400000, guid: 151d320c9c52b654790d2e40d081875e, type: 2}
+  - {fileID: 11400000, guid: 4b5fe6262ff3b3e40aaae7a3eac97cc4, type: 2}
+  - {fileID: 11400000, guid: f78a43ba24ddcf444b54a0342c3f2bee, type: 2}
+  - {fileID: 11400000, guid: 9abce826bdba0b745a333d80d66100e9, type: 2}
+  - {fileID: 11400000, guid: 239369e3cef82ae47848fd1fa363ca8f, type: 2}
+  - {fileID: 11400000, guid: 424e313fb58540342ba6ed97f7c9a52e, type: 2}
+  - {fileID: 11400000, guid: f55535479b966de4188091b855fcbc29, type: 2}
+  - {fileID: 11400000, guid: 6526ef2ed51028b4594f6b3bc2ac8479, type: 2}
+  - {fileID: 11400000, guid: e388c3d10402dab41a04e88b4e9a8543, type: 2}
+  - {fileID: 11400000, guid: b57f412ef7696374ba2c86bad1fe5efa, type: 2}
+  <GrassHalfTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: f89419b5994912f4388ede41c613253b, type: 2}
+  - {fileID: 11400000, guid: 213bf93888fc3c548b89d087edf6d9e3, type: 2}
+  - {fileID: 11400000, guid: 213bf93888fc3c548b89d087edf6d9e3, type: 2}
+  - {fileID: 11400000, guid: e397cfbdc1a036d42978bc11b65ede6b, type: 2}
+  - {fileID: 11400000, guid: 47951a40161833b4e894a2dc27a7d143, type: 2}
+  - {fileID: 11400000, guid: 2111ce43cdb0cf04181e8ce9e9c8a070, type: 2}
+  - {fileID: 11400000, guid: 3a8d700d4c3bdbd42a3ee6f2f2e0bcba, type: 2}
+  - {fileID: 11400000, guid: 38b7e5420266d6b41abf763c1611435b, type: 2}
+  - {fileID: 11400000, guid: 82273e544f518b04fb47ce267dab87af, type: 2}
+  <GrassFewTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 9a82527941c012d4abf97320190c05f7, type: 2}
+  - {fileID: 11400000, guid: e23a072ada6c3ce4bac062ea70d0f13f, type: 2}
+  - {fileID: 11400000, guid: bdca215c5de9ac3449387c3d09964ee8, type: 2}
+  - {fileID: 11400000, guid: 37a39b1e548018a459f601443de6e9e9, type: 2}
+  - {fileID: 11400000, guid: ee7d6fe5f75acc44c94e64993839bfc6, type: 2}
+  - {fileID: 11400000, guid: b5286d564b2592640be093be4012f1f4, type: 2}
+  - {fileID: 11400000, guid: d7355aa8da2d8a046b8eb1d86524f3ab, type: 2}
+  - {fileID: 11400000, guid: 11e6663348c0da24aad37557f47b4063, type: 2}
+  - {fileID: 11400000, guid: de6dceb5d32c6284595bad955a1cf514, type: 2}
+  - {fileID: 11400000, guid: a1267e0c25286ef4c9b8799d11dff13d, type: 2}
+  - {fileID: 11400000, guid: ce7791c25a8ac3a438a62717009ebafc, type: 2}
+  - {fileID: 11400000, guid: fe586f9532e48f244a46e23f2f108033, type: 2}
+  <GrassNoneTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 034581bcb95aa374abba98377a3f5c08, type: 2}
+  - {fileID: 11400000, guid: debab26d2aeec3641a23e9f4f9e09cb5, type: 2}
+  - {fileID: 11400000, guid: 095f358462227444fa342721e7cd20b1, type: 2}
+  - {fileID: 11400000, guid: 5040748b9c56b4245a54542770e7d32f, type: 2}
+  - {fileID: 11400000, guid: 7a9be97aa7d9de243a4572a388e88440, type: 2}
+  - {fileID: 11400000, guid: b868e4473fc221349a21c9de5e7d550b, type: 2}
+  - {fileID: 11400000, guid: 4bd19f6421592bd4894ffd5dab5ae062, type: 2}
+  - {fileID: 11400000, guid: c4d06f567071d584fb887f65953b08d7, type: 2}
+  - {fileID: 11400000, guid: 0c1e691dc9d7c684b9a30de0a342d626, type: 2}
+  - {fileID: 11400000, guid: 0e292b78debf84447a0cd4ce8394624c, type: 2}
+  - {fileID: 11400000, guid: 75c0174ce57e36b49b5575e69f5a5872, type: 2}
+  - {fileID: 11400000, guid: 9b75d36e3dc9be542a44cee4c9ca46d0, type: 2}
+  <GrassEdgeNorthTile>k__BackingField: {fileID: 11400000, guid: f8bc76366d5b19c40a2d93805fd2b36b, type: 2}
+  <GrassEdgeSouthTile>k__BackingField: {fileID: 11400000, guid: c82834c7d90df1a4299342663d626937, type: 2}
+  <GrassEdgeEastTile>k__BackingField: {fileID: 11400000, guid: 646009e67a89adb4f864179db2f84c23, type: 2}
+  <GrassEdgeWestTile>k__BackingField: {fileID: 11400000, guid: 47b7cd1ea803fd44193486e8698aabe4, type: 2}
+  <GrassEdgeNorthEastTile>k__BackingField: {fileID: 11400000, guid: c2a525e01d5d80745957c3072f51e575, type: 2}
+  <GrassEdgeNorthWestTile>k__BackingField: {fileID: 11400000, guid: 49cbb94bc40053441bd157df88272ed1, type: 2}
+  <GrassEdgeSouthEastTile>k__BackingField: {fileID: 11400000, guid: 28c74dd4ee7624445bb23e658eba2b42, type: 2}
+  <GrassEdgeSouthWestTile>k__BackingField: {fileID: 11400000, guid: d99d0087dcca58b4e97befd98b2eb379, type: 2}
   <HighGroundTileVariants>k__BackingField: []
   <FloorEdgeLeftTile>k__BackingField: {fileID: 0}
   <FloorEdgeRightTile>k__BackingField: {fileID: 0}

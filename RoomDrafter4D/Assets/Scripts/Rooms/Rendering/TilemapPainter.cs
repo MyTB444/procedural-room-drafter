@@ -199,15 +199,7 @@ namespace TRV
                                 : config.WaterTileAt(cellHash));
                             break;
                         case CellType.Floor:
-                            // High ground (Open/Anubis) wins, then the walking path (Plain/Lands),
-                            // then igroom interiors (Halls); everything else the regular floor.
-                            mapTilemap.SetTile(pos, grid.IsHighGround(x, y)
-                                ? config.HighGroundTileAt(cellHash)
-                                : grid.IsPath(x, y)
-                                    ? config.PathTileAt(cellHash)
-                                    : grid.IsRoomFloor(x, y)
-                                        ? config.RoomFloorTileAt(cellHash)
-                                        : config.FloorTileAt(cellHash));
+                            mapTilemap.SetTile(pos, FloorLookTile(grid, config, x, y, cellHash));
                             break;
                         case CellType.Door:
                         {
@@ -285,6 +277,38 @@ namespace TRV
             ForceDoorColliders(new BoundsInt(originCell, new Vector3Int(grid.Width, grid.Height, 1)));
             // Island decor is no longer painted — it's spawned as pooled GameObjects by
             // IslandDecorPool (driven by RoomManager from grid.IslandDecor).
+        }
+
+        /// <summary>The floor LOOK of a walkable cell, in priority order: high ground (Open/Anubis)
+        /// → path (Plain/Lands) → grass gradient → grass patch edge (both Plain/Lands) → igroom
+        /// room-floor (Halls) → regular floor.</summary>
+        private static TileBase FloorLookTile(RoomGrid grid, BiomeConfig config, int x, int y, int cellHash)
+        {
+            if (grid.IsHighGround(x, y)) return config.HighGroundTileAt(cellHash);
+            if (grid.IsPath(x, y)) return config.PathTileAt(cellHash);
+            int grass = grid.GrassLevelAt(x, y);
+            if (grass > 0) return config.GrassTileAt(grass, cellHash);
+            var edge = GrassEdgeFor(grid, config, x, y);
+            if (edge != null) return edge;
+            return grid.IsRoomFloor(x, y) ? config.RoomFloorTileAt(cellHash) : config.FloorTileAt(cellHash);
+        }
+
+        /// <summary>The grass patch's surrounding EDGE tile for a plain cell, keyed by where the
+        /// patch ends relative to it: grass directly below → the patch's NORTH edge, etc.; grass
+        /// only diagonally → the matching corner (e.g. grass to the south-west → the patch's
+        /// NORTH-EAST corner). Null when the cell doesn't border the gradient (or the slot is
+        /// unassigned) — it stays plain floor. Edge cells may sit right beside a path.</summary>
+        private static TileBase GrassEdgeFor(RoomGrid grid, BiomeConfig config, int x, int y)
+        {
+            if (grid.GrassLevelAt(x, y - 1) > 0) return config.GrassEdgeNorthTile;
+            if (grid.GrassLevelAt(x, y + 1) > 0) return config.GrassEdgeSouthTile;
+            if (grid.GrassLevelAt(x - 1, y) > 0) return config.GrassEdgeEastTile;
+            if (grid.GrassLevelAt(x + 1, y) > 0) return config.GrassEdgeWestTile;
+            if (grid.GrassLevelAt(x - 1, y - 1) > 0) return config.GrassEdgeNorthEastTile;
+            if (grid.GrassLevelAt(x + 1, y - 1) > 0) return config.GrassEdgeNorthWestTile;
+            if (grid.GrassLevelAt(x - 1, y + 1) > 0) return config.GrassEdgeSouthEastTile;
+            if (grid.GrassLevelAt(x + 1, y + 1) > 0) return config.GrassEdgeSouthWestTile;
+            return null;
         }
 
         // ---- Edge walls (Open/Anubis) --------------------------------------------------------

@@ -22,7 +22,8 @@ namespace TRV
                 new ConnectivityPass(),
                 new DeadEndPrunePass(), // Halls: drop stray 1-tile dead-end corridors (connect nothing)
                 new HighGroundPass(),   // Open/Anubis: flag the high-ground band + south corridors
-                new PathPass(),         // Plain/Lands: 2-wide random walking path linking the doors
+                new PathPass(),         // Plain/Lands: strictly 2-wide corridors linking the doors
+                new GrassPass(),        // Plain/Lands: grass gradient fading out of the corners farthest from the paths
                 new IslandPass(),       // after connectivity: all floor is connected, any hook-in works
                 new BuildingPass(),     // north-wall extensions over finished floor (islands included)
                 // new LandmarkPass(),  // added once landmark stamps exist

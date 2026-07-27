@@ -192,6 +192,52 @@ namespace TRV
                         "Leave empty to reuse the regular Floor pool (path invisible).")]
         [field: SerializeField] public TileBase[] PathTileVariants { get; private set; }
 
+        [field: Tooltip("FULL-grass pool (Plain/Lands): the 3×3/4×4 corner cubes at the heart of " +
+                        "the grass gradient (GrassPass). Beyond the gradient's rings the rest of " +
+                        "the room is the PLAIN floor = the regular Floor pool. Leave empty to " +
+                        "reuse the Floor pool (gradient invisible).")]
+        [field: SerializeField] public TileBase[] GrassFullTileVariants { get; private set; }
+
+        [field: Tooltip("HALF-grass pool (Plain/Lands): the 1–2 thick ring around the full-grass " +
+                        "cube. Leave empty to reuse the Floor pool.")]
+        [field: SerializeField] public TileBase[] GrassHalfTileVariants { get; private set; }
+
+        [field: Tooltip("VERY-FEW-grass pool (Plain/Lands): the 1–2 thick ring around the " +
+                        "half-grass ring. Leave empty to reuse the Floor pool.")]
+        [field: SerializeField] public TileBase[] GrassFewTileVariants { get; private set; }
+
+        [field: Tooltip("NO-grass pool (Plain/Lands): the final 1–2 thick ring that closes the " +
+                        "gradient — after it the rest of the floor is the PLAIN floor (the regular " +
+                        "Floor pool). Leave empty to reuse the Floor pool.")]
+        [field: SerializeField] public TileBase[] GrassNoneTileVariants { get; private set; }
+
+        [field: Tooltip("Grass patch EDGE, NORTH side (Plain/Lands): painted on the plain-floor " +
+                        "cell just ABOVE where the gradient ends (grass directly below it). Edge " +
+                        "cells may sit right beside a path. Empty = no edge on that side.")]
+        [field: SerializeField] public TileBase GrassEdgeNorthTile { get; private set; }
+
+        [field: Tooltip("Grass patch edge, SOUTH side: the cell just below the patch.")]
+        [field: SerializeField] public TileBase GrassEdgeSouthTile { get; private set; }
+
+        [field: Tooltip("Grass patch edge, EAST side: the cell just right of the patch.")]
+        [field: SerializeField] public TileBase GrassEdgeEastTile { get; private set; }
+
+        [field: Tooltip("Grass patch edge, WEST side: the cell just left of the patch.")]
+        [field: SerializeField] public TileBase GrassEdgeWestTile { get; private set; }
+
+        [field: Tooltip("Grass patch edge, NORTH-EAST corner: the cell diagonally above-right of " +
+                        "the patch's corner (grass only to its south-west).")]
+        [field: SerializeField] public TileBase GrassEdgeNorthEastTile { get; private set; }
+
+        [field: Tooltip("Grass patch edge, NORTH-WEST corner (grass only to its south-east).")]
+        [field: SerializeField] public TileBase GrassEdgeNorthWestTile { get; private set; }
+
+        [field: Tooltip("Grass patch edge, SOUTH-EAST corner (grass only to its north-west).")]
+        [field: SerializeField] public TileBase GrassEdgeSouthEastTile { get; private set; }
+
+        [field: Tooltip("Grass patch edge, SOUTH-WEST corner (grass only to its north-east).")]
+        [field: SerializeField] public TileBase GrassEdgeSouthWestTile { get; private set; }
+
         [field: Tooltip("High-ground pool (Open/Anubis): the second floor look carved over the base " +
                         "field by HighGroundPass — the north band + its south-running corridors. " +
                         "Leave empty to reuse the regular Floor pool.")]
@@ -465,6 +511,20 @@ namespace TRV
             PathTileVariants != null && PathTileVariants.Length > 0
                 ? PickVariant(PathTileVariants, cellHash)
                 : FloorTileAt(cellHash);
+
+        /// <summary>Grass tile for a gradient level (4 = full, 3 = half, 2 = few, 1 = the no-grass
+        /// ring) — each pool falls back to the regular (plain) floor pool while unassigned.</summary>
+        public TileBase GrassTileAt(int level, int cellHash)
+        {
+            var pool = level switch
+            {
+                4 => GrassFullTileVariants,
+                3 => GrassHalfTileVariants,
+                2 => GrassFewTileVariants,
+                _ => GrassNoneTileVariants,
+            };
+            return pool != null && pool.Length > 0 ? PickVariant(pool, cellHash) : FloorTileAt(cellHash);
+        }
 
         /// <summary>Floor tile for an igroom INTERIOR cell — picks from the room-floor pool, or falls
         /// back to the regular floor pool when that pool is empty (so biomes that don't set it look

@@ -148,6 +148,24 @@ namespace TRV
 
         public bool IsPath(int x, int y) => _path != null && _path.Contains((x, y));
 
+        /// <summary>
+        /// Grass gradient levels (Lands/Plain): 4 = full grass, 3 = half, 2 = very few, 1 = the
+        /// no-grass ring closing the gradient; unrecorded = the plain floor. Sparse: recorded by
+        /// <see cref="GrassPass"/> (overlapping patches keep the HIGHEST level); the painter picks
+        /// the matching grass pool.
+        /// </summary>
+        private Dictionary<(int x, int y), int> _grass;
+
+        public void MarkGrass(int x, int y, int level)
+        {
+            _grass ??= new Dictionary<(int x, int y), int>();
+            if (!_grass.TryGetValue((x, y), out int current) || level > current)
+                _grass[(x, y)] = level;
+        }
+
+        public int GrassLevelAt(int x, int y) =>
+            _grass != null && _grass.TryGetValue((x, y), out int level) ? level : 0;
+
         public RoomGrid(int width, int height)
         {
             Width = width;
