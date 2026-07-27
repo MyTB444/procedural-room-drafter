@@ -199,13 +199,15 @@ namespace TRV
                                 : config.WaterTileAt(cellHash));
                             break;
                         case CellType.Floor:
-                            // High ground (Open/Anubis) wins; then igroom interiors get the distinct
-                            // room-floor tiles; everything else the regular floor.
+                            // High ground (Open/Anubis) wins, then the walking path (Plain/Lands),
+                            // then igroom interiors (Halls); everything else the regular floor.
                             mapTilemap.SetTile(pos, grid.IsHighGround(x, y)
                                 ? config.HighGroundTileAt(cellHash)
-                                : grid.IsRoomFloor(x, y)
-                                    ? config.RoomFloorTileAt(cellHash)
-                                    : config.FloorTileAt(cellHash));
+                                : grid.IsPath(x, y)
+                                    ? config.PathTileAt(cellHash)
+                                    : grid.IsRoomFloor(x, y)
+                                        ? config.RoomFloorTileAt(cellHash)
+                                        : config.FloorTileAt(cellHash));
                             break;
                         case CellType.Door:
                         {
@@ -965,14 +967,49 @@ namespace TRV
         {
             if (wallsTilemap == null || config.NorthDoorLeftWallTile == null) return;
 
-            int c = grid.DoorStarts[(int)Cardinal.North];     // door's first (west) column
-            int row = grid.Height - config.WallThickness;     // the north door's row
-            int left = c - 1, right = c + config.DoorWidth;   // first cell each side of the 2-wide door
+            PaintDoorFlanks(grid, config, Cardinal.North);
+            if (config.Layout != BiomeLayout.Plain) return; // Lands: EVERY door gets the frame
+            PaintDoorFlanks(grid, config, Cardinal.South);
+            PaintDoorFlanks(grid, config, Cardinal.East);
+            PaintDoorFlanks(grid, config, Cardinal.West);
+        }
 
-            wallsTilemap.SetTile(new Vector3Int(originCell.x + left, originCell.y + row, 0),
-                config.NorthDoorLeftWallTile);
-            wallsTilemap.SetTile(new Vector3Int(originCell.x + right, originCell.y + row, 0),
-                config.NorthDoorRightWallTile);
+        /// <summary>The two flank-wall tiles beside one door, rotated RIGIDLY with the edge (the
+        /// whole north-door assembly turned to fit): North = authored (Left west, Right east);
+        /// South = 180° with the pair swapped; East = 90° right, Left on the upper cell; West =
+        /// 90° left, Left on the lower cell.</summary>
+        private void PaintDoorFlanks(RoomGrid grid, BiomeConfig config, Cardinal edge)
+        {
+            int start = grid.DoorStarts[(int)edge];
+            int t = config.WallThickness;
+            int before = start - 1, after = start + config.DoorWidth; // flank cells along the edge axis
+
+            Vector3Int a, b;      // a gets the LEFT tile, b the RIGHT tile
+            Matrix4x4 rot;
+            switch (edge)
+            {
+                case Cardinal.North:
+                    a = CellPos(before, grid.Height - t); b = CellPos(after, grid.Height - t);
+                    rot = Matrix4x4.identity;
+                    break;
+                case Cardinal.South:
+                    a = CellPos(after, t - 1); b = CellPos(before, t - 1); // 180° → halves swap
+                    rot = Rot180;
+                    break;
+                case Cardinal.East:
+                    a = CellPos(grid.Width - t, after); b = CellPos(grid.Width - t, before); // Left up
+                    rot = RotRight90;
+                    break;
+                default: // West
+                    a = CellPos(t - 1, before); b = CellPos(t - 1, after); // Left down
+                    rot = RotLeft90;
+                    break;
+            }
+
+            wallsTilemap.SetTile(a, config.NorthDoorLeftWallTile);
+            wallsTilemap.SetTransformMatrix(a, rot);
+            wallsTilemap.SetTile(b, config.NorthDoorRightWallTile);
+            wallsTilemap.SetTransformMatrix(b, rot);
         }
 
         /// <summary>

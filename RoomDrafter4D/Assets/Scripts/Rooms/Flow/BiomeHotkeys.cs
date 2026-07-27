@@ -25,6 +25,7 @@ namespace TRV
             if (keyboard[Key.Digit0].wasPressedThisFrame) SelectByLayout(BiomeLayout.Corridors); // Aqua
             else if (keyboard[Key.Digit1].wasPressedThisFrame) SelectByLayout(BiomeLayout.Halls);
             else if (keyboard[Key.Digit2].wasPressedThisFrame) SelectByLayout(BiomeLayout.Open); // Anubis
+            else if (keyboard[Key.Digit3].wasPressedThisFrame) SelectByLayout(BiomeLayout.Plain); // Lands
         }
 
         private void SelectByLayout(BiomeLayout layout)

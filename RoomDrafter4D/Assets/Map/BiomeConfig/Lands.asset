@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cba3642b34386146a984a1f0364b9cd, type: 3}
+  m_Name: Lands
+  m_EditorClassIdentifier: Assembly-CSharp::TRV.BiomeConfig
+  <Layout>k__BackingField: 3
+  <Width>k__BackingField: 25
+  <Height>k__BackingField: 14
+  <WallThickness>k__BackingField: 1
+  <DoorWidth>k__BackingField: 2
+  <LandingDepth>k__BackingField: 2
+  <DoorCornerPadding>k__BackingField: 2
+  <CorridorWidth>k__BackingField: 2
+  <WideCorridorChance>k__BackingField: 0.35
+  <MediumCorridorChance>k__BackingField: 0.25
+  <ExtraCorridorNodes>k__BackingField: 1
+  <HallMoatThickness>k__BackingField: 2
+  <HallMainRoomSize>k__BackingField: 6
+  <BuildingLeftTile>k__BackingField: {fileID: 0}
+  <BuildingMiddleTile>k__BackingField: {fileID: 0}
+  <BuildingRightTile>k__BackingField: {fileID: 0}
+  <WaterDecorPatches>k__BackingField: []
+  <EnemyPrefabs>k__BackingField: []
+  <EnemiesPerRoom>k__BackingField: 3
+  <MinibossPrefabs>k__BackingField: []
+  <MinibossChance>k__BackingField: 1
+  <EnemySpawnSafeRadius>k__BackingField: 4
+  <IslandDecorObjects>k__BackingField: []
+  <IslandDecorMinPerIsland>k__BackingField: 4
+  <IslandDecorMaxPerIsland>k__BackingField: 5
+  <MainRoomUpgrades>k__BackingField: []
+  <MainRoomFillers>k__BackingField: []
+  <MinWaterForIsland>k__BackingField: 40
+  <FloorPatches>k__BackingField: []
+  <FloorPatchCoverage>k__BackingField: 0.9
+  <FloorTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: ca5207436326f2241aa75641977632f5, type: 2}
+  <RoomFloorTileVariants>k__BackingField: []
+  <PathTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 5e4daad6fe4ff794c9d8bda5b8109c95, type: 2}
+  - {fileID: 11400000, guid: 2e7d9f88dbbc7bd44a3222eae80d7757, type: 2}
+  <HighGroundTileVariants>k__BackingField: []
+  <FloorEdgeLeftTile>k__BackingField: {fileID: 0}
+  <FloorEdgeRightTile>k__BackingField: {fileID: 0}
+  <FloorEdgeBottomTile>k__BackingField: {fileID: 0}
+  <HighGroundEdgeBottomTile>k__BackingField: {fileID: 0}
+  <HighGroundFirstLayerLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundFirstLayerRightTile>k__BackingField: {fileID: 0}
+  <HighGroundSecondLayerLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundSecondLayerRightTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerRightRightTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerLeftLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerRightLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerLeftRightTile>k__BackingField: {fileID: 0}
+  <FloorEdgeCornerTile>k__BackingField: {fileID: 0}
+  <StairsPatch>k__BackingField: []
+  <HighGroundDecorPatchA>k__BackingField: []
+  <HighGroundDecorPatchB>k__BackingField: []
+  <HighGroundDecorPatchC>k__BackingField: []
+  <HighGroundEndPatchA>k__BackingField: []
+  <WaterTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 19ebc817119c9bb4f839ea47a1756934, type: 2}
+  <NorthWaterTile>k__BackingField: {fileID: 0}
+  <UnderWallTile>k__BackingField: {fileID: 0}
+  <WaterfallTile>k__BackingField: {fileID: 0}
+  <WaterfallEnderTile>k__BackingField: {fileID: 0}
+  <WaterfallBasePatch>k__BackingField: []
+  <FloorDecorColumn>k__BackingField: []
+  <CubePatch>k__BackingField: []
+  <DoorTile>k__BackingField: {fileID: 11400000, guid: 5e4daad6fe4ff794c9d8bda5b8109c95, type: 2}
+  <LeftRoomDoorTile>k__BackingField: {fileID: 0}
+  <RightRoomDoorTile>k__BackingField: {fileID: 0}
+  <LeftLeadingTile>k__BackingField: {fileID: 0}
+  <RightLeadingTile>k__BackingField: {fileID: 0}
+  <NorthDoorLeftWallTile>k__BackingField: {fileID: 11400000, guid: d0c97e87b913a4741a1813c619abcde7, type: 2}
+  <NorthDoorRightWallTile>k__BackingField: {fileID: 11400000, guid: 59a4c1a5ebd9ce6488c4457e50c68652, type: 2}
+  <LeftStairTile>k__BackingField: {fileID: 0}
+  <RightStairTile>k__BackingField: {fileID: 0}
+  <LeftDoorTile>k__BackingField: {fileID: 0}
+  <RightDoorTile>k__BackingField: {fileID: 0}
+  <NorthBehindTile>k__BackingField: {fileID: 0}
+  <Transition1Tile>k__BackingField: {fileID: 0}
+  <Transition2Tile>k__BackingField: {fileID: 0}
+  <BlankBehindTile>k__BackingField: {fileID: 0}
+  <NorthBehindLeftEndTile>k__BackingField: {fileID: 0}
+  <NorthBehindRightEndTile>k__BackingField: {fileID: 0}
+  <Transition1LeftEndTile>k__BackingField: {fileID: 0}
+  <Transition1RightEndTile>k__BackingField: {fileID: 0}
+  <RotateSouthWalls>k__BackingField: 1
+  <NorthWallTileVariants>k__BackingField:
+  - {fileID: 11400000, guid: 5db69956380ccbd44b7f7211e522fd4f, type: 2}
+  <SouthWallTileVariants>k__BackingField: []
+  <EastWallTile>k__BackingField: {fileID: 11400000, guid: 93a43fe2df2988941b432e7fbe48fc2f, type: 2}
+  <WestWallTile>k__BackingField: {fileID: 11400000, guid: 9d8da40f44c44bc43a46e2c4e35d4202, type: 2}
+  <NorthWestCornerTile>k__BackingField: {fileID: 11400000, guid: f1cb61b04b8931e44bd81abc1034cb50, type: 2}
+  <NorthEastCornerTile>k__BackingField: {fileID: 11400000, guid: f1cb61b04b8931e44bd81abc1034cb50, type: 2}
+  <SouthWestCornerTile>k__BackingField: {fileID: 0}
+  <SouthEastCornerTile>k__BackingField: {fileID: 0}

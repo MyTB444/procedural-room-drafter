@@ -21315,6 +21315,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: fcbf5da9f50d0664cbd36ffadc93824c, type: 2}
   - {fileID: 11400000, guid: ad6910a1a28d88b4fa8443be1922ee49, type: 2}
   - {fileID: 11400000, guid: e13620554e3cec145bd78ea64cbfbf76, type: 2}
+  - {fileID: 11400000, guid: 75dd3d35b87c15e4ea8ea3f189e907e8, type: 2}
   painter: {fileID: 2069497690}
   fader: {fileID: 0}
   player: {fileID: 1164180864}

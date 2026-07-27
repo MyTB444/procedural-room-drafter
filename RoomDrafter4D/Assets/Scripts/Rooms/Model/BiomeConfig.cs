@@ -8,7 +8,8 @@ namespace TRV
     {
         Corridors = 0, // open water crossed by a random connected walkway network (CorridorPass)
         Halls = 1,     // one big walled inner room ("igroom") ringed by water (HallPass)
-        Open = 2,      // one fully-walkable floor field, no water (OpenFieldPass — Anubis)
+        Open = 2,      // floor field with a water shoreline + high ground (OpenFieldPass — Anubis)
+        Plain = 3,     // the plainest room: full wall ring, all-floor interior (PlainFieldPass — Lands)
     }
 
     // FloorPatch / WaterDecorPatch (the authored tile groups referenced below) live in
@@ -37,7 +38,8 @@ namespace TRV
         [field: Header("Layout")]
         [field: Tooltip("Corridors = open water crossed by a random connected network of 2-/4-wide " +
                         "walkways (Aqua). Halls = one big walled igroom ringed by water. " +
-                        "Open = one fully-walkable floor field, no water (Anubis).")]
+                        "Open = floor field with a water shoreline + high ground (Anubis). " +
+                        "Plain = full wall ring, all-floor interior (Lands).")]
         [field: SerializeField] public BiomeLayout Layout { get; private set; } = BiomeLayout.Corridors;
 
         [field: Header("Grid (cells)")]
@@ -184,6 +186,11 @@ namespace TRV
         [field: Tooltip("Room-floor pool: fills the INTERIOR of Halls igrooms (a distinct floor from " +
                         "the corridor floor). Leave empty to reuse the regular Floor pool.")]
         [field: SerializeField] public TileBase[] RoomFloorTileVariants { get; private set; }
+
+        [field: Tooltip("Path pool (Plain/Lands): the floor look of the strictly 2-wide corridors " +
+                        "linking all 4 doors (PathPass). Per-cell random pick like the floor pool. " +
+                        "Leave empty to reuse the regular Floor pool (path invisible).")]
+        [field: SerializeField] public TileBase[] PathTileVariants { get; private set; }
 
         [field: Tooltip("High-ground pool (Open/Anubis): the second floor look carved over the base " +
                         "field by HighGroundPass — the north band + its south-running corridors. " +
@@ -450,6 +457,13 @@ namespace TRV
         public TileBase HighGroundTileAt(int cellHash) =>
             HighGroundTileVariants != null && HighGroundTileVariants.Length > 0
                 ? PickVariant(HighGroundTileVariants, cellHash)
+                : FloorTileAt(cellHash);
+
+        /// <summary>Path floor tile (Plain/Lands) — picks from the path pool, or falls back to the
+        /// regular floor pool when it's empty (path invisible until tiles are assigned).</summary>
+        public TileBase PathTileAt(int cellHash) =>
+            PathTileVariants != null && PathTileVariants.Length > 0
+                ? PickVariant(PathTileVariants, cellHash)
                 : FloorTileAt(cellHash);
 
         /// <summary>Floor tile for an igroom INTERIOR cell — picks from the room-floor pool, or falls

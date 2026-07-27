@@ -133,6 +133,21 @@ namespace TRV
 
         public bool IsHighGround(int x, int y) => _highGround != null && _highGround.Contains((x, y));
 
+        /// <summary>
+        /// Cells on the walking PATH (Lands/Plain): still ordinary walkable Floor, but the painter
+        /// paves them with the biome's path tile pool instead of the base floor. Sparse: recorded by
+        /// <see cref="PathPass"/>; everything else paints as base floor.
+        /// </summary>
+        private HashSet<(int x, int y)> _path;
+
+        public void MarkPath(int x, int y)
+        {
+            _path ??= new HashSet<(int x, int y)>();
+            _path.Add((x, y));
+        }
+
+        public bool IsPath(int x, int y) => _path != null && _path.Contains((x, y));
+
         public RoomGrid(int width, int height)
         {
             Width = width;

@@ -60,7 +60,7 @@ MonoBehaviour:
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
   - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
-  <EnemiesPerRoom>k__BackingField: 2
+  <EnemiesPerRoom>k__BackingField: 0
   <MinibossPrefabs>k__BackingField: []
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
@@ -99,6 +99,25 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c195e3c647b06fc41a35cd9ea5cc4c83, type: 2}
   - {fileID: 11400000, guid: e65d4a2456bb607448aceb6c06bf9fb3, type: 2}
   <RoomFloorTileVariants>k__BackingField: []
+  <HighGroundTileVariants>k__BackingField: []
+  <FloorEdgeLeftTile>k__BackingField: {fileID: 0}
+  <FloorEdgeRightTile>k__BackingField: {fileID: 0}
+  <FloorEdgeBottomTile>k__BackingField: {fileID: 0}
+  <HighGroundEdgeBottomTile>k__BackingField: {fileID: 0}
+  <HighGroundFirstLayerLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundFirstLayerRightTile>k__BackingField: {fileID: 0}
+  <HighGroundSecondLayerLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundSecondLayerRightTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerRightRightTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerLeftLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerRightLeftTile>k__BackingField: {fileID: 0}
+  <HighGroundCornerLeftRightTile>k__BackingField: {fileID: 0}
+  <FloorEdgeCornerTile>k__BackingField: {fileID: 0}
+  <StairsPatch>k__BackingField: []
+  <HighGroundDecorPatchA>k__BackingField: []
+  <HighGroundDecorPatchB>k__BackingField: []
+  <HighGroundDecorPatchC>k__BackingField: []
+  <HighGroundEndPatchA>k__BackingField: []
   <WaterTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 19ebc817119c9bb4f839ea47a1756934, type: 2}
   <NorthWaterTile>k__BackingField: {fileID: 0}
