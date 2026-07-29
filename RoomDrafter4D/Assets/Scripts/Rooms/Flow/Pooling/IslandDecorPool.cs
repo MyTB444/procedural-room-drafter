@@ -41,7 +41,8 @@ namespace TRV
         /// REMOVES its cell from <paramref name="cells"/> when broken (the room's snapshot rides the same
         /// list, so a smashed crate stays gone on revisit). Skips/prunes collision cells. (The next room's
         /// Show releases these too.) For the Halls big-igroom filler.</summary>
-        public void Fill(GameObject prefab, IList<Vector2Int> cells, TilemapPainter painter)
+        public void Fill(GameObject prefab, IList<Vector2Int> cells, TilemapPainter painter,
+                         Vector3 worldOffset = default)
         {
             if (prefab == null || cells == null || painter == null) return;
             foreach (var cell in new List<Vector2Int>(cells)) // copy: the break callback mutates `cells`
@@ -49,7 +50,7 @@ namespace TRV
                 if (painter.HasSolidAt(cell.x, cell.y)) { cells.Remove(cell); continue; } // never on a collision tile
                 var go = Rent(prefab);
                 if (go == null) continue;
-                go.transform.position = painter.CellCenterWorld(cell.x, cell.y);
+                go.transform.position = painter.CellCenterWorld(cell.x, cell.y) + worldOffset;
                 var c = cell; // capture by value for the forget callback
                 go.GetComponent<IslandDecorPiece>().Activate(this, () => cells.Remove(c)); // breakable + persisted
                 go.SetActive(true);

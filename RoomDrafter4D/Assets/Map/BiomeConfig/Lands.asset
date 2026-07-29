@@ -120,6 +120,12 @@ MonoBehaviour:
   <HighGroundCornerLeftRightTile>k__BackingField: {fileID: 0}
   <FloorEdgeCornerTile>k__BackingField: {fileID: 0}
   <StairsPatch>k__BackingField: []
+  <VaseFloorPatch>k__BackingField:
+  - {fileID: 11400000, guid: 4ba11666f48981148aba75cd84ee8de7, type: 2}
+  - {fileID: 11400000, guid: b880d2c517ad5ee4f9289cc05eacf16b, type: 2}
+  - {fileID: 11400000, guid: 871449d69210b2848879ae86f60cbe42, type: 2}
+  - {fileID: 11400000, guid: b0e2b184d34b6f442b67969515034950, type: 2}
+  <VasePrefab>k__BackingField: {fileID: 2277051634198294532, guid: 166c7c13ea6b4104ba5fe5153cffef16, type: 3}
   <LandsDecorPatchA>k__BackingField:
   - {fileID: 11400000, guid: a61b239cf9aac554ba116b484f1735fe, type: 2}
   - {fileID: 11400000, guid: 50bc66739cc406344b8f72ef24e47ba6, type: 2}

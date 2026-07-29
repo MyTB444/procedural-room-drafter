@@ -322,6 +322,18 @@ namespace TRV
                         "the walkable ground). Empty = off.")]
         [field: SerializeField] public TileBase[] StairsPatch { get; private set; }
 
+        [field: Tooltip("Vase floor patch (Plain/Lands): a 2×2 tile group (4 tiles row-major, TOP " +
+                        "row first) painted on the Map layer as a floor look — 1–3 per room on " +
+                        "plain floor, never on paths or grass. A breakable VASE (Vase Prefab) " +
+                        "spawns at each patch's centre point. Empty = off.")]
+        [field: SerializeField] public TileBase[] VaseFloorPatch { get; private set; }
+
+        [field: Tooltip("The breakable vase spawned at the centre of each Vase Floor Patch " +
+                        "(pooled; gets an IslandDecorPiece — needs a trigger Collider2D on a layer " +
+                        "the player's hitbox hits + an Animator with a Break trigger, like other " +
+                        "island decor). Empty = patches paint without a vase.")]
+        [field: SerializeField] public GameObject VasePrefab { get; private set; }
+
         [field: Tooltip("Lands decor patch A (Plain): 2 tiles authored TOP first, BOTH painted on " +
                         "the Collision3 layer (give them collider types as needed). 2–3 per room, " +
                         "standing on plain floor CLOSE to the paths (within 2 tiles), clear of " +

@@ -34,6 +34,8 @@ namespace TRV
         public int MainUpgradeIndex = -1; // index into Biome.MainRoomUpgrades, or -1
         public int MainFillerIndex = -1;  // index into Biome.MainRoomFillers, or -1
         public List<Vector2Int> MainFillerCells; // cells still holding an unbroken filler (breaks persist)
+        public List<Vector2Int> VaseCells;       // Lands vase patches still holding an unbroken vase
+        public List<Vector2Int> GrassVaseCells;  // grass-core cells still holding an unbroken vase
     }
 
     /// <summary>One tilemap layer's tiles plus their per-cell transform matrices (parallel arrays).</summary>

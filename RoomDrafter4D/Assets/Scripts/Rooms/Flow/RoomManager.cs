@@ -67,6 +67,8 @@ namespace TRV
         private int _currentMainUpgradeIndex = -1;
         private int _currentMainFillerIndex = -1;
         private List<Vector2Int> _currentMainFillerCells; // unbroken filler cells (breaks persist via this list)
+        private List<Vector2Int> _currentVaseCells; // unbroken Lands vase patches (breaks persist via this list)
+        private List<Vector2Int> _currentGrassVaseCells; // unbroken vases scattered in grass cores
         private GameObject _mainUpgradeInstance; // the spawned upgrade pickup (destroyed on room change)
         private PlayerUpgrades _playerUpgrades;
 
@@ -140,7 +142,11 @@ namespace TRV
                 foreach (var b in biomes)
                 {
                     if (b == null) continue;
-                    if (decorPool != null) decorPool.Prewarm(b.IslandDecorObjects);
+                    if (decorPool != null)
+                    {
+                        decorPool.Prewarm(b.IslandDecorObjects);
+                        if (b.VasePrefab != null) decorPool.Prewarm(new[] { b.VasePrefab });
+                    }
                     if (enemyPool != null)
                     {
                         enemyPool.Prewarm(b.EnemyPrefabs);
@@ -184,6 +190,8 @@ namespace TRV
             snapshot.MainUpgradeIndex = _currentMainUpgradeIndex;
             snapshot.MainFillerIndex = _currentMainFillerIndex;
             snapshot.MainFillerCells = _currentMainFillerCells; // remembers which fillers are still intact
+            snapshot.VaseCells = _currentVaseCells;             // smashed Lands vases stay gone
+            snapshot.GrassVaseCells = _currentGrassVaseCells;
             _cache.Save(_coord, snapshot);
 
             _coord += exitDir.Offset();
@@ -218,6 +226,8 @@ namespace TRV
                 _currentMainUpgradeIndex = snapshot.MainUpgradeIndex;
                 _currentMainFillerIndex = snapshot.MainFillerIndex;
                 _currentMainFillerCells = snapshot.MainFillerCells; // already-broken fillers stay gone
+                _currentVaseCells = snapshot.VaseCells;             // already-smashed vases stay gone
+                _currentGrassVaseCells = snapshot.GrassVaseCells;
             }
             else
             {
@@ -229,6 +239,8 @@ namespace TRV
                 _currentMainArea = grid.MainIgroomArea;          // roll the big igroom's content (fresh only)
                 DecideMainContent(grid.MainIgroomArea, roomBiome, out _currentMainUpgradeIndex, out _currentMainFillerIndex);
                 _currentMainFillerCells = _currentMainFillerIndex >= 0 ? BuildFillerCells(_currentMainArea) : null;
+                _currentVaseCells = grid.VaseSpots; // Lands vase patches (snapshot rides the same list)
+                _currentGrassVaseCells = grid.GrassVaseSpots;
                 // An upgrade room also gets the small-igroom scatter decor (kept off the upgrade's centre).
                 if (_currentMainUpgradeIndex >= 0) _currentIslandDecor.AddRange(grid.MainIgroomDecor);
             }
@@ -241,6 +253,7 @@ namespace TRV
             // Swap the pooled objects over to this room (each releases the previous room's first).
             if (decorPool != null) decorPool.Show(_currentIslandDecor, painter, roomBiome);
             SpawnMainContent(roomBiome); // big-igroom upgrade/filler — AFTER Show (filler adds to the pool)
+            SpawnVases(roomBiome);       // Lands vase patches — AFTER Show (also adds to the pool)
             if (enemyPool != null) enemyPool.Populate(enemyPositions, roomBiome);
             if (collectablePool != null) collectablePool.ReleaseAll(); // clear any uncollected drops from the old room
 
@@ -338,6 +351,25 @@ namespace TRV
                 // the same list, so a smashed crate stays gone when the player returns to the room.
                 decorPool.Fill(prefab, _currentMainFillerCells, painter);
             }
+        }
+
+        /// <summary>Spawn the breakable VASE at the centre point of each Lands vase patch (the
+        /// recorded cells are the patches' bottom-left corners, so the centre = cell centre + half
+        /// a cell diagonally). Fill mutates the cell list on break; the snapshot rides the same
+        /// list, so a smashed vase stays gone on revisit.</summary>
+        private void SpawnVases(BiomeConfig biome)
+        {
+            if (biome == null || biome.VasePrefab == null || decorPool == null || painter == null) return;
+
+            if (_currentVaseCells != null && _currentVaseCells.Count > 0)
+            {
+                var halfDiagonal = (painter.CellCenterWorld(1, 1) - painter.CellCenterWorld(0, 0)) * 0.5f;
+                var oneCellRight = painter.CellCenterWorld(1, 0) - painter.CellCenterWorld(0, 0);
+                var offset = halfDiagonal - oneCellRight * 0.05f; // patch centre, nudged a hair LEFT
+                decorPool.Fill(biome.VasePrefab, _currentVaseCells, painter, offset);
+            }
+            if (_currentGrassVaseCells != null && _currentGrassVaseCells.Count > 0)
+                decorPool.Fill(biome.VasePrefab, _currentGrassVaseCells, painter); // grass vases sit on cell centres
         }
 
         /// <summary>A scattered HALF of the main igroom's interior cells to hold fillers (skips collision

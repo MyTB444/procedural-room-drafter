@@ -264,6 +264,7 @@ namespace TRV
             PaintStairsPatches(grid, config); // after edges: stairs win any overlap on Collision2
             PaintHighGroundDecor(grid, config);
             PaintLandsDecor(grid, config);
+            PaintVasePatches(grid, config);
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
             var floorDecor = PaintFloorDecor(grid, config);
@@ -780,9 +781,17 @@ namespace TRV
                 return false;
             }
 
+            // Vase floor patches count as NOT regular floor — decor never stands on them.
+            var vaseCells = new HashSet<(int x, int y)>();
+            foreach (var spot in grid.VaseSpots)
+                for (int dx = 0; dx <= 1; dx++)
+                    for (int dy = 0; dy <= 1; dy++)
+                        vaseCells.Add((spot.x + dx, spot.y + dy));
+
             bool PlainFloor(int cx, int cy) =>
                 grid.Get(cx, cy) == CellType.Floor && !grid.IsPath(cx, cy) &&
-                !TouchesGrass(cx, cy) && !landings.Contains((cx, cy));
+                !TouchesGrass(cx, cy) && !landings.Contains((cx, cy)) &&
+                !vaseCells.Contains((cx, cy));
 
             bool NearPath(int cx, int cy)
             {
@@ -816,6 +825,23 @@ namespace TRV
                 placedCells.Add((x, y));
                 placedCells.Add((x, y + 1));
                 target--;
+            }
+        }
+
+        /// <summary>Vase floor patches (Plain/Lands): the 2×2 tile group stamped on the Map layer
+        /// at each recorded spot (row-major, TOP row first) — a floor look; the vase object itself
+        /// is spawned by RoomManager at the patch's centre point.</summary>
+        private void PaintVasePatches(RoomGrid grid, BiomeConfig config)
+        {
+            var tiles = config.VaseFloorPatch;
+            if (tiles == null || tiles.Length < 4 || mapTilemap == null) return;
+
+            foreach (var spot in grid.VaseSpots)
+            {
+                if (tiles[0] != null) mapTilemap.SetTile(CellPos(spot.x, spot.y + 1), tiles[0]);
+                if (tiles[1] != null) mapTilemap.SetTile(CellPos(spot.x + 1, spot.y + 1), tiles[1]);
+                if (tiles[2] != null) mapTilemap.SetTile(CellPos(spot.x, spot.y), tiles[2]);
+                if (tiles[3] != null) mapTilemap.SetTile(CellPos(spot.x + 1, spot.y), tiles[3]);
             }
         }
 

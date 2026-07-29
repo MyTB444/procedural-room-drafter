@@ -174,6 +174,16 @@ namespace TRV
         /// re-reserves all patches from scratch before rerouting the paths around them.</summary>
         public void ClearGrass() => _grass?.Clear();
 
+        /// <summary>Bottom-left cell of every 2×2 VASE floor patch (Lands/Plain) — the painter
+        /// stamps the patch tiles there and RoomManager spawns a breakable vase at each patch's
+        /// centre point. Recorded by <see cref="VasePatchPass"/>.</summary>
+        public List<Vector2Int> VaseSpots { get; } = new List<Vector2Int>();
+
+        /// <summary>Cells inside grass patch CORES (full-grass) holding a scattered breakable vase
+        /// (4–6 per patch, Lands/Plain). Recorded by <see cref="VasePatchPass"/>; RoomManager
+        /// spawns them at the cell centres.</summary>
+        public List<Vector2Int> GrassVaseSpots { get; } = new List<Vector2Int>();
+
         public RoomGrid(int width, int height)
         {
             Width = width;
