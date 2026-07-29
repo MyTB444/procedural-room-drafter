@@ -148,6 +148,10 @@ namespace TRV
 
         public bool IsPath(int x, int y) => _path != null && _path.Contains((x, y));
 
+        /// <summary>Wipe every path flag — used by <see cref="GrassPass"/>'s last resort, which
+        /// reroutes the paths when they leave no room for a grass patch.</summary>
+        public void ClearPaths() => _path?.Clear();
+
         /// <summary>
         /// Grass gradient levels (Lands/Plain): 4 = full grass, 3 = half, 2 = very few, 1 = the
         /// no-grass ring closing the gradient; unrecorded = the plain floor. Sparse: recorded by
@@ -165,6 +169,10 @@ namespace TRV
 
         public int GrassLevelAt(int x, int y) =>
             _grass != null && _grass.TryGetValue((x, y), out int level) ? level : 0;
+
+        /// <summary>Wipe every grass level — used by <see cref="GrassPass"/>'s full reshape, which
+        /// re-reserves all patches from scratch before rerouting the paths around them.</summary>
+        public void ClearGrass() => _grass?.Clear();
 
         public RoomGrid(int width, int height)
         {

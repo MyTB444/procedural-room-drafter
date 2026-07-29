@@ -120,6 +120,9 @@ MonoBehaviour:
   <HighGroundCornerLeftRightTile>k__BackingField: {fileID: 0}
   <FloorEdgeCornerTile>k__BackingField: {fileID: 0}
   <StairsPatch>k__BackingField: []
+  <LandsDecorPatchA>k__BackingField:
+  - {fileID: 11400000, guid: a61b239cf9aac554ba116b484f1735fe, type: 2}
+  - {fileID: 11400000, guid: 50bc66739cc406344b8f72ef24e47ba6, type: 2}
   <HighGroundDecorPatchA>k__BackingField: []
   <HighGroundDecorPatchB>k__BackingField: []
   <HighGroundDecorPatchC>k__BackingField: []

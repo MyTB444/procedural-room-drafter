@@ -263,6 +263,7 @@ namespace TRV
             PaintFloorEdges(grid, config);
             PaintStairsPatches(grid, config); // after edges: stairs win any overlap on Collision2
             PaintHighGroundDecor(grid, config);
+            PaintLandsDecor(grid, config);
             PaintFloorPatches(grid, config);
             PaintWaterDecor(grid, config);
             var floorDecor = PaintFloorDecor(grid, config);
@@ -734,6 +735,86 @@ namespace TRV
                         if (tile != null) collision5Tilemap.SetTile(CellPos(x, y), tile);
                         occupied.Add((x, y));
                     }
+                target--;
+            }
+        }
+
+        /// <summary>How many Lands decor patches a room aims for (random in range, capped by spots).</summary>
+        private const int MinLandsDecor = 2;
+        private const int MaxLandsDecor = 3;
+
+        /// <summary>
+        /// Lands decor (Plain): a 2-tall authored patch, BOTH tiles on the Collision3 layer, placed
+        /// 2–3 times per room on plain floor CLOSE to the paths (bottom cell within 2 tiles of a
+        /// path, never on one) — decorating the walkway sides. Both cells must be plain grass-free
+        /// floor, clear of door landings, and placements keep 2 apart. Deterministic
+        /// (VariantSeed-seeded rng, decoupled from the other decor passes) and cache-stable.
+        /// </summary>
+        private void PaintLandsDecor(RoomGrid grid, BiomeConfig config)
+        {
+            var tiles = config.LandsDecorPatchA;
+            if (tiles == null || tiles.Length < 2 || collision3Tilemap == null) return;
+            if (config.Layout != BiomeLayout.Plain) return;
+
+            // Door landings — the solid decor must never block a doorway approach.
+            var landings = new HashSet<(int x, int y)>();
+            int t = config.WallThickness;
+            for (int x = 0; x < grid.Width; x++)
+                for (int y = 0; y < grid.Height; y++)
+                {
+                    if (grid[x, y] != CellType.Door) continue;
+                    int ix = x < t ? 1 : x >= grid.Width - t ? -1 : 0; // inward step
+                    int iy = y < t ? 1 : y >= grid.Height - t ? -1 : 0;
+                    for (int k = 1; k <= config.LandingDepth; k++)
+                        landings.Add((x + ix * k, y + iy * k));
+                }
+
+            // A grass-adjacent cell is the patch's EDGE (where the GrassEdge tiles paint) — decor
+            // never stands there, so the gradient's rim always stays visible.
+            bool TouchesGrass(int cx, int cy)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dy = -1; dy <= 1; dy++)
+                        if (grid.GrassLevelAt(cx + dx, cy + dy) > 0)
+                            return true;
+                return false;
+            }
+
+            bool PlainFloor(int cx, int cy) =>
+                grid.Get(cx, cy) == CellType.Floor && !grid.IsPath(cx, cy) &&
+                !TouchesGrass(cx, cy) && !landings.Contains((cx, cy));
+
+            bool NearPath(int cx, int cy)
+            {
+                for (int dx = -2; dx <= 2; dx++)
+                    for (int dy = -2; dy <= 2; dy++)
+                        if (grid.IsPath(cx + dx, cy + dy))
+                            return true;
+                return false;
+            }
+
+            var candidates = new List<(int x, int y)>(); // the patch's BOTTOM cell
+            for (int x = t; x < grid.Width - t; x++)
+                for (int y = t; y < grid.Height - t - 1; y++)
+                    if (PlainFloor(x, y) && PlainFloor(x, y + 1) && NearPath(x, y))
+                        candidates.Add((x, y));
+
+            var rng = new System.Random(unchecked(grid.VariantSeed * 71 + 13)); // decoupled from the other passes
+            rng.Shuffle(candidates);
+            int target = rng.Next(MinLandsDecor, MaxLandsDecor + 1);
+            var placedCells = new List<(int x, int y)>();
+            foreach (var (x, y) in candidates)
+            {
+                if (target == 0) break;
+                bool clear = true;
+                foreach (var p in placedCells)
+                    if (System.Math.Max(System.Math.Abs(p.x - x), System.Math.Abs(p.y - y)) < 3) { clear = false; break; }
+                if (!clear) continue;
+
+                collision3Tilemap.SetTile(CellPos(x, y), tiles[1]);     // bottom (authored TOP first)
+                collision3Tilemap.SetTile(CellPos(x, y + 1), tiles[0]); // top
+                placedCells.Add((x, y));
+                placedCells.Add((x, y + 1));
                 target--;
             }
         }

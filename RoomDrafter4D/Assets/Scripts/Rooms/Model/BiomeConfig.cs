@@ -322,6 +322,12 @@ namespace TRV
                         "the walkable ground). Empty = off.")]
         [field: SerializeField] public TileBase[] StairsPatch { get; private set; }
 
+        [field: Tooltip("Lands decor patch A (Plain): 2 tiles authored TOP first, BOTH painted on " +
+                        "the Collision3 layer (give them collider types as needed). 2–3 per room, " +
+                        "standing on plain floor CLOSE to the paths (within 2 tiles), clear of " +
+                        "door landings. Empty = off.")]
+        [field: SerializeField] public TileBase[] LandsDecorPatchA { get; private set; }
+
         [field: Tooltip("High-ground decor patch A (Open/Anubis): 2 tiles authored TOP first. The " +
                         "BOTTOM tile paints on the Collision5 layer (a solid base — give it a " +
                         "collider type), the top one on the ExtrasFrontOfPlayer layer. Scattered " +
