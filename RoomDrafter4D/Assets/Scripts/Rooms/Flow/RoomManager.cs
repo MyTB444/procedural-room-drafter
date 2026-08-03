@@ -50,8 +50,18 @@ namespace TRV
         public static RoomManager Instance =>
             _instance != null ? _instance : (_instance = FindFirstObjectByType<RoomManager>());
 
+        [Tooltip("The room-draft UI opened when the player steps on a door. Optional — auto-found " +
+                 "from the scene; when none exists, doors transition immediately (old behaviour).")]
+        [SerializeField] private RoomDraftUI draftUI;
+
         private Vector2Int _coord;
         private bool _transitioning;
+        private bool _drafting;        // the draft UI is open, waiting for a choice
+        private bool _draftSuppressed; // player cancelled — no new draft until they step OFF the door
+        private bool _warnedNoDraftUI; // one-shot setup warning
+        private Vector3 _pendingDoorPos;
+        private PlayerInventory _inventory; // lazily found — for the any-keys draft gate
+        private RoomMapUI _mapUI;           // lazily found — toggled with the M key
 
         private BiomeConfig _nextBiome;     // chosen by the player for the next NEW room
         private BiomeConfig _currentBiome;  // biome of the room currently shown
@@ -128,14 +138,9 @@ namespace TRV
 
             // Default biome for the start room + initial selection: Lands (Plain) when present,
             // else the list's first entry.
-            _nextBiome = null;
-            if (biomes != null)
-            {
-                foreach (var b in biomes)
-                    if (b != null && b.Layout == BiomeLayout.Plain) { _nextBiome = b; break; }
-                if (_nextBiome == null && biomes.Length > 0) _nextBiome = biomes[0];
-            }
+            _nextBiome = DefaultBiome();
             _currentBiome = _nextBiome;
+            if (draftUI == null) draftUI = FindFirstObjectByType<RoomDraftUI>(FindObjectsInactive.Include);
         }
 
         private void Start()
@@ -163,10 +168,22 @@ namespace TRV
 
         }
 
-        /// <summary>Called by a <see cref="DoorPortal"/> when the player steps onto a door tile.</summary>
+        private void Update()
+        {
+            // M toggles the room map — polled HERE (always active) so it works no matter where
+            // the map component lives in the UI hierarchy, active or not.
+            var keyboard = UnityEngine.InputSystem.Keyboard.current;
+            if (keyboard == null || !keyboard.mKey.wasPressedThisFrame) return;
+            if (_mapUI == null) _mapUI = FindFirstObjectByType<RoomMapUI>(FindObjectsInactive.Include);
+            if (_mapUI != null) _mapUI.Toggle();
+        }
+
+        /// <summary>Called by a <see cref="DoorPortal"/> while the player stands on a door tile.
+        /// Opens the room-draft UI (controls frozen) instead of transitioning immediately; the UI
+        /// then calls <see cref="ConfirmDraft"/> or <see cref="CancelDraft"/>.</summary>
         public void OnPlayerEnteredDoor(Vector3 playerWorldPos)
         {
-            if (_transitioning) return;
+            if (_transitioning || _drafting || _draftSuppressed) return;
 
             // Doors are locked until the room is cleared of enemies.
             if (enemyPool != null && enemyPool.ActiveCount > 0) return;
@@ -180,7 +197,125 @@ namespace TRV
 
             // Classify by nearest edge, not position-vs-centre — doors can be anywhere on an edge,
             // and a door cell is always nearest its own edge.
-            StartCoroutine(Transition(painter.NearestEdgeWorld(playerWorldPos, _currentBiome.Width, _currentBiome.Height)));
+            var exitDir = painter.NearestEdgeWorld(playerWorldPos, _currentBiome.Width, _currentBiome.Height);
+
+            // Already drafted — a room exists on the other side (cached, keeps its biome): nothing
+            // to choose, just walk through.
+            if (_cache.TryGet(_coord + exitDir.Offset(), out _))
+            {
+                StartCoroutine(Transition(exitDir));
+                return;
+            }
+
+            // No keys at all — nothing to choose either: straight into the default room.
+            if (!HasAnyKeys())
+            {
+                _nextBiome = DefaultBiome();
+                StartCoroutine(Transition(exitDir));
+                return;
+            }
+
+            if (draftUI == null) // late lookup — the UI may live on an initially inactive object
+                draftUI = FindFirstObjectByType<RoomDraftUI>(FindObjectsInactive.Include);
+            if (draftUI != null)
+            {
+                _drafting = true;
+                _pendingDoorPos = playerWorldPos;
+                draftUI.Open();
+                return;
+            }
+
+            // No draft UI in the scene — old behaviour: transition right away with _nextBiome.
+            if (!_warnedNoDraftUI)
+            {
+                _warnedNoDraftUI = true;
+                Debug.LogWarning($"[{nameof(RoomManager)}] No RoomDraftUI found — doors transition " +
+                                 "immediately. Add a RoomDraftUI to the scene for room drafting.", this);
+            }
+            StartCoroutine(Transition(exitDir));
+        }
+
+        /// <summary>Called by <see cref="DoorPortal"/> when the player steps OFF a door tile —
+        /// re-arms the draft UI after a cancel.</summary>
+        public void OnPlayerLeftDoor() => _draftSuppressed = false;
+
+        /// <summary>The draft UI was cancelled: nothing happens until the player leaves the door
+        /// trigger and re-enters it.</summary>
+        public void CancelDraft()
+        {
+            if (!_drafting) return;
+            _drafting = false;
+            _draftSuppressed = true;
+        }
+
+        /// <summary>The draft UI confirmed a choice: transition through the pending door into
+        /// <paramref name="biome"/> (null = the default biome, i.e. the Skip button).</summary>
+        public void ConfirmDraft(BiomeConfig biome)
+        {
+            if (!_drafting) return;
+            _drafting = false;
+            _nextBiome = biome != null ? biome : DefaultBiome();
+            // Classify by nearest edge, not position-vs-centre — doors can be anywhere on an edge,
+            // and a door cell is always nearest its own edge.
+            StartCoroutine(Transition(painter.NearestEdgeWorld(_pendingDoorPos, _currentBiome.Width, _currentBiome.Height)));
+        }
+
+        /// <summary>The biome of the room at <paramref name="coord"/> if it exists (drafted or
+        /// visited) — the CURRENT room included. False = nothing drafted there yet. For the map UI.</summary>
+        public bool TryGetRoomBiome(Vector2Int coord, out BiomeConfig biome)
+        {
+            if (coord == _coord)
+            {
+                biome = _currentBiome;
+                return biome != null;
+            }
+            if (_cache.TryGet(coord, out var snapshot) && snapshot.Biome != null)
+            {
+                biome = snapshot.Biome;
+                return true;
+            }
+            biome = null;
+            return false;
+        }
+
+        /// <summary>The biome a key colour drafts: blue → Aqua, purple → Halls, red → Anubis.
+        /// Null when that biome isn't in <see cref="Biomes"/>.</summary>
+        public BiomeConfig BiomeForKey(KeyType key) => key switch
+        {
+            KeyType.Blue => FindBiome(BiomeLayout.Corridors),
+            KeyType.Purple => FindBiome(BiomeLayout.Halls),
+            _ => FindBiome(BiomeLayout.Open),
+        };
+
+        private BiomeConfig FindBiome(BiomeLayout layout)
+        {
+            if (biomes == null) return null;
+            foreach (var b in biomes)
+                if (b != null && b.Layout == layout) return b;
+            return null;
+        }
+
+        /// <summary>True when the player holds at least one key of ANY colour — with none, doors
+        /// skip the draft UI and lead straight to the default room.</summary>
+        private bool HasAnyKeys()
+        {
+            if (_inventory == null) _inventory = FindFirstObjectByType<PlayerInventory>(FindObjectsInactive.Include);
+            if (_inventory == null) return false;
+            foreach (KeyType type in System.Enum.GetValues(typeof(KeyType)))
+                if (_inventory.Keys(type) > 0) return true;
+            return false;
+        }
+
+        /// <summary>The default (Skip / start) biome: Lands (Plain) when present, else the list's
+        /// first entry.</summary>
+        private BiomeConfig DefaultBiome()
+        {
+            var lands = FindBiome(BiomeLayout.Plain);
+            if (lands != null) return lands;
+            if (biomes != null)
+                foreach (var b in biomes)
+                    if (b != null) return b;
+            return null;
         }
 
         private IEnumerator Transition(Cardinal exitDir)

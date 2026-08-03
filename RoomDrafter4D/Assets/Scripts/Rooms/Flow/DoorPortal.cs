@@ -26,5 +26,12 @@ namespace TRV
             if (other.GetComponentInParent<TRVController>() == null) return; // players only
             roomManager.OnPlayerEnteredDoor(other.transform.position);
         }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (roomManager == null) return;
+            if (other.GetComponentInParent<TRVController>() == null) return; // players only
+            roomManager.OnPlayerLeftDoor(); // re-arms the draft UI after a cancel
+        }
     }
 }

@@ -108,5 +108,5 @@ MonoBehaviour:
   flySpeed: 2
   flyAcceleration: 10
   collectRadius: 0.4
-  type: 1
+  type: 2
   keys: 1
