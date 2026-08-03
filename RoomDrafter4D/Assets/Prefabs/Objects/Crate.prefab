@@ -196,4 +196,6 @@ MonoBehaviour:
   drops:
   - Prefab: {fileID: 3143547847192703935, guid: e42826508708a214e9a0099d722b0102, type: 3}
     Chance: 0.3
+  - Prefab: {fileID: 3143547847192703935, guid: e42826508708a214e9a0099d722b0102, type: 3}
+    Chance: 0.3
   scatterRadius: 0.25

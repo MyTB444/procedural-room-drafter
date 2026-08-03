@@ -126,8 +126,15 @@ namespace TRV
             if (randomizeWorldSeed)
                 worldSeed = System.Guid.NewGuid().GetHashCode();
 
-            // Default biome for the start room + initial selection.
-            _nextBiome = (biomes != null && biomes.Length > 0) ? biomes[0] : null;
+            // Default biome for the start room + initial selection: Lands (Plain) when present,
+            // else the list's first entry.
+            _nextBiome = null;
+            if (biomes != null)
+            {
+                foreach (var b in biomes)
+                    if (b != null && b.Layout == BiomeLayout.Plain) { _nextBiome = b; break; }
+                if (_nextBiome == null && biomes.Length > 0) _nextBiome = biomes[0];
+            }
             _currentBiome = _nextBiome;
         }
 

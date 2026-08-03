@@ -47,8 +47,7 @@ MonoBehaviour:
   - {fileID: 3605506087530754047, guid: 6a41c3751bea2864db6e80615899d38a, type: 3}
   - {fileID: 6451831146403502824, guid: ec40f6238de44c54c89d338f2eff5500, type: 3}
   <MainRoomFillers>k__BackingField:
-  - {fileID: 8161980004430131537, guid: 1515b6e95fb9d10459e11abf13d71939, type: 3}
-  - {fileID: 2277051634198294532, guid: 166c7c13ea6b4104ba5fe5153cffef16, type: 3}
+  - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
   <MinWaterForIsland>k__BackingField: 0
   <FloorPatches>k__BackingField: []
   <FloorPatchCoverage>k__BackingField: 0.9
@@ -62,6 +61,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c1bf9b1a85ccef245b676439f6333cb7, type: 2}
   - {fileID: 11400000, guid: 7a692f4f18873804f8c20fa144ba6b61, type: 2}
   - {fileID: 11400000, guid: 44be99da999997946b8b8e57881c4350, type: 2}
+  <PathTileVariants>k__BackingField: []
+  <GrassFullTileVariants>k__BackingField: []
+  <GrassHalfTileVariants>k__BackingField: []
+  <GrassFewTileVariants>k__BackingField: []
+  <GrassNoneTileVariants>k__BackingField: []
+  <GrassEdgeNorthTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthTile>k__BackingField: {fileID: 0}
+  <GrassEdgeEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeWestTile>k__BackingField: {fileID: 0}
+  <GrassEdgeNorthEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeNorthWestTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthWestTile>k__BackingField: {fileID: 0}
   <HighGroundTileVariants>k__BackingField: []
   <FloorEdgeLeftTile>k__BackingField: {fileID: 0}
   <FloorEdgeRightTile>k__BackingField: {fileID: 0}
@@ -77,6 +89,9 @@ MonoBehaviour:
   <HighGroundCornerLeftRightTile>k__BackingField: {fileID: 0}
   <FloorEdgeCornerTile>k__BackingField: {fileID: 0}
   <StairsPatch>k__BackingField: []
+  <VaseFloorPatch>k__BackingField: []
+  <VasePrefab>k__BackingField: {fileID: 0}
+  <LandsDecorPatchA>k__BackingField: []
   <HighGroundDecorPatchA>k__BackingField: []
   <HighGroundDecorPatchB>k__BackingField: []
   <HighGroundDecorPatchC>k__BackingField: []

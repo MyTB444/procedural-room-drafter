@@ -65,10 +65,8 @@ MonoBehaviour:
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
-  - Prefab: {fileID: 2277051634198294532, guid: 166c7c13ea6b4104ba5fe5153cffef16, type: 3}
-    Chance: 0.4
   - Prefab: {fileID: 8161980004430131537, guid: 1515b6e95fb9d10459e11abf13d71939, type: 3}
-    Chance: 0.6
+    Chance: 0.4
   <IslandDecorMinPerIsland>k__BackingField: 4
   <IslandDecorMaxPerIsland>k__BackingField: 5
   <MainRoomUpgrades>k__BackingField: []
@@ -99,6 +97,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c195e3c647b06fc41a35cd9ea5cc4c83, type: 2}
   - {fileID: 11400000, guid: e65d4a2456bb607448aceb6c06bf9fb3, type: 2}
   <RoomFloorTileVariants>k__BackingField: []
+  <PathTileVariants>k__BackingField: []
+  <GrassFullTileVariants>k__BackingField: []
+  <GrassHalfTileVariants>k__BackingField: []
+  <GrassFewTileVariants>k__BackingField: []
+  <GrassNoneTileVariants>k__BackingField: []
+  <GrassEdgeNorthTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthTile>k__BackingField: {fileID: 0}
+  <GrassEdgeEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeWestTile>k__BackingField: {fileID: 0}
+  <GrassEdgeNorthEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeNorthWestTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthWestTile>k__BackingField: {fileID: 0}
   <HighGroundTileVariants>k__BackingField: []
   <FloorEdgeLeftTile>k__BackingField: {fileID: 0}
   <FloorEdgeRightTile>k__BackingField: {fileID: 0}
@@ -114,6 +125,9 @@ MonoBehaviour:
   <HighGroundCornerLeftRightTile>k__BackingField: {fileID: 0}
   <FloorEdgeCornerTile>k__BackingField: {fileID: 0}
   <StairsPatch>k__BackingField: []
+  <VaseFloorPatch>k__BackingField: []
+  <VasePrefab>k__BackingField: {fileID: 0}
+  <LandsDecorPatchA>k__BackingField: []
   <HighGroundDecorPatchA>k__BackingField: []
   <HighGroundDecorPatchB>k__BackingField: []
   <HighGroundDecorPatchC>k__BackingField: []
