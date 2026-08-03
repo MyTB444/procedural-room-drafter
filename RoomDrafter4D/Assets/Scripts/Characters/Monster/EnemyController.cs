@@ -309,8 +309,10 @@ namespace TRV
             _velocity = Vector2.zero;
         }
 
-        /// <summary>Play the attack animation and land the hitbox — fired after the windup.</summary>
-        private void FireAttack(Vector2 dir)
+        /// <summary>Play the attack animation and land the hit (<see cref="OnAttack"/>) — fired
+        /// after the windup; also callable by subclasses that time their own shot (e.g. BigHead
+        /// fires the moment its flee ends).</summary>
+        protected void FireAttack(Vector2 dir)
         {
             AttackPerformed?.Invoke();
             OnAttack(dir);
