@@ -14,7 +14,7 @@ namespace TRV
 
         /// <summary>The scene's collectable pool (fake-null re-finds it after a reload). Null if none.</summary>
         public static CollectablePool Instance =>
-            _instance != null ? _instance : (_instance = FindFirstObjectByType<CollectablePool>());
+            _instance != null ? _instance : (_instance = FindAnyObjectByType<CollectablePool>());
 
         /// <summary>Rent a pooled <paramref name="prefab"/> and drop it at <paramref name="position"/>.</summary>
         public void Spawn(GameObject prefab, Vector3 position)

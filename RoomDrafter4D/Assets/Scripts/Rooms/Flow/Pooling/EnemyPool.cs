@@ -16,7 +16,7 @@ namespace TRV
         /// <summary>The scene's enemy pool (fake-null re-finds it after a reload). Null if none —
         /// lets non-room code (e.g. the player) ask whether the room still has enemies.</summary>
         public static EnemyPool Instance =>
-            _instance != null ? _instance : (_instance = FindFirstObjectByType<EnemyPool>());
+            _instance != null ? _instance : (_instance = FindAnyObjectByType<EnemyPool>());
 
         /// <summary>True when the room still has live enemies (a dying enemy counts until its fade ends).</summary>
         public static bool RoomHasEnemies => Instance != null && Instance.ActiveCount > 0;

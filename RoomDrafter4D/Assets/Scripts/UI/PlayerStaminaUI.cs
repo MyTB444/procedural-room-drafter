@@ -24,7 +24,7 @@ namespace TRV
 
         private void Awake()
         {
-            if (player == null) player = FindFirstObjectByType<TRVController>();
+            if (player == null) player = FindAnyObjectByType<TRVController>();
         }
 
         private void Update()

@@ -15,7 +15,7 @@ namespace TRV
         public static TRVController Player
         {
             // Unity's fake-null makes this re-find after a destroyed/reloaded player too.
-            get => _player != null ? _player : (_player = Object.FindFirstObjectByType<TRVController>());
+            get => _player != null ? _player : (_player = Object.FindAnyObjectByType<TRVController>());
         }
 
         /// <summary>The player's position, when a LIVING player exists.</summary>

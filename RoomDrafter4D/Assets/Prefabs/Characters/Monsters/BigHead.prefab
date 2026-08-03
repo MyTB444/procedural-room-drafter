@@ -244,7 +244,7 @@ MonoBehaviour:
   attackHitbox: {fileID: 0}
   deathFadeDuration: 0.5
   fleeSpeed: 6
-  safeDistance: 6
+  safeDistance: 5
   maxFleeSeconds: 3
   stuckFireSeconds: 0.35
   holdSeconds: 1
@@ -252,3 +252,4 @@ MonoBehaviour:
   wanderTurnSeconds: 0.8
   bulletPrefab: {fileID: 7251879486380165639, guid: c2f6a8962aac3814aa56cb9647c93470, type: 3}
   muzzle: {fileID: 0}
+  throwDelay: 0.15

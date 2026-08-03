@@ -33,7 +33,7 @@ namespace TRV
 
         private void Awake()
         {
-            if (player == null) player = FindFirstObjectByType<TRVController>();
+            if (player == null) player = FindAnyObjectByType<TRVController>();
             if (player != null) _health = player.GetComponent<Health>();
 
             // Clean slate; the menu is opened in Start (after every Awake has run).

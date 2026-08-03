@@ -48,7 +48,7 @@ namespace TRV
 
         /// <summary>The scene's room manager (fake-null re-finds it after a reload).</summary>
         public static RoomManager Instance =>
-            _instance != null ? _instance : (_instance = FindFirstObjectByType<RoomManager>());
+            _instance != null ? _instance : (_instance = FindAnyObjectByType<RoomManager>());
 
         [Tooltip("The room-draft UI opened when the player steps on a door. Optional — auto-found " +
                  "from the scene; when none exists, doors transition immediately (old behaviour).")]
@@ -121,12 +121,12 @@ namespace TRV
             // Be forgiving about wiring: the painter usually lives on the same object, and there's
             // one player in the scene. Biomes still have to be assigned explicitly.
             if (painter == null) painter = GetComponent<TilemapPainter>();
-            if (decorPool == null) decorPool = FindFirstObjectByType<IslandDecorPool>();
-            if (enemyPool == null) enemyPool = FindFirstObjectByType<EnemyPool>();
-            if (collectablePool == null) collectablePool = FindFirstObjectByType<CollectablePool>();
+            if (decorPool == null) decorPool = FindAnyObjectByType<IslandDecorPool>();
+            if (enemyPool == null) enemyPool = FindAnyObjectByType<EnemyPool>();
+            if (collectablePool == null) collectablePool = FindAnyObjectByType<CollectablePool>();
             if (player == null)
             {
-                var found = FindFirstObjectByType<TRVController>();
+                var found = FindAnyObjectByType<TRVController>();
                 if (found != null) player = found.transform;
             }
 
@@ -140,7 +140,7 @@ namespace TRV
             // else the list's first entry.
             _nextBiome = DefaultBiome();
             _currentBiome = _nextBiome;
-            if (draftUI == null) draftUI = FindFirstObjectByType<RoomDraftUI>(FindObjectsInactive.Include);
+            if (draftUI == null) draftUI = FindAnyObjectByType<RoomDraftUI>(FindObjectsInactive.Include);
         }
 
         private void Start()
@@ -174,7 +174,7 @@ namespace TRV
             // the map component lives in the UI hierarchy, active or not.
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
             if (keyboard == null || !keyboard.mKey.wasPressedThisFrame) return;
-            if (_mapUI == null) _mapUI = FindFirstObjectByType<RoomMapUI>(FindObjectsInactive.Include);
+            if (_mapUI == null) _mapUI = FindAnyObjectByType<RoomMapUI>(FindObjectsInactive.Include);
             if (_mapUI != null) _mapUI.Toggle();
         }
 
@@ -216,7 +216,7 @@ namespace TRV
             }
 
             if (draftUI == null) // late lookup — the UI may live on an initially inactive object
-                draftUI = FindFirstObjectByType<RoomDraftUI>(FindObjectsInactive.Include);
+                draftUI = FindAnyObjectByType<RoomDraftUI>(FindObjectsInactive.Include);
             if (draftUI != null)
             {
                 _drafting = true;
@@ -299,7 +299,7 @@ namespace TRV
         /// skip the draft UI and lead straight to the default room.</summary>
         private bool HasAnyKeys()
         {
-            if (_inventory == null) _inventory = FindFirstObjectByType<PlayerInventory>(FindObjectsInactive.Include);
+            if (_inventory == null) _inventory = FindAnyObjectByType<PlayerInventory>(FindObjectsInactive.Include);
             if (_inventory == null) return false;
             foreach (KeyType type in System.Enum.GetValues(typeof(KeyType)))
                 if (_inventory.Keys(type) > 0) return true;

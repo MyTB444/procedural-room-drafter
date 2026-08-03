@@ -59,9 +59,9 @@ namespace TRV
             if (_initialized) return;
             _initialized = true;
 
-            if (roomManager == null) roomManager = FindFirstObjectByType<RoomManager>(FindObjectsInactive.Include);
-            if (inventory == null) inventory = FindFirstObjectByType<PlayerInventory>(FindObjectsInactive.Include);
-            if (player == null) player = FindFirstObjectByType<TRVController>(FindObjectsInactive.Include);
+            if (roomManager == null) roomManager = FindAnyObjectByType<RoomManager>(FindObjectsInactive.Include);
+            if (inventory == null) inventory = FindAnyObjectByType<PlayerInventory>(FindObjectsInactive.Include);
+            if (player == null) player = FindAnyObjectByType<TRVController>(FindObjectsInactive.Include);
 
             // Unassigned count texts self-heal: use the TMP text found under each key parent.
             if (redCountText == null && redRoot != null) redCountText = redRoot.GetComponentInChildren<TMP_Text>(true);

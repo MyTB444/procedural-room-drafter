@@ -28,7 +28,7 @@ namespace TRV
         {
             if (health == null)
             {
-                var player = FindFirstObjectByType<TRVController>();
+                var player = FindAnyObjectByType<TRVController>();
                 if (player != null) health = player.GetComponent<Health>();
             }
         }

@@ -74,6 +74,10 @@ namespace TRV
         /// <summary>8-way direction of the most recent attack, aimed at the cursor (independent of movement).</summary>
         public CharacterDirection AttackDirection { get; private set; } = CharacterDirection.South;
 
+        /// <summary>LIVE normalized direction from the player toward the cursor — where an attack
+        /// pressed right now would aim (before the 8-way snap). For aim UI (e.g. the pointer).</summary>
+        public Vector2 AimDirection => GetAimDirection().normalized;
+
         /// <summary>Fraction of the attack cooldown still remaining (1 = just attacked, 0 = ready to swing).
         /// Reflects the CURRENT cooldown length, so it stays accurate if an effect changes it — for UI.</summary>
         public float AttackCooldownRemaining01 => _attackCooldown.Remaining01;

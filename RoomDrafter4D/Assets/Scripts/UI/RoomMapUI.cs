@@ -62,7 +62,7 @@ namespace TRV
         {
             if (_initialized) return;
             _initialized = true;
-            if (roomManager == null) roomManager = FindFirstObjectByType<RoomManager>(FindObjectsInactive.Include);
+            if (roomManager == null) roomManager = FindAnyObjectByType<RoomManager>(FindObjectsInactive.Include);
             if (viewRoot == null && gridParent != null) viewRoot = gridParent.gameObject;
             BuildCells();
             if (viewRoot != null) viewRoot.SetActive(false); // hidden until M is pressed

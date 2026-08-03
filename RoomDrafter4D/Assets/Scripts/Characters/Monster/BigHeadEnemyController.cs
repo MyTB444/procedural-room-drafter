@@ -57,17 +57,23 @@ namespace TRV
         [Tooltip("Where the bullet spawns. Empty = this transform.")]
         [SerializeField] private Transform muzzle;
 
+        [Tooltip("The projectile APPEARS at the muzzle first and is thrown this many seconds " +
+                 "later (0 = thrown instantly).")]
+        [SerializeField, Min(0f)] private float throwDelay = 0.15f;
+
         private Phase _phase;
         private float _phaseLeft;
         private float _turnLeft;
-        private Vector2 _wanderDir;
+        private Vector2 _roamDir;
         private Vector2 _lastPosition;
         private float _stuckTime;
+        private GameObject _heldBullet; // spawned but not yet thrown (throwDelay pending)
 
         protected override void OnInitialize()
         {
             base.OnInitialize();
             _phase = Phase.None; // pooled respawn: back to the normal FSM
+            _heldBullet = null;
         }
 
         /// <summary>The whole attack = the flee → fire → hold → wander cycle, driven by
@@ -148,8 +154,8 @@ namespace TRV
                     }
                     _turnLeft -= dt;
                     if (_turnLeft <= 0f) RollWanderDir();
-                    velocity = _wanderDir * Stats.MoveSpeed; // world limit blocks/slides at the border
-                    FacingDirection = _wanderDir;
+                    velocity = _roamDir * Stats.MoveSpeed; // world limit blocks/slides at the border
+                    FacingDirection = _roamDir;
                     return true;
                 }
             }
@@ -173,21 +179,63 @@ namespace TRV
             _phaseLeft = holdSeconds;
         }
 
-        /// <summary>The attack = the bullet (no melee hitbox).</summary>
+        /// <summary>The attack = the bullet (no melee hitbox). The projectile is SPAWNED at the
+        /// muzzle immediately (visible, sitting still) and thrown <see cref="throwDelay"/> seconds
+        /// later.</summary>
         protected override void OnAttack(Vector2 dir)
         {
             if (bulletPrefab == null) return;
             var origin = muzzle != null ? muzzle.position : transform.position;
             var bullet = Instantiate(bulletPrefab, origin, Quaternion.identity);
+            if (throwDelay <= 0f)
+            {
+                Throw(bullet, dir);
+                return;
+            }
+            _heldBullet = bullet;
+            StartCoroutine(ThrowAfterDelay(bullet, dir));
+        }
+
+        private System.Collections.IEnumerator ThrowAfterDelay(GameObject bullet, Vector2 dir)
+        {
+            yield return new WaitForSeconds(throwDelay);
+            if (bullet == null) yield break; // destroyed while held (e.g. the thrower died)
+            _heldBullet = null;
+            Throw(bullet, dir);
+        }
+
+        /// <summary>Launch the bullet at the player's position AT THROW TIME (re-aimed from the
+        /// bullet's spot, so the delay can't make it fly at a stale position); the attack's
+        /// original direction is only a fallback for a missing player.</summary>
+        private void Throw(GameObject bullet, Vector2 fallbackDir)
+        {
+            Vector2 dir = fallbackDir;
+            if (PlayerLocator.TryGetPosition(out var playerPos))
+            {
+                Vector2 toPlayer = playerPos - (Vector2)bullet.transform.position;
+                if (toPlayer.sqrMagnitude > 0.0001f) dir = toPlayer.normalized;
+            }
             if (bullet.TryGetComponent<IProjectile>(out var projectile))
                 projectile.Launch(dir, gameObject);
+        }
+
+        /// <summary>A bullet still sitting at the muzzle dies with its thrower (an unlaunched
+        /// bullet never flies or expires, so it would linger forever).</summary>
+        protected override void Die()
+        {
+            if (_heldBullet != null)
+            {
+                Destroy(_heldBullet);
+                _heldBullet = null;
+            }
+            base.Die();
         }
 
         private void RollWanderDir()
         {
             _turnLeft = wanderTurnSeconds;
             float angle = Random.Range(0f, Mathf.PI * 2f);
-            _wanderDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+            _roamDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
         }
     }
 }

@@ -33,7 +33,7 @@ namespace TRV
 
         private void Awake()
         {
-            if (inventory == null) inventory = FindFirstObjectByType<PlayerInventory>();
+            if (inventory == null) inventory = FindAnyObjectByType<PlayerInventory>();
             if (root == null) root = gameObject;
             if (inventory != null) inventory.KeysChanged += OnKeysChanged;
             Refresh(inventory != null ? inventory.Keys(type) : 0);
