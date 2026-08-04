@@ -36,7 +36,9 @@ namespace TRV
             if (player == null) player = FindAnyObjectByType<TRVController>();
             if (player != null) _health = player.GetComponent<Health>();
 
-            // Clean slate; the menu is opened in Start (after every Awake has run).
+            // Clean slate; the menu is opened in Start (after every Awake has run). The gate is
+            // static, so clear any claim left over from a previous scene load.
+            UIGate.Reset();
             if (menuRoot != null) menuRoot.SetActive(false);
             if (deathRoot != null) deathRoot.SetActive(false);
         }
@@ -65,7 +67,14 @@ namespace TRV
 
         private void SetMenu(bool open)
         {
+            // The menu is a blocking UI too: it can't open OVER the draft/choice panel (Escape is
+            // simply ignored until that closes) — but once open it holds the gate, so nothing else
+            // (map included, via MenuActive) can happen until it's closed.
+            if (open && !UIGate.TryOpen(this)) return;
+            if (!open && !_dead) UIGate.Close(this);
+
             _menuOpen = open;
+            UIGate.MenuActive = _menuOpen || _dead;
             if (menuRoot != null) menuRoot.SetActive(open);
             ApplyPauseState();
         }
@@ -74,6 +83,8 @@ namespace TRV
         {
             _dead = true;
             if (_menuOpen) SetMenu(false); // the death screen replaces the pause menu
+            UIGate.ForceOpen(this);        // death takes over no matter what was open
+            UIGate.MenuActive = true;
             if (deathRoot != null) deathRoot.SetActive(true);
             ApplyPauseState();
         }
@@ -92,6 +103,7 @@ namespace TRV
         public void RestartScene()
         {
             Time.timeScale = 1f; // defensive: in case anything paused time
+            UIGate.Reset();      // statics survive the reload
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }

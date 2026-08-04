@@ -41,9 +41,27 @@ namespace TRV
             if (!player.TryGetComponent<PlayerUpgrades>(out var upgrades) || upgrades.HasCollected(id)) return;
 
             Apply(upgrades);
+            Consume(upgrades, message);
+        }
+
+        /// <summary>True once this pickup has been used (for subclasses that defer the effect).</summary>
+        protected bool Used => _used;
+
+        /// <summary>Finish the pickup: mark the one-per-run id, fire <see cref="Collected"/> with
+        /// <paramref name="collectedMessage"/> and consume the object. Subclasses that apply their
+        /// effect later (e.g. via a choice UI) call this when the effect actually lands.</summary>
+        protected void Consume(PlayerUpgrades upgrades, string collectedMessage)
+        {
             upgrades.MarkCollected(id);
+            ConsumeWithoutId(collectedMessage);
+        }
+
+        /// <summary>Consume WITHOUT touching the one-per-run id — for repeatable pickups (books):
+        /// the object is spent but other pickups of the same kind stay available.</summary>
+        protected void ConsumeWithoutId(string collectedMessage)
+        {
             _used = true;
-            Collected?.Invoke(message); // tell the pickup UI what was upgraded
+            Collected?.Invoke(collectedMessage); // tell the pickup UI what was upgraded
             gameObject.SetActive(false); // consumed
         }
 

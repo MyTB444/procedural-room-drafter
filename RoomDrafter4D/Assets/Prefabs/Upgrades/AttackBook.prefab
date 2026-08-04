@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 331617484276981491}
   - component: {fileID: 994097725859494890}
-  - component: {fileID: 580310049584070622}
+  - component: {fileID: 2172346980886183840}
   m_Layer: 0
-  m_Name: Attack
+  m_Name: AttackBook
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,7 +92,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &580310049584070622
+--- !u!114 &2172346980886183840
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -101,16 +101,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 4787338882750658545}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 462376215e8726244a8ce020c7f93c6c, type: 3}
+  m_Script: {fileID: 11500000, guid: 20ee1a6dbd96ed14eb9c86cc12040579, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TRV.StatUpgrade
+  m_EditorClassIdentifier: Assembly-CSharp::TRV.BookUpgrade
   interactRange: 1.5
   id: 1
-  message: Faster attacks!
-  modifiers:
-  - Stat: 0
-    Op: 0
-    Factor: 0.5
-  - Stat: 1
-    Op: 0
-    Factor: 0.5
+  message: Upgrade acquired!
+  choices:
+  - Label: Attack Damage
+    Modifiers:
+    - Stat: 6
+      Amount: 5
+    UnlockAbility: 0
+    Ability: 0
+  - Label: Attack Speed
+    Modifiers:
+    - Stat: 0
+      Amount: -0.035
+    UnlockAbility: 0
+    Ability: 0
+  - Label: Movement Speed
+    Modifiers:
+    - Stat: 7
+      Amount: 0.6
+    UnlockAbility: 0
+    Ability: 0

@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6451831146403502824
+--- !u!1 &3605506087530754047
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,39 +8,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8315137940783781711}
-  - component: {fileID: 5172286704796208272}
-  - component: {fileID: 8829851810806738753}
+  - component: {fileID: 1827930859063958044}
+  - component: {fileID: 49492936267856621}
+  - component: {fileID: 6628515175591922885}
   m_Layer: 0
-  m_Name: ShieldCharge
+  m_Name: StatBook
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8315137940783781711
+--- !u!4 &1827930859063958044
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6451831146403502824}
+  m_GameObject: {fileID: 3605506087530754047}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.937, y: 0, z: 0}
+  m_LocalPosition: {x: 1.657, y: 0, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &5172286704796208272
+--- !u!212 &49492936267856621
 SpriteRenderer:
   serializedVersion: 2
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6451831146403502824}
+  m_GameObject: {fileID: 3605506087530754047}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 3
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 1153904863, guid: b226db52fd5880b4783bb5784410e868, type: 3}
+  m_Sprite: {fileID: -1243117609, guid: b226db52fd5880b4783bb5784410e868, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -92,19 +92,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &8829851810806738753
+--- !u!114 &6628515175591922885
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6451831146403502824}
+  m_GameObject: {fileID: 3605506087530754047}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d27c9d8c57aa8d40b4f6357c595fd30, type: 3}
+  m_Script: {fileID: 11500000, guid: 20ee1a6dbd96ed14eb9c86cc12040579, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TRV.AbilityUpgrade
+  m_EditorClassIdentifier: Assembly-CSharp::TRV.BookUpgrade
   interactRange: 1.5
-  id: 0
-  message: Shift to shield charge!
-  ability: 0
+  id: 2
+  message: Upgrade acquired!
+  choices:
+  - Label: Max HP
+    Modifiers:
+    - Stat: 5
+      Amount: 10
+    UnlockAbility: 0
+    Ability: 0
+  - Label: Max Stamina
+    Modifiers:
+    - Stat: 2
+      Amount: 5
+    UnlockAbility: 0
+    Ability: 0
+  - Label: Stamina Regen
+    Modifiers:
+    - Stat: 3
+      Amount: 1
+    UnlockAbility: 0
+    Ability: 0

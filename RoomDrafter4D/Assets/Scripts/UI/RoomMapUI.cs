@@ -76,6 +76,9 @@ namespace TRV
         {
             EnsureInit();
             if (viewRoot == null) return;
+            // The map is non-blocking and may open over any UI — EXCEPT the pause menu/death
+            // screen, which block everything (turning it OFF is always allowed).
+            if (!_visible && UIGate.MenuActive) return;
             _visible = !_visible;
             if (viewRoot == gameObject)
             {

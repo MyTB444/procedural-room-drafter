@@ -64,6 +64,7 @@ namespace TRV
         private RoomMapUI _mapUI;           // lazily found — toggled with the M key
 
         private BiomeConfig _nextBiome;     // chosen by the player for the next NEW room
+        private bool _nextBiomeForced;      // TESTING (BiomeHotkeys): skip the draft flow until a fresh room consumes the pick
         private BiomeConfig _currentBiome;  // biome of the room currently shown
 
         // Island decor placements for the room currently shown — saved into its snapshot on leave,
@@ -104,14 +105,16 @@ namespace TRV
         /// <summary>Pick the biome used to generate the NEXT new room the player walks into.</summary>
         public void SelectBiome(BiomeConfig biome)
         {
-            if (biome != null) _nextBiome = biome;
+            if (biome == null) return;
+            _nextBiome = biome;
+            _nextBiomeForced = true; // testing pick — bypasses the draft flow at the next new door
         }
 
         /// <summary>Pick the next-room biome by index into <see cref="Biomes"/>.</summary>
         public void SelectBiome(int index)
         {
-            if (biomes != null && index >= 0 && index < biomes.Length && biomes[index] != null)
-                _nextBiome = biomes[index];
+            if (biomes != null && index >= 0 && index < biomes.Length)
+                SelectBiome(biomes[index]);
         }
 
         private void Awake()
@@ -207,6 +210,14 @@ namespace TRV
                 return;
             }
 
+            // TESTING override (BiomeHotkeys 0-3): a forced selection bypasses the whole draft
+            // flow — no key spent, no UI, straight into the chosen biome.
+            if (_nextBiomeForced)
+            {
+                StartCoroutine(Transition(exitDir));
+                return;
+            }
+
             // No keys at all — nothing to choose either: straight into the default room.
             if (!HasAnyKeys())
             {
@@ -219,9 +230,9 @@ namespace TRV
                 draftUI = FindAnyObjectByType<RoomDraftUI>(FindObjectsInactive.Include);
             if (draftUI != null)
             {
+                if (!draftUI.Open()) return; // another blocking UI is up — retried while on the door
                 _drafting = true;
                 _pendingDoorPos = playerWorldPos;
-                draftUI.Open();
                 return;
             }
 
@@ -374,6 +385,7 @@ namespace TRV
             else
             {
                 roomBiome = _nextBiome;
+                _nextBiomeForced = false; // a fresh room consumed the testing pick
                 var grid = new RoomGenerator(roomBiome).Generate(RoomSeed.Rng(worldSeed, coord));
                 painter.Paint(grid, roomBiome);
                 _currentIslandDecor = grid.IslandDecor;

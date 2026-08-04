@@ -88,6 +88,15 @@ namespace TRV
         /// <summary>Maximum stamina (base stat with the MaxStamina upgrade applied). For UI.</summary>
         public float MaxStamina => Effective(PlayerUpgrades.Stat.MaxStamina, stats != null ? stats.MaxStamina : 0f);
 
+        // Effective stats for display (upgrades applied where an upgrade for the stat exists) —
+        // read by PlayerStatsUI on the menu screen.
+        public float MaxHealth => _health != null && _health.Max > 0f ? _health.Max : (stats != null ? stats.MaxHealth : 0f);
+        public float HealthRegenPerSecond => Effective(PlayerUpgrades.Stat.HealthRegen, stats != null ? stats.HealthRegenPerSecond : 0f);
+        public float StaminaRegenPerSecond => Effective(PlayerUpgrades.Stat.StaminaRegen, stats != null ? stats.StaminaRegenPerSecond : 0f);
+        public float AttackDamage => Effective(PlayerUpgrades.Stat.AttackDamage, stats != null ? stats.Damage : 0f);
+        public float AttackCooldownSeconds => Effective(PlayerUpgrades.Stat.AttackCooldown, stats != null ? stats.AttackCooldown : 0f);
+        public float MoveSpeed => Effective(PlayerUpgrades.Stat.MoveSpeed, stats != null ? stats.MoveSpeed : 0f);
+
         /// <summary>A stat with its upgrades applied (base × multiplier + bonus); the base when no upgrades.</summary>
         private float Effective(PlayerUpgrades.Stat stat, float baseValue) =>
             _upgrades != null ? _upgrades.Apply(stat, baseValue) : baseValue;
@@ -148,9 +157,20 @@ namespace TRV
                 enabled = false;
                 return;
             }
-            _health.Init(stats.MaxHealth);
+            _health.Init(Effective(PlayerUpgrades.Stat.MaxHealth, stats.MaxHealth));
             _stamina = MaxStamina;
+
+            // A MaxHealth upgrade collected mid-run raises the ceiling live (heals by the increase).
+            if (_upgrades != null) _upgrades.Changed += SyncMaxHealth;
         }
+
+        private void OnDestroy()
+        {
+            if (_upgrades != null) _upgrades.Changed -= SyncMaxHealth;
+        }
+
+        private void SyncMaxHealth() =>
+            _health.SetMax(Effective(PlayerUpgrades.Stat.MaxHealth, stats.MaxHealth));
 
         private void FixedUpdate()
         {
@@ -169,7 +189,7 @@ namespace TRV
             TickStamina(Time.fixedDeltaTime);
             TickHealthRegen(Time.fixedDeltaTime);
             // The body collider deals damage while dashing (re-arms on the rising edge, deduped per dash).
-            if (dashHitbox != null) dashHitbox.SetActive(IsDashing, gameObject, stats.Damage);
+            if (dashHitbox != null) dashHitbox.SetActive(IsDashing, gameObject, AttackDamage);
 
             // -0.5) Dash windup: a short pause after pressing dash before the burst fires. Movement
             //       stays normal during it (no i-frames yet); when it elapses the burst begins.
@@ -209,7 +229,7 @@ namespace TRV
             }
 
             // 3) Smoothly ease current velocity toward the target. Attacking briefly slows movement.
-            float moveSpeed = stats.MoveSpeed;
+            float moveSpeed = MoveSpeed; // effective (base + upgrades)
             if (_attackSlowTimeLeft > 0f)
             {
                 _attackSlowTimeLeft -= Time.fixedDeltaTime;
@@ -303,9 +323,9 @@ namespace TRV
             _dashWindupLeft = 0f;
 
             // Swing the melee hitbox along the shown 8-way direction (matches the attack animation),
-            // dealing stats.Damage to whatever it overlaps.
+            // dealing the effective damage (base + upgrades) to whatever it overlaps.
             if (attackHitbox != null)
-                attackHitbox.Strike(CharacterDirectionUtil.ToVector(AttackDirection), stats.Damage, gameObject);
+                attackHitbox.Strike(CharacterDirectionUtil.ToVector(AttackDirection), AttackDamage, gameObject);
 
             // Drives the attack animation (TRVAnimator listens).
             Attacked?.Invoke(AttackDirection);

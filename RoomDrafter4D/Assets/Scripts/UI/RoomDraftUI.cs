@@ -82,23 +82,27 @@ namespace TRV
             if (inventory != null) inventory.KeysChanged -= OnKeysChanged;
         }
 
-        /// <summary>Open the panel and freeze the player. Called by <see cref="RoomManager"/>.</summary>
-        public void Open()
+        /// <summary>Open the panel and freeze the player. Called by <see cref="RoomManager"/>.
+        /// False when another blocking UI holds the <see cref="UIGate"/> (nothing opened).</summary>
+        public bool Open()
         {
             EnsureInit();
-            if (IsOpen) return;
+            if (IsOpen) return true;
+            if (!UIGate.TryOpen(this)) return false; // another UI is up — refuse
             IsOpen = true;
             if (!gameObject.activeSelf) gameObject.SetActive(true); // component may live on the panel itself
             if (inventory != null) inventory.KeysChanged += OnKeysChanged;
             RefreshKeys();
             if (panelRoot != null) panelRoot.SetActive(true);
             if (player != null) player.SetControlsEnabled(false);
+            return true;
         }
 
         private void Close()
         {
             if (!IsOpen) return;
             IsOpen = false;
+            UIGate.Close(this);
             if (inventory != null) inventory.KeysChanged -= OnKeysChanged;
             if (panelRoot != null) panelRoot.SetActive(false);
             if (player != null) player.SetControlsEnabled(true);

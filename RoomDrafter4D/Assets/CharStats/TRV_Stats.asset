@@ -15,7 +15,7 @@ MonoBehaviour:
   <CharacterName>k__BackingField: TRV
   <MaxHealth>k__BackingField: 100
   <MoveSpeed>k__BackingField: 4
-  <Acceleration>k__BackingField: 60
+  <Acceleration>k__BackingField: 80
   <Deceleration>k__BackingField: 70
   <Damage>k__BackingField: 40
   <AttackCooldown>k__BackingField: 0.7
@@ -37,3 +37,4 @@ MonoBehaviour:
   <StaminaRegenDelay>k__BackingField: 0.8
   <LowStaminaThreshold>k__BackingField: 50
   <LowStaminaRegenMultiplier>k__BackingField: 2
+  <HealthRegenPerSecond>k__BackingField: 0

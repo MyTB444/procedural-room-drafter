@@ -37,6 +37,17 @@ namespace TRV
             Changed?.Invoke(Current);
         }
 
+        /// <summary>Change the maximum WITHOUT resetting to full (mid-run max-HP upgrade): an
+        /// increase also heals by the added amount; a decrease clamps Current. No-op while dead.</summary>
+        public void SetMax(float newMax)
+        {
+            if (!IsAlive || newMax <= 0f || Mathf.Approximately(newMax, Max)) return;
+            float delta = newMax - Max;
+            Max = newMax;
+            Current = delta > 0f ? Current + delta : Mathf.Min(Current, Max);
+            Changed?.Invoke(Current);
+        }
+
         public void TakeDamage(in DamageInfo info) => TakeDamage(info.Amount);
 
         public void TakeDamage(float amount)
