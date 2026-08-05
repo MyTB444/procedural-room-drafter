@@ -23,15 +23,27 @@ namespace TRV
                      "pickup popup text after choosing.")]
             public string Label;
 
-            [Tooltip("Flat +number stat bonuses this choice applies (same as a StatUpgrade's).")]
+            [Tooltip("Flat +number stat bonuses this choice applies (same as a StatUpgrade's). For " +
+                     "an ability choice these apply on the SECOND pick onward — the first pick " +
+                     "only unlocks.")]
             public StatUpgrade.Modifier[] Modifiers;
 
-            [Tooltip("Also unlock an ability?")]
+            [Tooltip("Is this an ABILITY skill (dash/firearm)? The FIRST pick only unlocks the " +
+                     "ability (no modifiers); later picks apply the modifiers.")]
             public bool UnlockAbility;
 
             [Tooltip("The ability unlocked when Unlock Ability is ticked.")]
             public PlayerUpgrades.Ability Ability = PlayerUpgrades.Ability.Dash;
+
+            [Tooltip("Max level for THIS choice (times it can be taken). 0 = the global default " +
+                     "(" + nameof(PlayerUpgrades) + ".MaxChoiceLevel = 10). E.g. 5 for the dash / " +
+                     "firearm skills.")]
+            [Min(0)] public int MaxLevel;
         }
+
+        /// <summary>The level cap for a choice: its own MaxLevel, or the global default when 0.</summary>
+        public static int MaxLevelOf(Choice choice) =>
+            choice != null && choice.MaxLevel > 0 ? choice.MaxLevel : PlayerUpgrades.MaxChoiceLevel;
 
         [Tooltip("The upgrades this book OFFERS — the choice UI shows one button per entry and " +
                  "the player picks exactly one.")]
@@ -51,7 +63,7 @@ namespace TRV
             var player = PlayerLocator.Player;
             if (player == null || !player.TryGetComponent<PlayerUpgrades>(out var upgrades)) return true;
             foreach (var c in choices)
-                if (c != null && upgrades.ChoiceLevel(c.Label) < PlayerUpgrades.MaxChoiceLevel)
+                if (c != null && upgrades.ChoiceLevel(c.Label) < MaxLevelOf(c))
                     return true;
             return false; // every choice maxed — nothing left to offer
         }
@@ -86,10 +98,16 @@ namespace TRV
             if (Used || upgrades == null || choices == null || index < 0 || index >= choices.Length) return;
 
             var choice = choices[index];
-            if (choice == null || upgrades.ChoiceLevel(choice.Label) >= PlayerUpgrades.MaxChoiceLevel)
+            if (choice == null || upgrades.ChoiceLevel(choice.Label) >= MaxLevelOf(choice))
                 return; // maxed — the UI disables the button, this is just the guard
 
-            if (choice.Modifiers != null)
+            // An ability skill's FIRST level only ENABLES it; the modifiers kick in from level 2 on.
+            bool unlockingNow = choice.UnlockAbility && !upgrades.IsUnlocked(choice.Ability);
+            if (unlockingNow)
+            {
+                upgrades.Unlock(choice.Ability);
+            }
+            else if (choice.Modifiers != null)
             {
                 foreach (var m in choice.Modifiers)
                 {
@@ -97,7 +115,6 @@ namespace TRV
                     upgrades.AddStat(m.Stat, m.Amount);
                 }
             }
-            if (choice.UnlockAbility) upgrades.Unlock(choice.Ability);
 
             upgrades.IncrementChoiceLevel(choice.Label);
             ConsumeWithoutId(choice.Label);

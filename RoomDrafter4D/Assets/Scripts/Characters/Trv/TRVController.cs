@@ -29,6 +29,11 @@ namespace TRV
         [Tooltip("Melee hitbox swung on attack. Auto-found in children if left empty.")]
         [SerializeField] private AttackHitbox attackHitbox;
 
+        [Tooltip("Bullet fired with RIGHT CLICK (a prefab with a Projectile — hitMask = the enemy " +
+                 "layer). Its damage is overridden with the player's live attack stat. Empty = no " +
+                 "ranged fire.")]
+        [SerializeField] private GameObject fireBulletPrefab;
+
         [Tooltip("Optional: turns the body collider into a hitbox during the dash. Auto-found on this " +
                  "object; leave the component off if the dash shouldn't deal damage.")]
         [SerializeField] private DashHitbox dashHitbox;
@@ -104,6 +109,7 @@ namespace TRV
         public event Action<CharacterDirection> FacingChanged;
         public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
         public event Action<CharacterDirection> Attacked;    // passes the aimed attack direction
+        public event Action<Vector2> Fired;                  // ranged fire — passes the RAW 360° aim direction
         public event Action<float> Interacted;               // passes horizontal facing sign: -1 left, +1 right
 
         private void Awake()
@@ -135,6 +141,7 @@ namespace TRV
             {
                 input.DashPressed += HandleDash;
                 input.AttackPressed += HandleAttack;
+                input.FirePressed += HandleFire;
                 input.InteractPressed += HandleInteract;
             }
         }
@@ -145,6 +152,7 @@ namespace TRV
             {
                 input.DashPressed -= HandleDash;
                 input.AttackPressed -= HandleAttack;
+                input.FirePressed -= HandleFire;
                 input.InteractPressed -= HandleInteract;
             }
         }
@@ -159,6 +167,7 @@ namespace TRV
             }
             _health.Init(Effective(PlayerUpgrades.Stat.MaxHealth, stats.MaxHealth));
             _stamina = MaxStamina;
+            ResetRoomBullets(); // the start room's allotment
 
             // A MaxHealth upgrade collected mid-run raises the ceiling live (heals by the increase).
             if (_upgrades != null) _upgrades.Changed += SyncMaxHealth;
@@ -284,7 +293,8 @@ namespace TRV
             if (!_controlsEnabled || !IsAlive || IsDashing || _dashWindupLeft > 0f || !_dashCooldown.IsReady
                 || _attackSlowTimeLeft > 0f) return;
             if (_upgrades == null || !_upgrades.IsUnlocked(PlayerUpgrades.Ability.Dash)) return; // dash is locked until the upgrade
-            if (!TrySpendStamina(stats.DodgeStaminaCost)) return; // not enough stamina → no dodge
+            // Effective dodge cost (dash skill levels reduce it); never below 0.
+            if (!TrySpendStamina(Mathf.Max(0f, Effective(PlayerUpgrades.Stat.DodgeStaminaCost, stats.DodgeStaminaCost)))) return;
 
             // Lock in the dash direction and face it now; the burst (and i-frames) fire after a
             // short windup. Dash toward current movement; if standing still, dash where we face.
@@ -330,6 +340,58 @@ namespace TRV
             // Drives the attack animation (TRVAnimator listens).
             Attacked?.Invoke(AttackDirection);
         }
+
+        /// <summary>Ranged FIRE (right click): launches the bullet prefab along the RAW cursor
+        /// direction (full 360°, no 8-way snap — only the fire ANIM is 4-way, via TRVAnimator).
+        /// The bullet's damage is overridden with the live attack stat, so damage upgrades apply.
+        /// Shares the attack cooldown + stamina cost. LOCKED until the Fire ability upgrade; while
+        /// the room has enemies each shot spends one of the per-room bullets (BulletsLeft, reset to
+        /// stats.FireBulletsPerRoom on every room entry) — in a cleared room ammo is unlimited.</summary>
+        private void HandleFire()
+        {
+            if (!_controlsEnabled || !IsAlive || !_attackCooldown.IsReady) return;
+            if (_upgrades == null || !_upgrades.IsUnlocked(PlayerUpgrades.Ability.Fire)) return; // fire is locked until the upgrade
+
+            // Ammo only matters while enemies are alive (like stamina, a cleared room is free).
+            bool roomHasEnemies = EnemyPool.RoomHasEnemies;
+            if (roomHasEnemies && _bulletsLeft <= 0) return; // out of bullets for this room
+
+            if (!TrySpendStamina(Effective(PlayerUpgrades.Stat.AttackStaminaCost, stats.AttackStaminaCost))) return;
+            _attackCooldown.Begin(Effective(PlayerUpgrades.Stat.AttackCooldown, stats.AttackCooldown));
+            if (roomHasEnemies) _bulletsLeft--;
+
+            Vector2 dir = GetAimDirection().normalized;
+
+            if (fireBulletPrefab != null)
+            {
+                var bullet = Instantiate(fireBulletPrefab, transform.position, Quaternion.identity);
+                if (bullet.TryGetComponent<Projectile>(out var projectile))
+                    projectile.SetDamage(AttackDamage); // live stat — attack upgrades boost the bullet too
+                if (bullet.TryGetComponent<IProjectile>(out var launchable))
+                    launchable.Launch(dir, gameObject);
+            }
+            else if (!_warnedNoFireBullet)
+            {
+                _warnedNoFireBullet = true;
+                Debug.LogWarning($"[{nameof(TRVController)}] Right-click fire: no Fire Bullet Prefab " +
+                                 "assigned — the animation plays but no bullet spawns.", this);
+            }
+
+            // Drives the 4-way fire animation (TRVAnimator snaps the direction).
+            Fired?.Invoke(dir);
+        }
+
+        private bool _warnedNoFireBullet;
+        private int _bulletsLeft;
+
+        /// <summary>Bullets left for THIS room (only spent while enemies are alive). For UI.</summary>
+        public int BulletsLeft => _bulletsLeft;
+
+        /// <summary>Refill the per-room bullets (base + FireBullets upgrades) — called by
+        /// RoomManager on every room entry.</summary>
+        public void ResetRoomBullets() => _bulletsLeft = stats != null
+            ? Mathf.Max(0, Mathf.RoundToInt(Effective(PlayerUpgrades.Stat.FireBullets, stats.FireBulletsPerRoom)))
+            : 0;
 
         /// <summary>
         /// World-space direction from the character toward the cursor. Falls back to the current

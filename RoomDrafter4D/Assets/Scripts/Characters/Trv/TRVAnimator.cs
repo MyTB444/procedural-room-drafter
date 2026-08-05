@@ -17,6 +17,9 @@ namespace TRV
     ///   • Speed            (Float)   — 0 when idle, 1 when moving (alternative to IsMoving).
     ///   • AttackX, AttackY (Float)   — unit vector of the cursor-aimed attack (attack blend tree).
     ///   • Attack           (Trigger) — fired on each attack.
+    ///   • FireX, FireY     (Float)   — 4-WAY snapped unit vector of the ranged fire (diagonals →
+    ///                                  horizontal); the bullet itself flies the raw 360° aim.
+    ///   • Fire             (Trigger) — fired on each ranged fire (right click).
     ///   • DashX, DashY     (Float)   — unit vector of the dash direction (dash blend tree).
     ///   • Dash             (Trigger) — fired when a dash burst starts.
     ///   • InteractX        (Float)   — horizontal sign of the interact (-1 left, +1 right); the
@@ -41,6 +44,9 @@ namespace TRV
         [SerializeField] private string attackXParam = "AttackX";
         [SerializeField] private string attackYParam = "AttackY";
         [SerializeField] private string attackTriggerParam = "Attack";
+        [SerializeField] private string fireXParam = "FireX";
+        [SerializeField] private string fireYParam = "FireY";
+        [SerializeField] private string fireTriggerParam = "Fire";
         [SerializeField] private string dashXParam = "DashX";
         [SerializeField] private string dashYParam = "DashY";
         [SerializeField] private string dashTriggerParam = "Dash";
@@ -48,6 +54,7 @@ namespace TRV
         [SerializeField] private string interactTriggerParam = "Interact";
 
         private AnimParam _lookX, _lookY, _isMoving, _speed, _attackX, _attackY, _attack;
+        private AnimParam _fireX, _fireY, _fire;
         private AnimParam _dashX, _dashY, _dash;
         private AnimParam _interactX, _interact;
 
@@ -63,6 +70,9 @@ namespace TRV
             _attackX = new AnimParam(animator, attackXParam);
             _attackY = new AnimParam(animator, attackYParam);
             _attack = new AnimParam(animator, attackTriggerParam);
+            _fireX = new AnimParam(animator, fireXParam);
+            _fireY = new AnimParam(animator, fireYParam);
+            _fire = new AnimParam(animator, fireTriggerParam);
             _dashX = new AnimParam(animator, dashXParam);
             _dashY = new AnimParam(animator, dashYParam);
             _dash = new AnimParam(animator, dashTriggerParam);
@@ -74,6 +84,7 @@ namespace TRV
         {
             if (controller == null) return;
             controller.Attacked += OnAttacked;
+            controller.Fired += OnFired;
             controller.DashStarted += OnDashStarted;
             controller.Interacted += OnInteracted;
         }
@@ -82,6 +93,7 @@ namespace TRV
         {
             if (controller == null) return;
             controller.Attacked -= OnAttacked;
+            controller.Fired -= OnFired;
             controller.DashStarted -= OnDashStarted;
             controller.Interacted -= OnInteracted;
         }
@@ -105,6 +117,19 @@ namespace TRV
             _attackX.SetFloat(aim.x);
             _attackY.SetFloat(aim.y);
             _attack.SetTrigger();
+        }
+
+        // The fire ANIM is 4-way only (N/E/S/W clips) while the bullet flies the raw 360° aim —
+        // snap the direction to the nearest cardinal (diagonals resolve to horizontal, like the
+        // enemy animators) and fire the trigger.
+        private void OnFired(Vector2 dir)
+        {
+            Vector2 snapped = Mathf.Abs(dir.x) >= Mathf.Abs(dir.y)
+                ? new Vector2(Mathf.Sign(dir.x), 0f)
+                : new Vector2(0f, Mathf.Sign(dir.y));
+            _fireX.SetFloat(snapped.x);
+            _fireY.SetFloat(snapped.y);
+            _fire.SetTrigger();
         }
 
         // Point the dash blend tree along the dash direction, then fire the trigger.

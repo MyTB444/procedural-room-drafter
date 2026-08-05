@@ -424,6 +424,9 @@ namespace TRV
                     var landing = RoomDoors.Landing(roomBiome, enterFrom);
                     player.position = painter.CellCenterWorld(landing.x, landing.y);
                 }
+
+                // Fresh room, fresh ammo: the per-room fire bullets refill on every entry.
+                if (player.TryGetComponent<TRVController>(out var trv)) trv.ResetRoomBullets();
             }
 
         }

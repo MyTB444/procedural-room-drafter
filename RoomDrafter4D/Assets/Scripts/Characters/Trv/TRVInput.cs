@@ -47,6 +47,10 @@ namespace TRV
         /// <summary>Raised the moment the attack control is pressed.</summary>
         public event Action AttackPressed;
 
+        /// <summary>Raised the moment the FIRE control (right mouse button) is pressed. Polled from
+        /// the mouse directly — no action for it exists in the input asset.</summary>
+        public event Action FirePressed;
+
         /// <summary>Raised when the interact control completes.</summary>
         public event Action InteractPressed;
 
@@ -83,6 +87,13 @@ namespace TRV
             _attack.performed -= OnAttackPerformed;
             _interact.performed -= OnInteractPerformed;
             _map.Disable();
+        }
+
+        private void Update()
+        {
+            // Right click = ranged fire. The actions asset has no binding for it, so poll directly.
+            if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
+                FirePressed?.Invoke();
         }
 
         private void OnDashPerformed(InputAction.CallbackContext _) => DashPressed?.Invoke();

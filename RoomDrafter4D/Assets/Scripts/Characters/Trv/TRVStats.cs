@@ -95,5 +95,14 @@ namespace TRV
                         "to it (an Add upgrade grants regen from 0).")]
         [field: Min(0f)]
         [field: SerializeField] public float HealthRegenPerSecond { get; private set; } = 0f;
+
+        // ─────────────────────────────────────────────────────────────
+        // RANGED FIRE  (right click; the ability itself unlocks via upgrade)
+        // ─────────────────────────────────────────────────────────────
+        [field: Header("Ranged fire")]
+        [field: Tooltip("Bullets available per room while enemies are alive — resets to this on every " +
+                        "room entry; firing is unlimited once the room is cleared.")]
+        [field: Min(0)]
+        [field: SerializeField] public int FireBulletsPerRoom { get; private set; } = 3;
     }
 }

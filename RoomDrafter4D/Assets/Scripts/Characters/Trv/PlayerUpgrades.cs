@@ -15,13 +15,13 @@ namespace TRV
     public class PlayerUpgrades : MonoBehaviour
     {
         /// <summary>Stats an upgrade can add to (flat +number).</summary>
-        public enum Stat { AttackCooldown, AttackStaminaCost, MaxStamina, StaminaRegen, HealthRegen, MaxHealth, AttackDamage, MoveSpeed }
+        public enum Stat { AttackCooldown, AttackStaminaCost, MaxStamina, StaminaRegen, HealthRegen, MaxHealth, AttackDamage, MoveSpeed, FireBullets, DodgeStaminaCost }
 
         /// <summary>Abilities an upgrade can unlock (locked until granted).</summary>
-        public enum Ability { Dash }
+        public enum Ability { Dash, Fire }
 
         /// <summary>Identity of each one-per-run upgrade (so a collected one can't appear again).</summary>
-        public enum UpgradeId { Dash, Attack, Stamina }
+        public enum UpgradeId { Dash, Attack, Stamina, Fire }
 
         /// <summary>How many times each book CHOICE can be taken per run (its max level).</summary>
         public const int MaxChoiceLevel = 10;

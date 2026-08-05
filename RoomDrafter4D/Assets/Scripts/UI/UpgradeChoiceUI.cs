@@ -87,7 +87,7 @@ namespace TRV
                 if (!used) continue;
 
                 int level = upgrades != null ? upgrades.ChoiceLevel(choices[i].Label) : 0;
-                choiceButtons[i].interactable = level < PlayerUpgrades.MaxChoiceLevel;
+                choiceButtons[i].interactable = level < BookUpgrade.MaxLevelOf(choices[i]);
                 if (choiceTexts[i] != null) choiceTexts[i].text = $"{choices[i].Label} lvl {level}";
             }
             if (choices.Length > choiceButtons.Length)

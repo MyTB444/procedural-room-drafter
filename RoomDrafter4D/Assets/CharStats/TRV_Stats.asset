@@ -32,9 +32,10 @@ MonoBehaviour:
   <DashCooldown>k__BackingField: 0.6
   <MaxStamina>k__BackingField: 100
   <AttackStaminaCost>k__BackingField: 20
-  <DodgeStaminaCost>k__BackingField: 40
+  <DodgeStaminaCost>k__BackingField: 50
   <StaminaRegenPerSecond>k__BackingField: 20
   <StaminaRegenDelay>k__BackingField: 0.8
   <LowStaminaThreshold>k__BackingField: 50
   <LowStaminaRegenMultiplier>k__BackingField: 2
   <HealthRegenPerSecond>k__BackingField: 0
+  <FireBulletsPerRoom>k__BackingField: 3
