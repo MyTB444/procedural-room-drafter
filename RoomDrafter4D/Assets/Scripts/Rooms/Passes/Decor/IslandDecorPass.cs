@@ -23,43 +23,39 @@ namespace TRV
             int max = System.Math.Max(min, config.IslandDecorMaxPerIsland);
             if (max == 0) return;
 
-            // Aqua: every 4×4 island.
+            // Aqua: every 4×4 island. The CENTRE 2×2 stays clear — the biome's upgrade BOOK spawns
+            // on the island's middle point (RoomManager), and decor must not overlap it.
             foreach (var (ax, ay) in grid.IslandAnchors)
             {
                 var cells = new List<(int x, int y)>();
                 for (int x = ax; x < ax + IslandSize; x++)
                     for (int y = ay; y < ay + IslandSize; y++)
+                    {
+                        if (x >= ax + 1 && x <= ax + 2 && y >= ay + 1 && y <= ay + 2) continue; // book spot
                         if (grid[x, y] == CellType.Floor)
                             cells.Add((x, y));
+                    }
                 PlaceDecor(grid.IslandDecor, rng, objects, min, max, cells);
             }
 
-            // Halls: the SMALL igrooms' interiors (the big main room is excluded by HallPass).
+            // Halls: the SMALL igrooms' interiors (the big main room is excluded by HallPass). Each
+            // interior's CENTRE cell stays clear — the rare extra book spawns there.
             foreach (var area in grid.IgroomDecorAreas)
             {
+                int scx = area.xMin + area.width / 2, scy = area.yMin + area.height / 2;
                 var cells = new List<(int x, int y)>();
                 for (int x = area.xMin; x < area.xMax; x++)
                     for (int y = area.yMin; y < area.yMax; y++)
+                    {
+                        if (x == scx && y == scy) continue; // book spot
                         if (grid[x, y] == CellType.Floor)
                             cells.Add((x, y));
+                    }
                 PlaceDecor(grid.IslandDecor, rng, objects, min, max, cells);
             }
 
-            // Halls big main room: same count/type as the small igrooms, but recorded SEPARATELY (only used
-            // when the room's content is an upgrade — RoomManager appends it then). Keep the 3×3 around the
-            // interior centre clear so it never lands on the upgrade pickup placed there.
-            var main = grid.MainIgroomArea;
-            if (main.width > 0 && main.height > 0)
-            {
-                int cx = main.xMin + main.width / 2, cy = main.yMin + main.height / 2;
-                var cells = new List<(int x, int y)>();
-                for (int x = main.xMin; x < main.xMax; x++)
-                    for (int y = main.yMin; y < main.yMax; y++)
-                        if (grid[x, y] == CellType.Floor &&
-                            (System.Math.Abs(x - cx) > 1 || System.Math.Abs(y - cy) > 1)) // off the upgrade spot
-                            cells.Add((x, y));
-                PlaceDecor(grid.MainIgroomDecor, rng, objects, min, max, cells);
-            }
+            // (The big main igroom gets no scatter decor: its content is the filler + the book at
+            // the centre — see RoomManager.SpawnMainContent / SpawnBooks.)
         }
 
         /// <summary>Record up to a random [min, max] decor on distinct cells of <paramref name="cells"/>

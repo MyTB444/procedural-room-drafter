@@ -152,14 +152,40 @@ namespace TRV
         [field: SerializeField] public int IslandDecorMaxPerIsland { get; private set; } = 5;
 
         [field: Header("Main room content (Halls big igroom)")]
-        [field: Tooltip("Upgrade prefabs (each an Upgrade with an Id) that can fill the big main igroom — " +
-                        "each offered ONCE per run, removed once collected. RoomManager rolls ONE of " +
-                        "{the still-available upgrades + the fillers below} at equal chance.")]
-        [field: SerializeField] public GameObject[] MainRoomUpgrades { get; private set; }
-
-        [field: Tooltip("Filler decor prefabs (e.g. crates, vases) — rolling one FILLS the big main igroom " +
-                        "with that breakable prefab. Each is one equal-chance option alongside the upgrades.")]
+        [field: Tooltip("Filler decor prefabs (e.g. crates, vases) — a random one FILLS the big main igroom " +
+                        "with that breakable prefab (the centre stays clear for the book). Empty = bare room.")]
         [field: SerializeField] public GameObject[] MainRoomFillers { get; private set; }
+
+        [field: Header("Upgrade books")]
+        [field: Tooltip("The biome's upgrade BOOK prefab (a BookUpgrade interactable). Placement is " +
+                        "per-layout: Aqua = middle of every 4×4 island; Halls = middle of the big " +
+                        "igroom (+ rarely one small igroom, see chance below); Anubis = the end of " +
+                        "one south corridor without the tall decor patch B. Empty = no books.")]
+        [field: SerializeField] public GameObject BookPrefab { get; private set; }
+
+        [field: Tooltip("Chance of a SECOND book: Halls = in the middle of a random small igroom; " +
+                        "Anubis = on another free (no decor B) corridor end when one exists. " +
+                        "Unused by Aqua (always one per island) and Lands (no books).")]
+        [field: Range(0f, 1f)]
+        [field: SerializeField] public float ExtraBookChance { get; private set; } = 0.15f;
+
+        [field: Header("Barrels (Anubis)")]
+        [field: Tooltip("Breakable barrel prefab scattered in Open/Anubis rooms — mostly on random " +
+                        "regular floor (never at the floor's edge, never on stairs/decor/doors), " +
+                        "sometimes one behind a free corridor end. Empty = no barrels.")]
+        [field: SerializeField] public GameObject BarrelPrefab { get; private set; }
+
+        [field: Tooltip("Barrels per room, random in [min, max].")]
+        [field: Min(0)]
+        [field: SerializeField] public int MinBarrels { get; private set; } = 2;
+
+        [field: Min(0)]
+        [field: SerializeField] public int MaxBarrels { get; private set; } = 4;
+
+        [field: Tooltip("Chance that ONE barrel stands behind a south-corridor end that has neither " +
+                        "decor B nor a book (the rest always scatter on regular floor).")]
+        [field: Range(0f, 1f)]
+        [field: SerializeField] public float BarrelAtEndChance { get; private set; } = 0.35f;
 
         [field: Header("Water island")]
         [field: Tooltip("If the room's largest water body has at least this many cells, a strictly " +

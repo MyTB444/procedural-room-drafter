@@ -59,18 +59,22 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
-  <EnemiesPerRoom>k__BackingField: 0
+  <EnemiesPerRoom>k__BackingField: 1
   <MinibossPrefabs>k__BackingField: []
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
   - Prefab: {fileID: 8161980004430131537, guid: 1515b6e95fb9d10459e11abf13d71939, type: 3}
     Chance: 0.4
-  <IslandDecorMinPerIsland>k__BackingField: 4
-  <IslandDecorMaxPerIsland>k__BackingField: 5
-  <MainRoomUpgrades>k__BackingField: []
+  <IslandDecorMinPerIsland>k__BackingField: 5
+  <IslandDecorMaxPerIsland>k__BackingField: 6
   <MainRoomFillers>k__BackingField: []
+  <BookPrefab>k__BackingField: {fileID: 3605506087530754047, guid: 6a41c3751bea2864db6e80615899d38a, type: 3}
+  <ExtraBookChance>k__BackingField: 0.15
+  <BarrelPrefab>k__BackingField: {fileID: 0}
+  <MinBarrels>k__BackingField: 2
+  <MaxBarrels>k__BackingField: 4
+  <BarrelAtEndChance>k__BackingField: 0.35
   <MinWaterForIsland>k__BackingField: 40
   <FloorPatches>k__BackingField:
   - Size: 2

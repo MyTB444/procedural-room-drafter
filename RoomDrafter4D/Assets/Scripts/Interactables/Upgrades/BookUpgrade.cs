@@ -58,6 +58,7 @@ namespace TRV
         protected override bool CanInteract()
         {
             if (Used) return false;
+            if (EnemyPool.RoomHasEnemies) return false; // locked until the room is cleared
             if (choices == null || choices.Length == 0) return true;
 
             var player = PlayerLocator.Player;

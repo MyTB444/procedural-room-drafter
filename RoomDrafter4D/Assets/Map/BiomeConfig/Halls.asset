@@ -30,11 +30,9 @@ MonoBehaviour:
   <BuildingRightTile>k__BackingField: {fileID: 0}
   <WaterDecorPatches>k__BackingField: []
   <EnemyPrefabs>k__BackingField:
-  - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
-  <EnemiesPerRoom>k__BackingField: 0
-  <MinibossPrefabs>k__BackingField:
-  - {fileID: 6191281873977571966, guid: 1260c57f6f8b88d4d994f755c988207d, type: 3}
+  - {fileID: 9110480874252319943, guid: be5280e4ea6daae478b0d8fd72cb58df, type: 3}
+  <EnemiesPerRoom>k__BackingField: 1
+  <MinibossPrefabs>k__BackingField: []
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:
@@ -42,12 +40,14 @@ MonoBehaviour:
     Chance: 1
   <IslandDecorMinPerIsland>k__BackingField: 2
   <IslandDecorMaxPerIsland>k__BackingField: 3
-  <MainRoomUpgrades>k__BackingField:
-  - {fileID: 4787338882750658545, guid: d16e2c8037bcd9e4e8f6604e94adb6f1, type: 3}
-  - {fileID: 3605506087530754047, guid: 6a41c3751bea2864db6e80615899d38a, type: 3}
-  - {fileID: 6451831146403502824, guid: ec40f6238de44c54c89d338f2eff5500, type: 3}
   <MainRoomFillers>k__BackingField:
   - {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
+  <BookPrefab>k__BackingField: {fileID: 4787338882750658545, guid: d16e2c8037bcd9e4e8f6604e94adb6f1, type: 3}
+  <ExtraBookChance>k__BackingField: 0.4
+  <BarrelPrefab>k__BackingField: {fileID: 0}
+  <MinBarrels>k__BackingField: 2
+  <MaxBarrels>k__BackingField: 4
+  <BarrelAtEndChance>k__BackingField: 0.35
   <MinWaterForIsland>k__BackingField: 0
   <FloorPatches>k__BackingField: []
   <FloorPatchCoverage>k__BackingField: 0.9

@@ -197,5 +197,5 @@ MonoBehaviour:
   - Prefab: {fileID: 7965372890594679348, guid: 6f5177d45f993944fae2f444ff16a4ed, type: 3}
     Chance: 0.5
   - Prefab: {fileID: 3143547847192703935, guid: bbb94765cd6bfc549a0d7acf191f280b, type: 3}
-    Chance: 0.1
+    Chance: 0.3
   scatterRadius: 0.25

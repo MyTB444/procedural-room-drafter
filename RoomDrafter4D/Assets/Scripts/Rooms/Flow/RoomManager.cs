@@ -71,22 +71,21 @@ namespace TRV
         // so a cached room re-spawns the same decor without re-running generation.
         private List<PatchPlacement> _currentIslandDecor;
 
+        // Upgrade books of the room currently shown: world spots + their live instances (parallel
+        // lists). Unconsumed books persist on the snapshot; a consumed one stays gone on revisit.
+        private List<Vector3> _currentBookSpots;
+        private readonly List<GameObject> _bookInstances = new List<GameObject>();
+        private readonly HashSet<Vector2Int> _openBookCells = new HashSet<Vector2Int>(); // Anubis book grid cells (barrels avoid them)
+        private List<Vector2Int> _currentBarrelCells; // unbroken Anubis barrels (breaks persist via this list)
+
         // Rolled main-room content for the room currently shown (Halls big igroom): the interior rect
-        // and which option won (one of upgrade/filler index is >= 0, or both -1 = nothing). Saved into
-        // the snapshot on leave so a revisited room re-spawns the same content.
+        // and the chosen filler (-1 = nothing). Saved into the snapshot on leave so a revisited room
+        // re-spawns the same content. (Upgrades come from the BOOK system — see SpawnBooks.)
         private RectInt _currentMainArea;
-        private int _currentMainUpgradeIndex = -1;
         private int _currentMainFillerIndex = -1;
         private List<Vector2Int> _currentMainFillerCells; // unbroken filler cells (breaks persist via this list)
         private List<Vector2Int> _currentVaseCells; // unbroken Lands vase patches (breaks persist via this list)
         private List<Vector2Int> _currentGrassVaseCells; // unbroken vases scattered in grass cores
-        private GameObject _mainUpgradeInstance; // the spawned upgrade pickup (destroyed on room change)
-        private PlayerUpgrades _playerUpgrades;
-
-        // The player's runtime upgrade ledger (lazy — auto-added to the player by TRVController).
-        private PlayerUpgrades PlayerUpgrades =>
-            _playerUpgrades != null ? _playerUpgrades :
-            (_playerUpgrades = player != null ? player.GetComponent<PlayerUpgrades>() : null);
 
         // Visited rooms, captured on leave and restored on return (includes the hand-made start room).
         private readonly RoomCache _cache = new RoomCache();
@@ -340,11 +339,20 @@ namespace TRV
             snapshot.IslandDecor = _currentIslandDecor;
             snapshot.Biome = _currentBiome;
             snapshot.MainArea = _currentMainArea;
-            snapshot.MainUpgradeIndex = _currentMainUpgradeIndex;
             snapshot.MainFillerIndex = _currentMainFillerIndex;
             snapshot.MainFillerCells = _currentMainFillerCells; // remembers which fillers are still intact
             snapshot.VaseCells = _currentVaseCells;             // smashed Lands vases stay gone
             snapshot.GrassVaseCells = _currentGrassVaseCells;
+
+            // Books still standing (not consumed) persist; a consumed book's spot is dropped.
+            var remainingBooks = new List<Vector3>();
+            if (_currentBookSpots != null)
+                for (int i = 0; i < _bookInstances.Count && i < _currentBookSpots.Count; i++)
+                    if (_bookInstances[i] != null && _bookInstances[i].activeSelf)
+                        remainingBooks.Add(_currentBookSpots[i]);
+            snapshot.BookSpots = remainingBooks;
+            snapshot.BarrelCells = _currentBarrelCells; // same list Fill mutates on break
+
             _cache.Save(_coord, snapshot);
 
             _coord += exitDir.Offset();
@@ -376,11 +384,12 @@ namespace TRV
                 _currentIslandDecor = snapshot.IslandDecor;
                 roomBiome = snapshot.Biome != null ? snapshot.Biome : _nextBiome;
                 _currentMainArea = snapshot.MainArea;            // re-spawn the same main-room content
-                _currentMainUpgradeIndex = snapshot.MainUpgradeIndex;
                 _currentMainFillerIndex = snapshot.MainFillerIndex;
                 _currentMainFillerCells = snapshot.MainFillerCells; // already-broken fillers stay gone
                 _currentVaseCells = snapshot.VaseCells;             // already-smashed vases stay gone
                 _currentGrassVaseCells = snapshot.GrassVaseCells;
+                _currentBookSpots = snapshot.BookSpots;             // consumed books stay gone
+                _currentBarrelCells = snapshot.BarrelCells;         // smashed barrels stay gone
             }
             else
             {
@@ -391,12 +400,12 @@ namespace TRV
                 _currentIslandDecor = grid.IslandDecor;
                 enemyPositions = PickEnemyPositions(grid, roomBiome, enterFrom);
                 _currentMainArea = grid.MainIgroomArea;          // roll the big igroom's content (fresh only)
-                DecideMainContent(grid.MainIgroomArea, roomBiome, out _currentMainUpgradeIndex, out _currentMainFillerIndex);
+                _currentMainFillerIndex = PickMainFiller(grid.MainIgroomArea, roomBiome);
                 _currentMainFillerCells = _currentMainFillerIndex >= 0 ? BuildFillerCells(_currentMainArea) : null;
                 _currentVaseCells = grid.VaseSpots; // Lands vase patches (snapshot rides the same list)
                 _currentGrassVaseCells = grid.GrassVaseSpots;
-                // An upgrade room also gets the small-igroom scatter decor (kept off the upgrade's centre).
-                if (_currentMainUpgradeIndex >= 0) _currentIslandDecor.AddRange(grid.MainIgroomDecor);
+                _currentBookSpots = ComputeBookSpots(grid, roomBiome); // biome-specific book placement
+                _currentBarrelCells = ComputeBarrelCells(grid, roomBiome); // Anubis barrels (after books — avoids their cells)
             }
             _currentBiome = roomBiome;
 
@@ -406,8 +415,10 @@ namespace TRV
 
             // Swap the pooled objects over to this room (each releases the previous room's first).
             if (decorPool != null) decorPool.Show(_currentIslandDecor, painter, roomBiome);
-            SpawnMainContent(roomBiome); // big-igroom upgrade/filler — AFTER Show (filler adds to the pool)
+            SpawnMainContent(roomBiome); // big-igroom filler — AFTER Show (filler adds to the pool)
             SpawnVases(roomBiome);       // Lands vase patches — AFTER Show (also adds to the pool)
+            SpawnBooks(roomBiome);       // the biome's upgrade books (fresh spots or the snapshot's)
+            SpawnBarrels(roomBiome);     // Anubis barrels — AFTER Show (also adds to the pool)
             if (enemyPool != null) enemyPool.Populate(enemyPositions, roomBiome);
             if (collectablePool != null) collectablePool.ReleaseAll(); // clear any uncollected drops from the old room
 
@@ -431,83 +442,38 @@ namespace TRV
 
         }
 
-        /// <summary>Roll the big main igroom's content for a FRESH Halls room. Upgrades take PRIORITY:
-        /// while ANY one-per-run upgrade (<see cref="BiomeConfig.MainRoomUpgrades"/>) is still uncollected,
-        /// the room is ALWAYS an upgrade room (random among the uncollected ones). Only once EVERY upgrade
-        /// has been collected does it fall back to a random filler (<see cref="BiomeConfig.MainRoomFillers"/>
-        /// — crates/vases). Outputs the chosen index into ONE array (the other stays -1); both -1 = nothing
-        /// (no main area / nothing configured).</summary>
-        private void DecideMainContent(RectInt area, BiomeConfig biome, out int upgradeIndex, out int fillerIndex)
+        /// <summary>Roll the big main igroom's FILLER for a FRESH Halls room: a random
+        /// <see cref="BiomeConfig.MainRoomFillers"/> entry (crates/vases scattered over the interior),
+        /// or -1 for nothing (no main area / none configured). Upgrades come from the BOOK system —
+        /// the attack book always spawns at the igroom's centre, which the filler cells avoid.</summary>
+        private int PickMainFiller(RectInt area, BiomeConfig biome)
         {
-            upgradeIndex = -1;
-            fillerIndex = -1;
-            if (area.width <= 0 || biome == null) return;
+            if (area.width <= 0 || biome == null) return -1;
 
-            // Still-uncollected upgrades — one entry each. If any exist, the room is guaranteed an upgrade.
-            var upgradeIndices = new List<int>();
-            var upgrades = biome.MainRoomUpgrades;
-            if (upgrades != null)
-                for (int i = 0; i < upgrades.Length; i++)
-                {
-                    if (upgrades[i] == null) continue;
-                    if (upgrades[i].TryGetComponent<Upgrade>(out var up) &&
-                        PlayerUpgrades != null && PlayerUpgrades.HasCollected(up.Id))
-                        continue; // collected this run — can't appear again
-                    upgradeIndices.Add(i);
-                }
-
-            if (upgradeIndices.Count > 0)
-            {
-                upgradeIndex = upgradeIndices[Random.Range(0, upgradeIndices.Count)];
-                return;
-            }
-
-            // Every upgrade collected → a random filler instead.
             var fillerIndices = new List<int>();
             var fillers = biome.MainRoomFillers;
             if (fillers != null)
                 for (int i = 0; i < fillers.Length; i++)
                     if (fillers[i] != null) fillerIndices.Add(i);
 
-            if (fillerIndices.Count > 0)
-                fillerIndex = fillerIndices[Random.Range(0, fillerIndices.Count)];
+            return fillerIndices.Count > 0 ? fillerIndices[Random.Range(0, fillerIndices.Count)] : -1;
         }
 
-        /// <summary>Spawn the current room's rolled big-igroom content: a single upgrade pickup at the
-        /// room centre, OR fill the interior with the chosen filler decor (crates/vases). Destroys the
-        /// previous room's upgrade instance first; an upgrade collected since the room was generated is
-        /// not re-spawned. Uses the cached area/indices (fresh on generation, restored from the snapshot
-        /// on revisit). No-op for non-Halls rooms (no main area).</summary>
+        /// <summary>Spawn the current room's big-igroom filler decor (crates/vases). Uses the cached
+        /// area/index (fresh on generation, restored from the snapshot on revisit). No-op for
+        /// non-Halls rooms (no main area).</summary>
         private void SpawnMainContent(BiomeConfig biome)
         {
-            if (_mainUpgradeInstance != null) { Destroy(_mainUpgradeInstance); _mainUpgradeInstance = null; }
             if (_currentMainArea.width <= 0 || biome == null || painter == null) return;
+            if (_currentMainFillerIndex < 0) return;
 
-            if (_currentMainUpgradeIndex >= 0)
-            {
-                var upgrades = biome.MainRoomUpgrades;
-                if (upgrades == null || _currentMainUpgradeIndex >= upgrades.Length) return;
-                var prefab = upgrades[_currentMainUpgradeIndex];
-                if (prefab == null) return;
-                // Don't re-spawn an upgrade collected since this room was first generated.
-                if (prefab.TryGetComponent<Upgrade>(out var up) &&
-                    PlayerUpgrades != null && PlayerUpgrades.HasCollected(up.Id))
-                    return;
-                int cx = _currentMainArea.xMin + _currentMainArea.width / 2;
-                int cy = _currentMainArea.yMin + _currentMainArea.height / 2;
-                _mainUpgradeInstance = Instantiate(prefab);
-                _mainUpgradeInstance.transform.position = painter.CellCenterWorld(cx, cy);
-            }
-            else if (_currentMainFillerIndex >= 0)
-            {
-                var fillers = biome.MainRoomFillers;
-                if (fillers == null || _currentMainFillerIndex >= fillers.Length) return;
-                var prefab = fillers[_currentMainFillerIndex];
-                if (prefab == null || decorPool == null || _currentMainFillerCells == null) return;
-                // Fill mutates the cell list (drops a cell when its crate breaks); the snapshot rides
-                // the same list, so a smashed crate stays gone when the player returns to the room.
-                decorPool.Fill(prefab, _currentMainFillerCells, painter);
-            }
+            var fillers = biome.MainRoomFillers;
+            if (fillers == null || _currentMainFillerIndex >= fillers.Length) return;
+            var prefab = fillers[_currentMainFillerIndex];
+            if (prefab == null || decorPool == null || _currentMainFillerCells == null) return;
+            // Fill mutates the cell list (drops a cell when its crate breaks); the snapshot rides
+            // the same list, so a smashed crate stays gone when the player returns to the room.
+            decorPool.Fill(prefab, _currentMainFillerCells, painter);
         }
 
         /// <summary>Spawn the breakable VASE at the centre point of each Lands vase patch (the
@@ -530,14 +496,19 @@ namespace TRV
         }
 
         /// <summary>A scattered HALF of the main igroom's interior cells to hold fillers (skips collision
-        /// tiles). Shuffled and halved so crates/vases are sparse and randomly placed, not a packed wall.</summary>
+        /// tiles and the 3×3 around the centre — the biome's BOOK spawns there). Shuffled and halved so
+        /// crates/vases are sparse and randomly placed, not a packed wall.</summary>
         private List<Vector2Int> BuildFillerCells(RectInt area)
         {
+            int bcx = area.xMin + area.width / 2, bcy = area.yMin + area.height / 2;
             var cells = new List<Vector2Int>(area.width * area.height);
             for (int x = area.xMin; x < area.xMax; x++)
                 for (int y = area.yMin; y < area.yMax; y++)
+                {
+                    if (Mathf.Abs(x - bcx) <= 1 && Mathf.Abs(y - bcy) <= 1) continue; // book spot
                     if (painter == null || !painter.HasSolidAt(x, y))
                         cells.Add(new Vector2Int(x, y));
+                }
 
             // Fisher–Yates shuffle, then keep half — random subset = scattered locations.
             for (int i = cells.Count - 1; i > 0; i--)
@@ -548,6 +519,183 @@ namespace TRV
             int keep = cells.Count / 4; // sparse: a quarter of the interior gets a filler
             if (cells.Count > keep) cells.RemoveRange(keep, cells.Count - keep);
             return cells;
+        }
+
+        /// <summary>Where the biome's upgrade BOOKS go in a FRESH room (world positions). Per layout:
+        /// Aqua = the middle of every 4×4 island (decor keeps the centre 2×2 clear); Halls = the big
+        /// igroom's centre (+ rarely one small igroom's centre, both kept clear of decor/fillers);
+        /// Anubis = the end of ONE south corridor that did NOT get the tall decor patch B (max 1);
+        /// Lands = none.</summary>
+        private List<Vector3> ComputeBookSpots(RoomGrid grid, BiomeConfig biome)
+        {
+            var spots = new List<Vector3>();
+            _openBookCells.Clear(); // re-filled by the Open branch; barrels read it afterwards
+            if (grid == null || biome == null || biome.BookPrefab == null || painter == null) return spots;
+
+            switch (biome.Layout)
+            {
+                case BiomeLayout.Corridors: // Aqua: one per island, on its exact middle point
+                    foreach (var (ax, ay) in grid.IslandAnchors)
+                        spots.Add((painter.CellCenterWorld(ax + 1, ay + 1) +
+                                   painter.CellCenterWorld(ax + 2, ay + 2)) * 0.5f);
+                    break;
+
+                case BiomeLayout.Halls: // always the big igroom's middle; rarely one small igroom too
+                {
+                    var main = grid.MainIgroomArea;
+                    if (main.width > 0)
+                        spots.Add(painter.CellCenterWorld(main.xMin + main.width / 2, main.yMin + main.height / 2));
+
+                    // The rare extra book: only igrooms with NO painted collision inside — a
+                    // waterfall ends on a solid 3×3 base patch inside its igroom, and a book
+                    // there would overlap it.
+                    var candidates = new List<RectInt>();
+                    var smalls = grid.IgroomDecorAreas;
+                    if (smalls != null)
+                        foreach (var area in smalls)
+                        {
+                            bool clear = true;
+                            for (int x = area.xMin; x < area.xMax && clear; x++)
+                                for (int y = area.yMin; y < area.yMax && clear; y++)
+                                    if (painter.HasSolidAt(x, y)) clear = false;
+                            if (clear) candidates.Add(area);
+                        }
+                    if (candidates.Count > 0 && Random.value < biome.ExtraBookChance)
+                    {
+                        var area = candidates[Random.Range(0, candidates.Count)];
+                        spots.Add(painter.CellCenterWorld(area.xMin + area.width / 2, area.yMin + area.height / 2));
+                    }
+                    break;
+                }
+
+                case BiomeLayout.Open: // Anubis: corridor ends without the tall (patch B) decor —
+                {                      // one guaranteed; a SECOND on the extra-book chance if
+                                       // another free end exists. The book sits 1 tile ABOVE the
+                                       // end row (where decor B would stand — hence B-corridors
+                                       // are excluded).
+                    var candidates = new List<Vector2Int>();
+                    foreach (var (cx, endY) in grid.HighGroundEnds)
+                        if (painter.HighGroundDecorBEnd.x != cx || painter.HighGroundDecorBEnd.y != endY)
+                            candidates.Add(new Vector2Int(cx, endY));
+                    if (candidates.Count > 0)
+                    {
+                        int first = Random.Range(0, candidates.Count);
+                        var firstCell = new Vector2Int(candidates[first].x, candidates[first].y + 1);
+                        _openBookCells.Add(firstCell);
+                        spots.Add(painter.CellCenterWorld(firstCell.x, firstCell.y));
+
+                        if (candidates.Count > 1 && Random.value < biome.ExtraBookChance)
+                        {
+                            candidates.RemoveAt(first);
+                            var extra = candidates[Random.Range(0, candidates.Count)];
+                            var extraCell = new Vector2Int(extra.x, extra.y + 1);
+                            _openBookCells.Add(extraCell);
+                            spots.Add(painter.CellCenterWorld(extraCell.x, extraCell.y));
+                        }
+                    }
+                    break;
+                }
+            }
+            return spots;
+        }
+
+        /// <summary>Anubis BARREL cells for a FRESH room: sometimes ONE stands behind a corridor
+        /// end that has neither decor B nor a book; the rest scatter on random REGULAR floor —
+        /// never at the floor's edge (all 4 neighbours must be floor, and any cell with painted
+        /// collision — shoreline rims, stairs rails, decor bases — is skipped), never on a stairs
+        /// footprint, clear of doors, ≥2 apart.</summary>
+        private List<Vector2Int> ComputeBarrelCells(RoomGrid grid, BiomeConfig biome)
+        {
+            var cells = new List<Vector2Int>();
+            if (grid == null || biome == null || biome.BarrelPrefab == null || painter == null) return cells;
+            if (biome.Layout != BiomeLayout.Open) return cells;
+
+            int count = Random.Range(biome.MinBarrels, Mathf.Max(biome.MinBarrels, biome.MaxBarrels) + 1);
+            if (count <= 0) return cells;
+
+            // Sometimes one barrel takes a free corridor end (no decor B, no book there).
+            var freeEnds = new List<Vector2Int>();
+            foreach (var (cx, endY) in grid.HighGroundEnds)
+            {
+                if (painter.HighGroundDecorBEnd.x == cx && painter.HighGroundDecorBEnd.y == endY) continue;
+                var spot = new Vector2Int(cx, endY + 1);
+                if (_openBookCells.Contains(spot)) continue;
+                freeEnds.Add(spot);
+            }
+            if (freeEnds.Count > 0 && Random.value < biome.BarrelAtEndChance)
+            {
+                cells.Add(freeEnds[Random.Range(0, freeEnds.Count)]);
+                count--;
+            }
+
+            // The rest scatter over regular floor.
+            var candidates = new List<Vector2Int>();
+            for (int x = 1; x < grid.Width - 1; x++)
+                for (int y = 1; y < grid.Height - 1; y++)
+                {
+                    if (grid[x, y] != CellType.Floor || grid.IsHighGround(x, y)) continue;
+                    if (painter.HasSolidAt(x, y)) continue; // rims/stairs rails/decor bases/walls
+                    if (grid[x - 1, y] != CellType.Floor || grid[x + 1, y] != CellType.Floor ||
+                        grid[x, y - 1] != CellType.Floor || grid[x, y + 1] != CellType.Floor)
+                        continue; // exactly at the floor's edge
+                    if (NearDoor(grid, x, y) || InStairsFootprint(grid, x, y)) continue;
+                    candidates.Add(new Vector2Int(x, y));
+                }
+
+            for (int i = candidates.Count - 1; i > 0; i--) // shuffle
+            {
+                int j = Random.Range(0, i + 1);
+                (candidates[i], candidates[j]) = (candidates[j], candidates[i]);
+            }
+            foreach (var c in candidates)
+            {
+                if (count == 0) break;
+                bool tooClose = false;
+                foreach (var b in cells)
+                    if (Mathf.Abs(b.x - c.x) <= 1 && Mathf.Abs(b.y - c.y) <= 1) { tooClose = true; break; }
+                if (tooClose) continue;
+                cells.Add(c);
+                count--;
+            }
+            return cells;
+        }
+
+        private static bool NearDoor(RoomGrid grid, int x, int y)
+        {
+            for (int dx = -1; dx <= 1; dx++)
+                for (int dy = -1; dy <= 1; dy++)
+                    if (grid.Get(x + dx, y + dy) == CellType.Door) return true;
+            return false;
+        }
+
+        private static bool InStairsFootprint(RoomGrid grid, int x, int y)
+        {
+            foreach (var (sx, sy) in grid.StairPatches)
+                if (x >= sx && x <= sx + 2 && y >= sy && y <= sy + 2) return true;
+            return false;
+        }
+
+        /// <summary>Spawn the room's barrels (breakable, pooled via <see cref="IslandDecorPool.Fill"/> —
+        /// the cell list is mutated on break and rides the snapshot, so smashed barrels stay gone).</summary>
+        private void SpawnBarrels(BiomeConfig biome)
+        {
+            if (biome == null || biome.BarrelPrefab == null || decorPool == null || painter == null) return;
+            if (_currentBarrelCells == null || _currentBarrelCells.Count == 0) return;
+            decorPool.Fill(biome.BarrelPrefab, _currentBarrelCells, painter);
+        }
+
+        /// <summary>Spawn the current room's book instances at <see cref="_currentBookSpots"/>
+        /// (destroying the previous room's). A consumed book deactivates itself; on leave its spot
+        /// is pruned from the snapshot, so it stays gone on revisit.</summary>
+        private void SpawnBooks(BiomeConfig biome)
+        {
+            foreach (var book in _bookInstances)
+                if (book != null) Destroy(book);
+            _bookInstances.Clear();
+
+            if (_currentBookSpots == null || biome == null || biome.BookPrefab == null) return;
+            foreach (var spot in _currentBookSpots)
+                _bookInstances.Add(Instantiate(biome.BookPrefab, spot, Quaternion.identity));
         }
 
         /// <summary>Pick up to EnemiesPerRoom distinct open-Floor cells (world positions) to spawn on,

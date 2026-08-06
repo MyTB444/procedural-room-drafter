@@ -31,15 +31,20 @@ MonoBehaviour:
   <WaterDecorPatches>k__BackingField: []
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 3
+  <EnemiesPerRoom>k__BackingField: 1
   <MinibossPrefabs>k__BackingField: []
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 4
   <IslandDecorObjects>k__BackingField: []
   <IslandDecorMinPerIsland>k__BackingField: 4
   <IslandDecorMaxPerIsland>k__BackingField: 5
-  <MainRoomUpgrades>k__BackingField: []
   <MainRoomFillers>k__BackingField: []
+  <BookPrefab>k__BackingField: {fileID: 0}
+  <ExtraBookChance>k__BackingField: 0.15
+  <BarrelPrefab>k__BackingField: {fileID: 0}
+  <MinBarrels>k__BackingField: 2
+  <MaxBarrels>k__BackingField: 4
+  <BarrelAtEndChance>k__BackingField: 0.35
   <MinWaterForIsland>k__BackingField: 40
   <FloorPatches>k__BackingField: []
   <FloorPatchCoverage>k__BackingField: 0.9

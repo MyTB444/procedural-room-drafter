@@ -117,9 +117,14 @@ namespace TRV
         private Tilemap WaterCollisionTilemap(BiomeConfig config) =>
             config.Layout == BiomeLayout.Halls && unseenCollisionTilemap != null ? unseenCollisionTilemap : wallsTilemap;
 
+        /// <summary>Corridor end (centre column, end row) that received high-ground decor patch B
+        /// this paint — so book placement can avoid that corridor. (int.MinValue,…) = none.</summary>
+        public Vector2Int HighGroundDecorBEnd { get; private set; } = new Vector2Int(int.MinValue, int.MinValue);
+
         public void Paint(RoomGrid grid, BiomeConfig config)
         {
             Clear();
+            HighGroundDecorBEnd = new Vector2Int(int.MinValue, int.MinValue);
 
             // Halls puts everything "behind" (the per-wall water backdrop AND the banded background) on
             // the backmost ExtrasFullBehind layer; other biomes use the regular ExtrasBehind.
@@ -643,6 +648,7 @@ namespace TRV
                 extrasFrontOfPlayerTilemap.SetTile(CellPos(cx, endY + 2), b[1]);
                 extrasFrontOfPlayerTilemap.SetTile(CellPos(cx, endY + 3), b[0]);
                 occupied.Add((cx, endY + 1));
+                HighGroundDecorBEnd = new Vector2Int(cx, endY); // book placement skips this corridor
             }
 
             if (hasA)
@@ -657,9 +663,11 @@ namespace TRV
                     if (x >= doorStart && x < doorStart + config.DoorWidth) continue; // door mouth stays open
                     if (FloorHighAt(grid, x, topRow)) candidates.Add((x, topRow));
                 }
+                // The CENTRE column cell above an end is skipped — the biome's book spawns there
+                // (on a corridor without patch B), and decor A must never take that cell.
                 foreach (var (cx, endY) in decorEnds)
                     for (int x = cx - 1; x <= cx + 1; x++)
-                        if (FloorHighAt(grid, x, endY + 1)) candidates.Add((x, endY + 1));
+                        if (x != cx && FloorHighAt(grid, x, endY + 1)) candidates.Add((x, endY + 1));
 
                 rng.Shuffle(candidates);
                 int target = rng.Next(MinHighGroundDecorA, MaxHighGroundDecorA + 1);

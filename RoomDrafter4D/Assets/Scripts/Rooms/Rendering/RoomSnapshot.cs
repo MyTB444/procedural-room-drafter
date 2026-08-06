@@ -31,11 +31,12 @@ namespace TRV
 
         // Rolled main-room content (Halls big igroom). Re-spawned on revisit so the room stays consistent.
         public RectInt MainArea;          // interior of the big main igroom (width 0 = none)
-        public int MainUpgradeIndex = -1; // index into Biome.MainRoomUpgrades, or -1
         public int MainFillerIndex = -1;  // index into Biome.MainRoomFillers, or -1
         public List<Vector2Int> MainFillerCells; // cells still holding an unbroken filler (breaks persist)
         public List<Vector2Int> VaseCells;       // Lands vase patches still holding an unbroken vase
         public List<Vector2Int> GrassVaseCells;  // grass-core cells still holding an unbroken vase
+        public List<Vector3> BookSpots;          // world positions of upgrade books not yet consumed
+        public List<Vector2Int> BarrelCells;     // Anubis barrel cells still holding an unbroken barrel
     }
 
     /// <summary>One tilemap layer's tiles plus their per-cell transform matrices (parallel arrays).</summary>

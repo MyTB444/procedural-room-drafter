@@ -31,16 +31,20 @@ MonoBehaviour:
   <WaterDecorPatches>k__BackingField: []
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
-  <EnemiesPerRoom>k__BackingField: 0
+  <EnemiesPerRoom>k__BackingField: 1
   <MinibossPrefabs>k__BackingField: []
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField: []
   <IslandDecorMinPerIsland>k__BackingField: 4
   <IslandDecorMaxPerIsland>k__BackingField: 5
-  <MainRoomUpgrades>k__BackingField: []
   <MainRoomFillers>k__BackingField: []
+  <BookPrefab>k__BackingField: {fileID: 6451831146403502824, guid: ec40f6238de44c54c89d338f2eff5500, type: 3}
+  <ExtraBookChance>k__BackingField: 0.2
+  <BarrelPrefab>k__BackingField: {fileID: 0}
+  <MinBarrels>k__BackingField: 2
+  <MaxBarrels>k__BackingField: 4
+  <BarrelAtEndChance>k__BackingField: 0.35
   <MinWaterForIsland>k__BackingField: 0
   <FloorPatches>k__BackingField: []
   <FloorPatchCoverage>k__BackingField: 0.9
@@ -50,6 +54,19 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2ac15cddfb1f52549b4d08c763ccd80e, type: 2}
   - {fileID: 11400000, guid: db0c46d25343aa847af52bbf7806362f, type: 2}
   <RoomFloorTileVariants>k__BackingField: []
+  <PathTileVariants>k__BackingField: []
+  <GrassFullTileVariants>k__BackingField: []
+  <GrassHalfTileVariants>k__BackingField: []
+  <GrassFewTileVariants>k__BackingField: []
+  <GrassNoneTileVariants>k__BackingField: []
+  <GrassEdgeNorthTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthTile>k__BackingField: {fileID: 0}
+  <GrassEdgeEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeWestTile>k__BackingField: {fileID: 0}
+  <GrassEdgeNorthEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeNorthWestTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthEastTile>k__BackingField: {fileID: 0}
+  <GrassEdgeSouthWestTile>k__BackingField: {fileID: 0}
   <HighGroundTileVariants>k__BackingField:
   - {fileID: 11400000, guid: 9cff6f831101a6f438373d5832d8f751, type: 2}
   <FloorEdgeLeftTile>k__BackingField: {fileID: 11400000, guid: 20a7a8d5b80626e47b154700d236817c, type: 2}
@@ -75,6 +92,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d9c73466c315b6741bd1d6a864d8b74b, type: 2}
   - {fileID: 11400000, guid: e954dccc19bdc7840baca82d227488af, type: 2}
   - {fileID: 11400000, guid: fd8e2a2d23b94c041a272db334d6eea8, type: 2}
+  <VaseFloorPatch>k__BackingField: []
+  <VasePrefab>k__BackingField: {fileID: 0}
+  <LandsDecorPatchA>k__BackingField: []
   <HighGroundDecorPatchA>k__BackingField:
   - {fileID: 11400000, guid: cb88a7573567d804a8e7b90087033fc5, type: 2}
   - {fileID: 11400000, guid: 954f2ab60c4685f43b07ab23e26cd0d2, type: 2}
