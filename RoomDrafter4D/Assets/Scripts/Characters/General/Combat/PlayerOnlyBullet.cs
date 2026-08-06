@@ -36,6 +36,10 @@ namespace TRV
         private float _timeLeft;
         private bool _launched;
 
+        /// <summary>Multiply the per-prefab damage before launch — e.g. scaled by the room layer's
+        /// <see cref="EnemyController.DamageScale"/>.</summary>
+        public void ScaleDamage(float multiplier) => damage *= Mathf.Max(0f, multiplier);
+
         /// <inheritdoc />
         public void Launch(Vector2 direction, GameObject source)
         {

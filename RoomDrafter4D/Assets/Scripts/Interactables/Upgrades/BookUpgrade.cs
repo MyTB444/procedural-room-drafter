@@ -102,22 +102,30 @@ namespace TRV
             if (choice == null || upgrades.ChoiceLevel(choice.Label) >= MaxLevelOf(choice))
                 return; // maxed — the UI disables the button, this is just the guard
 
-            // An ability skill's FIRST level only ENABLES it; the modifiers kick in from level 2 on.
-            bool unlockingNow = choice.UnlockAbility && !upgrades.IsUnlocked(choice.Ability);
-            if (unlockingNow)
+            // Deeper LAYERS make books stronger: 1 level + the room manager's per-layer bonus,
+            // each level applied in sequence (capped at the choice's max).
+            int levels = 1 + (RoomManager.Instance != null ? RoomManager.Instance.BonusBookLevels : 0);
+            for (int n = 0; n < levels; n++)
             {
-                upgrades.Unlock(choice.Ability);
-            }
-            else if (choice.Modifiers != null)
-            {
-                foreach (var m in choice.Modifiers)
-                {
-                    if (m == null) continue;
-                    upgrades.AddStat(m.Stat, m.Amount);
-                }
-            }
+                if (upgrades.ChoiceLevel(choice.Label) >= MaxLevelOf(choice)) break;
 
-            upgrades.IncrementChoiceLevel(choice.Label);
+                // An ability skill's FIRST level only ENABLES it; modifiers kick in from level 2 on.
+                bool unlockingNow = choice.UnlockAbility && !upgrades.IsUnlocked(choice.Ability);
+                if (unlockingNow)
+                {
+                    upgrades.Unlock(choice.Ability);
+                }
+                else if (choice.Modifiers != null)
+                {
+                    foreach (var m in choice.Modifiers)
+                    {
+                        if (m == null) continue;
+                        upgrades.AddStat(m.Stat, m.Amount);
+                    }
+                }
+
+                upgrades.IncrementChoiceLevel(choice.Label);
+            }
             ConsumeWithoutId(choice.Label);
         }
 

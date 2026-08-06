@@ -18,9 +18,9 @@ namespace TRV
         [Min(0f)] public float Damage = 1f;
 
         /// <summary>Swing this attack's hitbox along <paramref name="dir"/>. No-op if no hitbox is set.</summary>
-        public void Perform(Vector2 dir, GameObject owner)
+        public void Perform(Vector2 dir, GameObject owner, float damageScale = 1f)
         {
-            if (Hitbox != null) Hitbox.Strike(dir, Damage, owner);
+            if (Hitbox != null) Hitbox.Strike(dir, Damage * damageScale, owner);
         }
     }
 }

@@ -107,8 +107,23 @@ namespace TRV
         /// <summary>Called by a pool when this enemy is spawned. null = placed in the scene by hand.</summary>
         public void AssignPool(PrefabPool pool) => _pool = pool;
 
+        /// <summary>Damage multiplier from the room's LAYER (1 = base). Every damage source of this
+        /// enemy (melee, charges, skirmish attacks, bullets) multiplies by it.</summary>
+        public float DamageScale { get; private set; } = 1f;
+
+        /// <summary>Scale this enemy for the room's layer: max HP re-initialised (full) at
+        /// stats.MaxHealth × <paramref name="healthMultiplier"/>, damage via <see cref="DamageScale"/>.
+        /// Called by <see cref="EnemyPool"/> right after each spawn (1/1 on unscaled layers).</summary>
+        public void ApplyLayerScale(float healthMultiplier, float damageMultiplier)
+        {
+            DamageScale = Mathf.Max(0f, damageMultiplier);
+            if (stats != null && _health != null)
+                _health.Init(stats.MaxHealth * Mathf.Max(0.01f, healthMultiplier));
+        }
+
         private void Initialize()
         {
+            DamageScale = 1f; // re-scaled by the pool after activation (hand-placed enemies stay 1)
             _health.Init(stats.MaxHealth);
             _dying = false;
             _velocity = Vector2.zero;
@@ -334,7 +349,7 @@ namespace TRV
         /// Override for other archetypes (e.g. fire a projectile).</summary>
         protected virtual void OnAttack(Vector2 dir)
         {
-            if (attackHitbox != null) attackHitbox.Strike(dir, stats.Damage, gameObject);
+            if (attackHitbox != null) attackHitbox.Strike(dir, stats.Damage * DamageScale, gameObject);
         }
 
         /// <summary>Whether knockback moves this enemy. Override → false for an unstoppable enemy that's

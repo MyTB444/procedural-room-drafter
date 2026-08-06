@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -52,6 +53,7 @@ namespace TRV
         [SerializeField] private RoomManager roomManager;
 
         private Image[] _cells; // row-major, top row (north) first
+        private TMP_Text[] _cellTexts; // optional per-cell layer label (a TMP child of the cell image)
         private bool _initialized;
 
         private void Awake() => EnsureInit();
@@ -114,6 +116,12 @@ namespace TRV
             if (cellSprite != null)
                 foreach (var cell in _cells)
                     if (cell != null) cell.sprite = cellSprite;
+
+            // Each cell's LAYER label: the TMP text authored as a child of the cell image (none = no label).
+            _cellTexts = new TMP_Text[total];
+            for (int i = 0; i < total; i++)
+                if (_cells[i] != null)
+                    _cellTexts[i] = _cells[i].GetComponentInChildren<TMP_Text>(true);
         }
 
         private void Update()
@@ -124,8 +132,14 @@ namespace TRV
             if (testFillAll)
             {
                 var cycle = new[] { landsColor, anubisColor, aquaColor, hallsColor };
-                for (int c = 0; c < _cells.Length; c++)
-                    if (_cells[c] != null) _cells[c].color = cycle[c % cycle.Length];
+                int c = 0;
+                for (int dy = Radius; dy >= -Radius; dy--)
+                    for (int dx = -Radius; dx <= Radius; dx++, c++)
+                    {
+                        if (_cells[c] != null) _cells[c].color = cycle[c % cycle.Length];
+                        if (_cellTexts[c] != null) // preview: ring distance from the map's centre
+                            _cellTexts[c].text = Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dy)).ToString();
+                    }
                 return;
             }
 
@@ -136,9 +150,17 @@ namespace TRV
             for (int dy = Radius; dy >= -Radius; dy--)          // top row = north
                 for (int dx = -Radius; dx <= Radius; dx++, i++)
                 {
+                    var coord = centre + new Vector2Int(dx, dy);
                     var cell = _cells[i];
-                    if (cell == null) continue;
-                    cell.color = ColorFor(centre + new Vector2Int(dx, dy));
+                    if (cell != null) cell.color = ColorFor(coord);
+
+                    // Layer label: only on DRAFTED rooms, and never on the start room (layer 0).
+                    if (_cellTexts[i] != null)
+                    {
+                        int layer = roomManager.LayerOf(coord);
+                        bool drafted = roomManager.TryGetRoomBiome(coord, out var biome) && biome != null;
+                        _cellTexts[i].text = drafted && layer > 0 ? layer.ToString() : "";
+                    }
                 }
         }
 

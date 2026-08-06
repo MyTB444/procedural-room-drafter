@@ -58,23 +58,33 @@ namespace TRV
             // the centre — see RoomManager.SpawnMainContent / SpawnBooks.)
         }
 
-        /// <summary>Record up to a random [min, max] decor on distinct cells of <paramref name="cells"/>
-        /// into <paramref name="target"/>, each cell's prefab chosen by per-type chance (a cell where
-        /// nothing rolls in stays empty). The final on-collision check happens at spawn time in
-        /// <see cref="IslandDecorPool"/>.</summary>
+        /// <summary>Record a random [min, max] decor count on distinct cells of <paramref name="cells"/>
+        /// into <paramref name="target"/>, each cell's prefab chosen by per-type chance. Failed chance
+        /// rolls are RE-SWEPT over the still-empty cells until the count is met (or a full sweep
+        /// places nothing / cells run out) — so reserving cells for other content (e.g. the book
+        /// spots) doesn't starve the decor count. The final on-collision check happens at spawn time
+        /// in <see cref="IslandDecorPool"/>.</summary>
         private static void PlaceDecor(List<PatchPlacement> target, System.Random rng, IslandDecorEntry[] objects,
                                        int min, int max, List<(int x, int y)> cells)
         {
-            rng.Shuffle(cells); // each shuffled cell is unique, so taking the first N never overlaps
+            rng.Shuffle(cells); // each shuffled cell is unique, so filling never overlaps
             int count = rng.Next(min, max + 1);
             int placed = 0;
-            foreach (var (x, y) in cells)
+
+            var unused = new List<(int x, int y)>(cells);
+            while (placed < count && unused.Count > 0)
             {
-                if (placed >= count) break;
-                int index = PickByChance(rng, objects);
-                if (index < 0) continue; // no type rolled in for this cell → leave it empty
-                target.Add(new PatchPlacement(x, y, index));
-                placed++;
+                bool progressed = false;
+                for (int i = unused.Count - 1; i >= 0 && placed < count; i--)
+                {
+                    int index = PickByChance(rng, objects);
+                    if (index < 0) continue; // no type rolled in — this cell may fill on a later sweep
+                    target.Add(new PatchPlacement(unused[i].x, unused[i].y, index));
+                    unused.RemoveAt(i);
+                    placed++;
+                    progressed = true;
+                }
+                if (!progressed) break; // every chance is (near) zero — don't loop forever
             }
         }
 

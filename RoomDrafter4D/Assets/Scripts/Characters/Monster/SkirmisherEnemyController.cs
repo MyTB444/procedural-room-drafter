@@ -104,7 +104,7 @@ namespace TRV
             }
             else // Skirmish (state 1): the bigger attack fires immediately, FINISH it, then flee
             {
-                skirmishAttack.Perform(dir, gameObject);
+                skirmishAttack.Perform(dir, gameObject, DamageScale);
                 Attacked?.Invoke(1);
                 _skirmishHoldTimer = skirmishAttackDuration; // hold facing the player until the attack finishes
             }
@@ -114,7 +114,7 @@ namespace TRV
         // starts the post-attack halt (no movement during it).
         private void FireMelee(Vector2 dir)
         {
-            meleeAttack.Perform(dir, gameObject);
+            meleeAttack.Perform(dir, gameObject, DamageScale);
             Attacked?.Invoke(0);
             _meleeRecoverTimer = Stats != null ? Stats.AttackHaltDuration : 0f;
             if (++_aggressiveCount >= aggressiveAttacks)

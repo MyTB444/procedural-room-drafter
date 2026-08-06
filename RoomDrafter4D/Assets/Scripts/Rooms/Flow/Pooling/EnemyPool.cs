@@ -27,7 +27,8 @@ namespace TRV
         /// ONE random slot may be a miniboss (max 1 per room, rolled by <see cref="BiomeConfig.MinibossChance"/>
         /// when <see cref="BiomeConfig.MinibossPrefabs"/> is set). Pass null/empty to just clear.
         /// </summary>
-        public void Populate(IReadOnlyList<Vector3> positions, BiomeConfig biome)
+        public void Populate(IReadOnlyList<Vector3> positions, BiomeConfig biome,
+                             float healthMultiplier = 1f, float damageMultiplier = 1f)
         {
             ReleaseAll();
             if (positions == null || positions.Count == 0 || biome == null) return;
@@ -47,6 +48,9 @@ namespace TRV
                 if (go.TryGetComponent<EnemyController>(out var enemy))
                     enemy.AssignPool(this);
                 go.SetActive(true);
+                // AFTER SetActive: enabling ran Initialize (base health) — the layer scale rescales it.
+                if (go.TryGetComponent<EnemyController>(out var scaled))
+                    scaled.ApplyLayerScale(healthMultiplier, damageMultiplier);
             }
         }
 

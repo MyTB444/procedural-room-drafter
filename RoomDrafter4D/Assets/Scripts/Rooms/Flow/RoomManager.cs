@@ -44,11 +44,72 @@ namespace TRV
         [Tooltip("How many cells in FRONT of the entry door to spawn the player (clear of the door trigger).")]
         [SerializeField] private int spawnInset = 2;
 
+        [Header("Layers (difficulty scaling)")]
+        [Tooltip("Layer = ring distance from the start room (Chebyshev — the first ring around the " +
+                 "start is layer 1). Scaling KICKS IN at this layer: each layer from here on adds " +
+                 "one scaling STEP (layer 1 is always unscaled).")]
+        [SerializeField, Min(2)] private int scalingStartLayer = 2;
+
+        [Tooltip("Enemy MAX HP increase per scaling step (0.1 = +10% each).")]
+        [SerializeField, Min(0f)] private float enemyHealthPercentPerLayer = 0.1f;
+
+        [Tooltip("Enemy DAMAGE increase per scaling step (0.1 = +10% each).")]
+        [SerializeField, Min(0f)] private float enemyDamagePercentPerLayer = 0.1f;
+
+        [Tooltip("Extra enemies spawned per room per enemy-step (on top of the biome's EnemiesPerRoom).")]
+        [SerializeField, Min(0)] private int extraEnemiesPerLayer = 1;
+
+        [Tooltip("How many LAYERS it takes to add one enemy-step — 2 = the enemy count grows every " +
+                 "2nd layer (first increase still at Scaling Start Layer); 1 = every layer.")]
+        [SerializeField, Min(1)] private int layersPerExtraEnemy = 2;
+
+        [Tooltip("Extra LEVELS a book choice grants per scaling step (on top of its base 1).")]
+        [SerializeField, Min(0)] private int bookLevelsPerLayer = 1;
+
+        [Tooltip("From this layer on, the DEFAULT (Lands) biome can no longer be drafted: the draft " +
+                 "UI hides its Skip button, and a keyless player can't pass a door leading there.")]
+        [SerializeField, Min(1)] private int noLandsFromLayer = 4;
+
         private static RoomManager _instance;
 
         /// <summary>The scene's room manager (fake-null re-finds it after a reload).</summary>
         public static RoomManager Instance =>
             _instance != null ? _instance : (_instance = FindAnyObjectByType<RoomManager>());
+
+        /// <summary>The current room's LAYER: Chebyshev ring distance from the start room (start = 0,
+        /// the ring around it = 1, and so on outward).</summary>
+        public int CurrentLayer =>
+            Mathf.Max(Mathf.Abs(_coord.x - startCoord.x), Mathf.Abs(_coord.y - startCoord.y));
+
+        /// <summary>Scaling steps for the current layer: 0 until <see cref="scalingStartLayer"/>,
+        /// then +1 per layer (layer 2 = 1 step, layer 3 = 2 steps, … with the default start).</summary>
+        public int LayerSteps => Mathf.Max(0, CurrentLayer - scalingStartLayer + 1);
+
+        /// <summary>Enemy max-HP multiplier for the current layer (1 = unscaled).</summary>
+        public float EnemyHealthMultiplier => 1f + enemyHealthPercentPerLayer * LayerSteps;
+
+        /// <summary>Enemy damage multiplier for the current layer (1 = unscaled).</summary>
+        public float EnemyDamageMultiplier => 1f + enemyDamagePercentPerLayer * LayerSteps;
+
+        /// <summary>Extra enemies added to every room at the current layer — grows one enemy-step
+        /// every <see cref="layersPerExtraEnemy"/> layers (ceil, so the first step still lands ON
+        /// the scaling start layer: with the defaults L2→+1, L4→+2, L6→+3…).</summary>
+        public int ExtraEnemies =>
+            extraEnemiesPerLayer * ((LayerSteps + layersPerExtraEnemy - 1) / layersPerExtraEnemy);
+
+        /// <summary>Extra levels a book choice grants at the current layer (on top of its base 1).</summary>
+        public int BonusBookLevels => bookLevelsPerLayer * LayerSteps;
+
+        /// <summary>Layer (ring distance from the start) of an arbitrary room coordinate — 0 = the
+        /// start room. Also used by the map UI to label drafted rooms.</summary>
+        public int LayerOf(Vector2Int coord) =>
+            Mathf.Max(Mathf.Abs(coord.x - startCoord.x), Mathf.Abs(coord.y - startCoord.y));
+
+        /// <summary>Whether the pending draft's target room may take the DEFAULT (Lands) biome —
+        /// false from <see cref="noLandsFromLayer"/> on (the draft UI hides its Skip button).</summary>
+        public bool PendingDraftAllowsDefault => LayerOf(_pendingDraftCoord) < noLandsFromLayer;
+
+        private Vector2Int _pendingDraftCoord; // target coord of the draft currently open/starting
 
         [Tooltip("The room-draft UI opened when the player steps on a door. Optional — auto-found " +
                  "from the scene; when none exists, doors transition immediately (old behaviour).")]
@@ -217,9 +278,14 @@ namespace TRV
                 return;
             }
 
-            // No keys at all — nothing to choose either: straight into the default room.
+            // The target room's layer decides whether the DEFAULT (Lands) biome is allowed there.
+            _pendingDraftCoord = _coord + exitDir.Offset();
+
+            // No keys at all — nothing to choose either: straight into the default room… unless
+            // the door leads to a no-Lands layer, in which case a keyless player can't pass.
             if (!HasAnyKeys())
             {
+                if (!PendingDraftAllowsDefault) return; // locked out — come back with a key
                 _nextBiome = DefaultBiome();
                 StartCoroutine(Transition(exitDir));
                 return;
@@ -264,6 +330,9 @@ namespace TRV
         {
             if (!_drafting) return;
             _drafting = false;
+            // Defensive: a null (Skip) confirm into a no-Lands layer is refused (the UI hides the
+            // Skip button there, so this shouldn't happen).
+            if (biome == null && !PendingDraftAllowsDefault) return;
             _nextBiome = biome != null ? biome : DefaultBiome();
             // Classify by nearest edge, not position-vs-centre — doors can be anywhere on an edge,
             // and a door cell is always nearest its own edge.
@@ -419,7 +488,7 @@ namespace TRV
             SpawnVases(roomBiome);       // Lands vase patches — AFTER Show (also adds to the pool)
             SpawnBooks(roomBiome);       // the biome's upgrade books (fresh spots or the snapshot's)
             SpawnBarrels(roomBiome);     // Anubis barrels — AFTER Show (also adds to the pool)
-            if (enemyPool != null) enemyPool.Populate(enemyPositions, roomBiome);
+            if (enemyPool != null) enemyPool.Populate(enemyPositions, roomBiome, EnemyHealthMultiplier, EnemyDamageMultiplier);
             if (collectablePool != null) collectablePool.ReleaseAll(); // clear any uncollected drops from the old room
 
             // Spawn in FRONT of the actual door on the entry edge (so doors can be anywhere on it).
@@ -735,7 +804,7 @@ namespace TRV
                 (pickFrom[i], pickFrom[j]) = (pickFrom[j], pickFrom[i]);
             }
 
-            int n = Mathf.Min(biome.EnemiesPerRoom, pickFrom.Count + 1);
+            int n = Mathf.Min(biome.EnemiesPerRoom + ExtraEnemies, pickFrom.Count + 1); // layers add enemies
             positions.Add(painter.CellCenterWorld(prime.x, prime.y));
             for (int i = 0; i < n - 1; i++)
                 positions.Add(painter.CellCenterWorld(pickFrom[i].x, pickFrom[i].y));

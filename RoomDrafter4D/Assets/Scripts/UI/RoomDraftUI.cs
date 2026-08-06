@@ -92,6 +92,11 @@ namespace TRV
             IsOpen = true;
             if (!gameObject.activeSelf) gameObject.SetActive(true); // component may live on the panel itself
             if (inventory != null) inventory.KeysChanged += OnKeysChanged;
+
+            // Skip drafts the DEFAULT (Lands) biome — hidden when the target room's layer forbids it.
+            if (skipButton != null)
+                skipButton.gameObject.SetActive(roomManager == null || roomManager.PendingDraftAllowsDefault);
+
             RefreshKeys();
             if (panelRoot != null) panelRoot.SetActive(true);
             if (player != null) player.SetControlsEnabled(false);

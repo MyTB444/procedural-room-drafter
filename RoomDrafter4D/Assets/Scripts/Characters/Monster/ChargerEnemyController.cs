@@ -72,7 +72,7 @@ namespace TRV
                         _phaseTimer = chargeDuration;
                         // Arm the child hitbox for the whole lunge (it follows the body, hits once).
                         if (AttackHitbox != null)
-                            AttackHitbox.Strike(_chargeDir, Stats != null ? Stats.Damage : 0f, gameObject, chargeDuration);
+                            AttackHitbox.Strike(_chargeDir, (Stats != null ? Stats.Damage : 0f) * DamageScale, gameObject, chargeDuration);
                     }
                     return true; // stand still during the wind-up
 
