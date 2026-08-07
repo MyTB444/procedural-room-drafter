@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7897d1523e11ae641a03b8c946ccb421, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TRV.Projectile
-  speed: 10
+  speed: 12
   lifetime: 5
   damage: 10
   knockback: 0
@@ -141,3 +141,4 @@ MonoBehaviour:
     m_Bits: 896
   destroyOnHit: 1
   spriteForwardAngle: 90
+  noColliderHitRadius: 0.3

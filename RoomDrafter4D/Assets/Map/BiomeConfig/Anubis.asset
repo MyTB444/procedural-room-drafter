@@ -41,9 +41,9 @@ MonoBehaviour:
   <MainRoomFillers>k__BackingField: []
   <BookPrefab>k__BackingField: {fileID: 6451831146403502824, guid: ec40f6238de44c54c89d338f2eff5500, type: 3}
   <ExtraBookChance>k__BackingField: 0.2
-  <BarrelPrefab>k__BackingField: {fileID: 0}
-  <MinBarrels>k__BackingField: 2
-  <MaxBarrels>k__BackingField: 4
+  <BarrelPrefab>k__BackingField: {fileID: 3590478880627600977, guid: b4a2eac11fe431844b454c9f389fd136, type: 3}
+  <MinBarrels>k__BackingField: 4
+  <MaxBarrels>k__BackingField: 6
   <BarrelAtEndChance>k__BackingField: 0.35
   <MinWaterForIsland>k__BackingField: 0
   <FloorPatches>k__BackingField: []
