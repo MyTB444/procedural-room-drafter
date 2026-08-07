@@ -107,6 +107,7 @@ MonoBehaviour:
   interactRange: 1.5
   id: 0
   message: Upgrade acquired!
+  bookType: 2
   choices:
   - Label: ShieldBash
     Modifiers:

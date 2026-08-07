@@ -28,6 +28,16 @@ namespace TRV
                  "button's children.")]
         [SerializeField] private TMP_Text[] choiceTexts;
 
+        [Header("Button colours per book type")]
+        [Tooltip("Button tint when a STAT book (Aqua) opened the panel.")]
+        [SerializeField] private Color statBookColor = Color.white;
+
+        [Tooltip("Button tint when an ATTACK book (Halls) opened the panel.")]
+        [SerializeField] private Color attackBookColor = Color.white;
+
+        [Tooltip("Button tint when a SKILL book (Anubis) opened the panel.")]
+        [SerializeField] private Color skillBookColor = Color.white;
+
         /// <summary>True while the panel is up (controls frozen, waiting for a choice).</summary>
         public bool IsOpen { get; private set; }
 
@@ -78,6 +88,8 @@ namespace TRV
 
             // One button per choice; hide the slots this book doesn't need. Text shows the choice's
             // current LEVEL (times taken, "Label lvlN"); a maxed choice stays visible but disabled.
+            // Buttons are TINTED by the opening book's type.
+            var buttonColor = ColorFor(book.Type);
             var choices = book.Choices;
             for (int i = 0; i < choiceButtons.Length; i++)
             {
@@ -86,6 +98,7 @@ namespace TRV
                 choiceButtons[i].gameObject.SetActive(used);
                 if (!used) continue;
 
+                if (choiceButtons[i].image != null) choiceButtons[i].image.color = buttonColor;
                 int level = upgrades != null ? upgrades.ChoiceLevel(choices[i].Label) : 0;
                 choiceButtons[i].interactable = level < BookUpgrade.MaxLevelOf(choices[i]);
                 if (choiceTexts[i] != null) choiceTexts[i].text = $"{choices[i].Label} lvl {level}";
@@ -98,6 +111,13 @@ namespace TRV
             if (panelRoot != null) panelRoot.SetActive(true);
             if (_player != null) _player.SetControlsEnabled(false);
         }
+
+        private Color ColorFor(BookUpgrade.BookType type) => type switch
+        {
+            BookUpgrade.BookType.Attack => attackBookColor,
+            BookUpgrade.BookType.Skill => skillBookColor,
+            _ => statBookColor,
+        };
 
         private void Choose(int index)
         {

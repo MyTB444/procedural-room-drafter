@@ -16,6 +16,17 @@ namespace TRV
     /// </summary>
     public class BookUpgrade : Upgrade
     {
+        /// <summary>Which kind of book this is — the choice UI tints its buttons per type
+        /// (Stat = Aqua islands, Attack = Halls igrooms, Skill = Anubis corridor ends).</summary>
+        public enum BookType { Stat, Attack, Skill }
+
+        [Tooltip("The book's type — the choice UI colours its buttons by it (Stat = Aqua, " +
+                 "Attack = Halls, Skill = Anubis).")]
+        [SerializeField] private BookType bookType = BookType.Stat;
+
+        /// <summary>This book's type (read by the choice UI for button tinting).</summary>
+        public BookType Type => bookType;
+
         [System.Serializable]
         public class Choice
         {

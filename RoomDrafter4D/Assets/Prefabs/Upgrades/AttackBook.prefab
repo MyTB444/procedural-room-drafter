@@ -107,6 +107,7 @@ MonoBehaviour:
   interactRange: 1.5
   id: 1
   message: Upgrade acquired!
+  bookType: 1
   choices:
   - Label: Attack Damage
     Modifiers:
@@ -114,15 +115,18 @@ MonoBehaviour:
       Amount: 5
     UnlockAbility: 0
     Ability: 0
+    MaxLevel: 0
   - Label: Attack Speed
     Modifiers:
     - Stat: 0
       Amount: -0.035
     UnlockAbility: 0
     Ability: 0
+    MaxLevel: 0
   - Label: Movement Speed
     Modifiers:
     - Stat: 7
-      Amount: 0.6
+      Amount: 0.3
     UnlockAbility: 0
     Ability: 0
+    MaxLevel: 0
