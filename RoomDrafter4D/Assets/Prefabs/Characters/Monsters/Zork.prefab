@@ -247,8 +247,8 @@ MonoBehaviour:
   safeDistance: 4
   maxFleeSeconds: 3
   stuckFireSeconds: 0.35
-  holdSeconds: 1
-  wanderSeconds: 1
+  holdSeconds: 1.5
+  wanderSeconds: 2
   wanderTurnSeconds: 0.8
   bulletPrefab: {fileID: 3956604837008965977, guid: fa11b69acac1c0c4ba256cf00e098f0e, type: 3}
   muzzle: {fileID: 0}
