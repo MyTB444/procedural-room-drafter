@@ -96,12 +96,23 @@ namespace TRV
         private void OnEnable()
         {
             _health.Died += Die;
+            _health.Damaged += OnDamagedAlert;
             if (stats != null) Initialize();
         }
 
         private void OnDisable()
         {
             _health.Died -= Die;
+            _health.Damaged -= OnDamagedAlert;
+        }
+
+        /// <summary>Taking a hit ALERTS the enemy no matter where it came from — detection latches
+        /// exactly as if the player had entered vision (incl. the OnFirstDetected intro hook).</summary>
+        private void OnDamagedAlert()
+        {
+            if (_dying || _seenPlayer) return;
+            _seenPlayer = true;
+            OnFirstDetected();
         }
 
         /// <summary>Called by a pool when this enemy is spawned. null = placed in the scene by hand.</summary>

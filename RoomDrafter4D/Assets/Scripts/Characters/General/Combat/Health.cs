@@ -22,6 +22,7 @@ namespace TRV
         public bool Invincible { get; set; }
 
         public event Action<float> Changed; // new current health
+        public event Action Damaged;        // an actual HIT landed (not heals/init) — e.g. enemies alert on it
         public event Action Died;
 
         private HitFlash _flash;
@@ -55,6 +56,7 @@ namespace TRV
             if (!IsAlive || amount <= 0f || Invincible) return;
             Current = Mathf.Max(0f, Current - amount);
             Changed?.Invoke(Current);
+            Damaged?.Invoke();
 
             if (Current > 0f)
             {
