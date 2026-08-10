@@ -365,10 +365,11 @@ namespace TRV
             if (fireBulletPrefab != null)
             {
                 var bullet = Instantiate(fireBulletPrefab, transform.position, Quaternion.identity);
-                if (bullet.TryGetComponent<Projectile>(out var projectile))
-                    projectile.SetDamage(AttackDamage); // live stat — attack upgrades boost the bullet too
                 if (bullet.TryGetComponent<IProjectile>(out var launchable))
+                {
+                    launchable.SetDamage(AttackDamage); // live stat — attack upgrades boost the bullet too
                     launchable.Launch(dir, gameObject);
+                }
             }
             else if (!_warnedNoFireBullet)
             {

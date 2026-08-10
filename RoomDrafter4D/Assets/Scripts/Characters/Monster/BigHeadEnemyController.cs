@@ -188,12 +188,9 @@ namespace TRV
             var origin = muzzle != null ? muzzle.position : transform.position;
             var bullet = Instantiate(bulletPrefab, origin, Quaternion.identity);
 
-            // Layer scaling: the bullet inherits this enemy's damage multiplier.
-            if (DamageScale != 1f)
-            {
-                if (bullet.TryGetComponent<Projectile>(out var proj)) proj.ScaleDamage(DamageScale);
-                else if (bullet.TryGetComponent<PlayerOnlyBullet>(out var pob)) pob.ScaleDamage(DamageScale);
-            }
+            // Bullets carry no damage of their own — the SHOOTER's damage stat (layer-scaled) is it.
+            if (bullet.TryGetComponent<IProjectile>(out var armed))
+                armed.SetDamage((Stats != null ? Stats.Damage : 0f) * DamageScale);
             if (throwDelay <= 0f)
             {
                 Throw(bullet, dir);

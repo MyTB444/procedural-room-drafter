@@ -4943,6 +4943,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TRV.PlayerOnlyBullet
   speed: 8
   lifetime: 5
-  damage: 40
+  damage: 30
   knockback: 0
   hitRadius: 0.4

@@ -70,6 +70,17 @@ namespace TRV
                  "UI hides its Skip button, and a keyless player can't pass a door leading there.")]
         [SerializeField, Min(1)] private int noLandsFromLayer = 4;
 
+        [Header("Room clear reward")]
+        [Tooltip("HP pot prefab (a Collectable, e.g. the HealthPotion) dropped at the room's middle " +
+                 "when its last enemy dies. Empty = no reward.")]
+        [SerializeField] private GameObject clearRewardPotPrefab;
+
+        [Tooltip("Pots per LAYER on clear (count = layer × this; layer 0/start = none).")]
+        [SerializeField, Min(0)] private int potsPerLayerOnClear = 1;
+
+        [Tooltip("How far around the middle point the pots scatter (world units).")]
+        [SerializeField, Min(0f)] private float clearRewardScatter = 0.6f;
+
         private static RoomManager _instance;
 
         /// <summary>The scene's room manager (fake-null re-finds it after a reload).</summary>
@@ -138,6 +149,7 @@ namespace TRV
         private readonly List<GameObject> _bookInstances = new List<GameObject>();
         private readonly HashSet<Vector2Int> _openBookCells = new HashSet<Vector2Int>(); // Anubis book grid cells (barrels avoid them)
         private List<Vector2Int> _currentBarrelCells; // unbroken Anubis barrels (breaks persist via this list)
+        private bool _roomHadEnemies; // armed on a fresh spawn; the clear reward fires when the count hits 0
 
         // Rolled main-room content for the room currently shown (Halls big igroom): the interior rect
         // and the chosen filler (-1 = nothing). Saved into the snapshot on leave so a revisited room
@@ -233,12 +245,34 @@ namespace TRV
 
         private void Update()
         {
+            // Room-clear reward: the moment the last enemy of this room dies, HP pots (layer ×
+            // potsPerLayerOnClear) drop at the room's middle and fly to the player.
+            if (_roomHadEnemies && enemyPool != null && enemyPool.ActiveCount == 0)
+            {
+                _roomHadEnemies = false;
+                SpawnClearReward();
+            }
+
             // M toggles the room map — polled HERE (always active) so it works no matter where
             // the map component lives in the UI hierarchy, active or not.
             var keyboard = UnityEngine.InputSystem.Keyboard.current;
             if (keyboard == null || !keyboard.mKey.wasPressedThisFrame) return;
             if (_mapUI == null) _mapUI = FindAnyObjectByType<RoomMapUI>(FindObjectsInactive.Include);
             if (_mapUI != null) _mapUI.Toggle();
+        }
+
+        /// <summary>Drop the clear reward — one HP pot per layer (× the tunable) scattered around
+        /// the room's middle point; the pots ground-wait then fly to the player (Collectable flow).</summary>
+        private void SpawnClearReward()
+        {
+            if (clearRewardPotPrefab == null || potsPerLayerOnClear <= 0 || painter == null) return;
+            int count = CurrentLayer * potsPerLayerOnClear;
+            var pool = CollectablePool.Instance;
+            if (count <= 0 || pool == null || _currentBiome == null) return;
+
+            var centre = painter.CellCenterWorld(_currentBiome.Width / 2, _currentBiome.Height / 2);
+            for (int i = 0; i < count; i++)
+                pool.Spawn(clearRewardPotPrefab, centre + (Vector3)(Random.insideUnitCircle * clearRewardScatter));
         }
 
         /// <summary>Called by a <see cref="DoorPortal"/> while the player stands on a door tile.
@@ -489,6 +523,7 @@ namespace TRV
             SpawnBooks(roomBiome);       // the biome's upgrade books (fresh spots or the snapshot's)
             SpawnBarrels(roomBiome);     // Anubis barrels — AFTER Show (also adds to the pool)
             if (enemyPool != null) enemyPool.Populate(enemyPositions, roomBiome, EnemyHealthMultiplier, EnemyDamageMultiplier);
+            _roomHadEnemies = enemyPositions != null && enemyPositions.Count > 0; // arms the clear reward (fresh rooms only)
             if (collectablePool != null) collectablePool.ReleaseAll(); // clear any uncollected drops from the old room
 
             // Spawn in FRONT of the actual door on the entry edge (so doors can be anywhere on it).

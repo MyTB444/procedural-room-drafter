@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: Zork_Stats
   m_EditorClassIdentifier: Assembly-CSharp::TRV.EnemyStats
   <CharacterName>k__BackingField: Character
-  <MaxHealth>k__BackingField: 50
+  <MaxHealth>k__BackingField: 45
   <MoveSpeed>k__BackingField: 2
   <Acceleration>k__BackingField: 60
   <Deceleration>k__BackingField: 70
-  <Damage>k__BackingField: 15
+  <Damage>k__BackingField: 10
   <AttackCooldown>k__BackingField: 0.35
   <AttackRange>k__BackingField: 4
   <AttackMoveMultiplier>k__BackingField: 0.5

@@ -14,5 +14,9 @@ namespace TRV
         /// <paramref name="source"/> is the shooter, so the projectile can ignore its own owner.
         /// </summary>
         void Launch(Vector2 direction, GameObject source);
+
+        /// <summary>Set the damage this projectile deals — bullets carry NO damage of their own;
+        /// the SPAWNER passes its damage stat before <see cref="Launch"/>.</summary>
+        void SetDamage(float amount);
     }
 }

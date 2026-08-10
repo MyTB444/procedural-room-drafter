@@ -28,10 +28,8 @@ namespace TRV
         [SerializeField, Min(0f)] private float lifetime = 5f;
 
         [Header("Impact")]
-        [Tooltip("Damage dealt to the first damageable it hits.")]
-        [SerializeField, Min(0f)] private float damage = 10f;
-
-        [Tooltip("Knockback force applied to the target (0 = none).")]
+        [Tooltip("Knockback force applied to the target (0 = none). Damage has NO field — the " +
+                 "spawner passes its own damage stat via SetDamage before launch.")]
         [SerializeField, Min(0f)] private float knockback = 0f;
 
         [Tooltip("Layers the projectile reacts to (walls, characters). Its own shooter is always ignored.")]
@@ -52,6 +50,7 @@ namespace TRV
         private Collider2D _collider;
         private Vector2 _direction;
         private GameObject _source;
+        private float _damage; // always set by the spawner (its damage stat) — no per-prefab value
         private float _timeLeft;
         private bool _launched;
         private readonly System.Collections.Generic.HashSet<Collider2D> _alreadyHit =
@@ -68,13 +67,8 @@ namespace TRV
             _collider = GetComponent<Collider2D>();
         }
 
-        /// <summary>Override the per-prefab damage before launch — e.g. the player's bullet dealing
-        /// the CURRENT attack stat (upgrades included) instead of a fixed number.</summary>
-        public void SetDamage(float amount) => damage = amount;
-
-        /// <summary>Multiply the per-prefab damage before launch — e.g. an enemy bullet scaled by
-        /// the room layer's <see cref="EnemyController.DamageScale"/>.</summary>
-        public void ScaleDamage(float multiplier) => damage *= Mathf.Max(0f, multiplier);
+        /// <inheritdoc />
+        public void SetDamage(float amount) => _damage = Mathf.Max(0f, amount);
 
         /// <inheritdoc />
         public void Launch(Vector2 direction, GameObject source)
@@ -126,7 +120,7 @@ namespace TRV
                 if (other == null || !_alreadyHit.Add(other)) continue; // once per target
                 if (_source != null && other.transform.IsChildOf(_source.transform)) continue; // never hit the shooter
 
-                CombatHit.Apply(other.gameObject, new DamageInfo(damage, _direction, _source), knockback);
+                CombatHit.Apply(other.gameObject, new DamageInfo(_damage, _direction, _source), knockback);
 
                 if (destroyOnHit)
                 {

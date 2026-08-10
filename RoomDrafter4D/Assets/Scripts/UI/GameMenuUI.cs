@@ -46,6 +46,11 @@ namespace TRV
         [SerializeField] private string controlsText = "Controls";
         [SerializeField] private string infoText = "Info";
 
+        [Header("In-game UI (hidden while the menu is up)")]
+        [Tooltip("The single parent holding ALL in-game UI — disabled while the menu/death screen " +
+                 "is open, re-enabled when it closes.")]
+        [SerializeField] private GameObject hudRoot;
+
         [Header("Player")]
         [Tooltip("The player to freeze while the menu is up. Auto-found if left empty.")]
         [SerializeField] private TRVController player;
@@ -159,11 +164,15 @@ namespace TRV
 
         // The menu pauses time — EXCEPT when dead (the world plays on behind the death menu).
         // Controls are frozen while the menu is up or the player is dead. Escape/UI still respond
-        // while paused because Update + the UI event system run on unscaled time.
+        // while paused because Update + the UI event system run on unscaled time. The in-game HUD
+        // hides with the menu so the overlays never stack visually.
         private void ApplyPauseState()
         {
             Time.timeScale = _menuOpen && !_dead ? 0f : 1f;
             if (player != null) player.SetControlsEnabled(!_menuOpen && !_dead);
+
+            if (hudRoot != null && hudRoot.activeSelf == _menuOpen)
+                hudRoot.SetActive(!_menuOpen);
         }
 
         /// <summary>Reload the current scene from scratch (also bindable to a button OnClick).</summary>

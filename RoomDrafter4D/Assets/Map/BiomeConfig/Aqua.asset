@@ -59,8 +59,10 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b0126710ea506cf4fb4e27754656f060, type: 2}
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 1
-  <MinibossPrefabs>k__BackingField: []
+  - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
+  <EnemiesPerRoom>k__BackingField: 2
+  <MinibossPrefabs>k__BackingField:
+  - {fileID: 6334333803242247449, guid: 63abb0d8975685c40950bc5459daae6f, type: 3}
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 6
   <IslandDecorObjects>k__BackingField:

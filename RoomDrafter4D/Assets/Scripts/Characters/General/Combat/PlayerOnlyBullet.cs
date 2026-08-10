@@ -22,10 +22,8 @@ namespace TRV
         [SerializeField, Min(0.1f)] private float lifetime = 5f;
 
         [Header("Impact")]
-        [Tooltip("Damage dealt to the player on hit.")]
-        [SerializeField, Min(0f)] private float damage = 10f;
-
-        [Tooltip("Knockback force applied to the player (0 = none).")]
+        [Tooltip("Knockback force applied to the player (0 = none). Damage has NO field — the " +
+                 "spawner passes its own damage stat via SetDamage before launch.")]
         [SerializeField, Min(0f)] private float knockback = 0f;
 
         [Tooltip("How close to the player's position counts as a hit.")]
@@ -33,12 +31,12 @@ namespace TRV
 
         private Vector2 _direction;
         private GameObject _source;
+        private float _damage; // always set by the spawner (its damage stat) — no per-prefab value
         private float _timeLeft;
         private bool _launched;
 
-        /// <summary>Multiply the per-prefab damage before launch — e.g. scaled by the room layer's
-        /// <see cref="EnemyController.DamageScale"/>.</summary>
-        public void ScaleDamage(float multiplier) => damage *= Mathf.Max(0f, multiplier);
+        /// <inheritdoc />
+        public void SetDamage(float amount) => _damage = Mathf.Max(0f, amount);
 
         /// <inheritdoc />
         public void Launch(Vector2 direction, GameObject source)
@@ -69,7 +67,7 @@ namespace TRV
 
             var player = PlayerLocator.Player;
             if (player != null)
-                CombatHit.Apply(player.gameObject, new DamageInfo(damage, _direction, _source), knockback);
+                CombatHit.Apply(player.gameObject, new DamageInfo(_damage, _direction, _source), knockback);
             Destroy(gameObject);
         }
     }

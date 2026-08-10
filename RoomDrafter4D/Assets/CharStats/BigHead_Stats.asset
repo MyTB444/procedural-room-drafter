@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BigHead_Stats
   m_EditorClassIdentifier: Assembly-CSharp::TRV.EnemyStats
   <CharacterName>k__BackingField: Character
-  <MaxHealth>k__BackingField: 200
+  <MaxHealth>k__BackingField: 100
   <MoveSpeed>k__BackingField: 1
   <Acceleration>k__BackingField: 60
   <Deceleration>k__BackingField: 70
