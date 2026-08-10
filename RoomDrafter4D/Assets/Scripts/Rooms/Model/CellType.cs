@@ -16,9 +16,5 @@ namespace TRV
     {
         /// <summary>Cells the player can stand on.</summary>
         public static bool IsWalkable(this CellType c) => c == CellType.Floor || c == CellType.Door;
-
-        /// <summary>Solid, movement-blocking cells.</summary>
-        public static bool IsSolid(this CellType c) =>
-            c == CellType.Wall || c == CellType.Water || c == CellType.Building;
     }
 }

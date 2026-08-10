@@ -1,10 +1,10 @@
 namespace TRV
 {
     /// <summary>
-    /// Places the 4 doorways as openings in the wall ring — the door takes the INNER-most wall cell
-    /// (centre of each edge), so the layout reads <c>map → door → wall → edge</c>: the door is the
-    /// last visible tile before the outer wall, with <c>WallThickness-1</c> wall(s) behind it (1 by
-    /// default) sealing the exit until the room is cleared (future). A floor landing is carved inward.
+    /// Places the 4 doorways as openings in the wall ring — each door takes the INNER-most wall
+    /// cell of its edge, so the layout reads <c>map → door → wall → edge</c> with
+    /// <c>WallThickness-1</c> wall(s) behind it. A floor landing is carved inward (the actual
+    /// door-lock-until-cleared lives in RoomManager/DoorPortal).
     /// Door positions are rolled per room edge (anywhere along it, corner-padded) by
     /// RoomGenerator and read from <see cref="RoomGrid.DoorStarts"/>; the entry spawn finds the
     /// door by scanning the painted Door layer, so rooms don't need matching door positions.

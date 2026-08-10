@@ -4,8 +4,8 @@ namespace TRV
 {
     /// <summary>
     /// One Animator parameter: caches its hash and whether the controller actually defines it, so
-    /// every setter is a safe no-op (no warning spam) when the parameter is absent. Shared by the
-    /// character → Animator bridges (TRVAnimator, EnemyAnimator).
+    /// every setter is a safe no-op (no warning spam) when the parameter is absent. Shared by all
+    /// the character → Animator bridges (TRVAnimator + the enemy animators).
     /// </summary>
     public readonly struct AnimParam
     {

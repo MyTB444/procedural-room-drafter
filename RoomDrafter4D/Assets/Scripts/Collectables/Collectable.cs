@@ -37,7 +37,6 @@ namespace TRV
             _groundLeft = groundDelay;
             _speed = flySpeed;
             _collected = false;
-            OnDropped();
         }
 
         private void Update()
@@ -71,8 +70,5 @@ namespace TRV
 
         /// <summary>Apply the pickup's effect to the player. Called once when collected.</summary>
         protected abstract void OnCollected(TRVController player);
-
-        /// <summary>Optional hook fired when (re)dropped — e.g. reset a spawn animation. No-op by default.</summary>
-        protected virtual void OnDropped() { }
     }
 }

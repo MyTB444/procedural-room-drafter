@@ -8,7 +8,7 @@ namespace TRV
     /// </summary>
     public static class RoomSeed
     {
-        public static int For(int worldSeed, Vector2Int coord)
+        private static int For(int worldSeed, Vector2Int coord)
         {
             unchecked
             {

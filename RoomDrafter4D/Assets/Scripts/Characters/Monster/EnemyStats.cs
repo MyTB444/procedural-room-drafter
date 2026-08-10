@@ -4,7 +4,7 @@ namespace TRV
 {
     /// <summary>
     /// Stats for an enemy: inherits the actor-agnostic <see cref="CharacterStats"/> (health,
-    /// movement, Damage/AttackCooldown/AttackRange, knockback) and adds the AI tuning shared by
+    /// movement, Damage/AttackCooldown/AttackRange) and adds the AI tuning shared by
     /// melee enemies — detection range, wander cadence, and the post-attack halt. Subclass for
     /// archetype-specific extras. Create via Create ▸ TRV ▸ Enemy Stats.
     /// </summary>

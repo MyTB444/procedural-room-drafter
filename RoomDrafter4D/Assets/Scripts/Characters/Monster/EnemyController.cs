@@ -8,8 +8,9 @@ namespace TRV
     /// <summary>
     /// Reusable melee-enemy brain + body. Wanders (idle ↔ roam, random cadence) until the player
     /// enters <see cref="EnemyStats.DetectionRadius"/>, then chases and, once within AttackRange,
-    /// attacks on cooldown — halting in place for <see cref="EnemyStats.AttackHaltDuration"/> after
-    /// each swing. Movement is full 2D; the 4-direction animation snaps diagonals to East/West.
+    /// attacks on cooldown — each attack opens with an <see cref="EnemyStats.AttackWindup"/> halt
+    /// (the hitbox lands after it) and recovers for <see cref="EnemyStats.AttackHaltDuration"/>.
+    /// Movement is full 2D; the 4-direction animation snaps diagonals to East/West.
     /// Implements the shared combat interfaces so the player's attacks damage and knock it back.
     ///
     /// Reuse: drop on any melee enemy with an EnemyStats asset + a child <see cref="AttackHitbox"/>.

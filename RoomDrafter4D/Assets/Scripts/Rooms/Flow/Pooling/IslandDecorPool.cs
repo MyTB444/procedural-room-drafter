@@ -17,16 +17,8 @@ namespace TRV
                 instance.AddComponent<IslandDecorPiece>(); // makes it hittable → returns to this pool on hit
         }
 
-        /// <summary>
-        /// Show decor for a room: release the previous room's objects, then place a pooled instance
-        /// at each placement's cell (world position via <paramref name="painter"/>), using
-        /// <paramref name="biome"/>'s decor prefabs (the same biome that generated the placements).
-        /// Each piece is wired to REMOVE its placement from <paramref name="placements"/> when broken,
-        /// so a destroyed piece doesn't respawn when the player returns (the room's snapshot rides the
-        /// same list).
-        /// </summary>
-        /// <summary>Pre-instantiate a batch of each island-decor prefab (weights ignored — every type
-        /// can appear). Convenience overload over <see cref="PrefabPool.Prewarm"/>.</summary>
+        /// <summary>Pre-instantiate a batch of each island-decor prefab (chances ignored — every
+        /// type can appear). Convenience overload over <see cref="PrefabPool.Prewarm"/>.</summary>
         public void Prewarm(IslandDecorEntry[] entries)
         {
             if (entries == null) return;
@@ -57,6 +49,13 @@ namespace TRV
             }
         }
 
+        /// <summary>
+        /// Show decor for a room: release the previous room's objects, then place a pooled instance
+        /// at each placement's cell (world position via <paramref name="painter"/>), using
+        /// <paramref name="biome"/>'s decor prefabs (the same biome that generated the placements).
+        /// Each piece is wired to REMOVE its placement from <paramref name="placements"/> when
+        /// broken, so a destroyed piece doesn't respawn on revisit (the snapshot rides the list).
+        /// </summary>
         public void Show(List<PatchPlacement> placements, TilemapPainter painter, BiomeConfig biome)
         {
             ReleaseAll();

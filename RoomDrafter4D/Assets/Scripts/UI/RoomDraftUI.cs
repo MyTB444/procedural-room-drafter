@@ -6,16 +6,18 @@ namespace TRV
 {
     /// <summary>
     /// The ROOM DRAFT panel, opened by <see cref="RoomManager"/> when the player steps on a door
-    /// (instead of transitioning immediately). While open the player's controls are frozen.
-    /// Buttons (wired in code — assign the Button references, no OnClick setup needed):
-    /// • CANCEL — closes the panel; the player keeps playing, and the draft won't reopen until
-    ///   they step OFF the door trigger and back on.
-    /// • SKIP — no keys spent; transitions into the DEFAULT biome (Lands).
+    /// (instead of transitioning immediately). While open the player's controls are frozen; the
+    /// <see cref="UIGate"/> is claimed, so <see cref="Open"/> can REFUSE (returns false) while
+    /// another blocking UI is up. Buttons (wired in code — just assign the Button references):
+    /// • CANCEL — closes the panel; the draft won't reopen until the player steps OFF the door
+    ///   trigger and back on.
+    /// • SKIP — no keys spent; drafts the DEFAULT biome (Lands). HIDDEN when the target room's
+    ///   layer forbids the default (<see cref="RoomManager.PendingDraftAllowsDefault"/>).
     /// • RED / BLUE / PURPLE — each shows how many keys of that colour the player holds; pressing
-    ///   spends ONE key and drafts red → Anubis, blue → Aqua, purple → Halls. A button is only
-    ///   interactable while the player holds a key of that colour (and the biome exists).
-    /// Put this component on an ACTIVE object (e.g. the canvas) and let it toggle the panel root —
-    /// the panel itself starts hidden.
+    ///   spends ONE key and drafts red → Anubis, blue → Aqua, purple → Halls. A colour's whole
+    ///   parent hides at 0 keys.
+    /// Works from an active OR initially-inactive object (idempotent EnsureInit); the panel root
+    /// itself starts hidden.
     /// </summary>
     public class RoomDraftUI : MonoBehaviour
     {

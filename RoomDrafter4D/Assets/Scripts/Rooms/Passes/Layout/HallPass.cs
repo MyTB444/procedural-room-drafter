@@ -130,9 +130,10 @@ namespace TRV
                 }
         }
 
-        /// <summary>Record the INTERIOR rect of each igroom EXCEPT the largest (the main room, which gets
-        /// no decor for now) onto <see cref="RoomGrid.IgroomDecorAreas"/> — interior = footprint minus the
-        /// 1-cell wall border.</summary>
+        /// <summary>Record the INTERIOR rect of each igroom EXCEPT the largest (the main room — its
+        /// content is the rolled filler + the book, spawned by RoomManager) onto
+        /// <see cref="RoomGrid.IgroomDecorAreas"/> — interior = footprint minus the 1-cell wall
+        /// border. The main room's interior goes to <see cref="RoomGrid.MainIgroomArea"/>.</summary>
         private static void RecordDecorAreas(RoomGrid grid, List<(int x, int y, int fw, int fh)> rooms)
         {
             if (rooms.Count == 0) return;

@@ -9,7 +9,8 @@ namespace TRV
     /// ready) it RUNS AWAY from the player at <see cref="fleeSpeed"/> (regular movement keeps
     /// using MoveSpeed); once far enough (<see cref="safeDistance"/> — or pressed against the
     /// WORLD LIMIT and unable to flee further, or timed out) it stops, TURNS to the player and
-    /// INSTANTLY fires a bullet, HOLDS in place facing the player for <see cref="holdSeconds"/>,
+    /// fires a bullet (spawned at once, THROWN <see cref="throwDelay"/> later, re-aimed at the
+    /// player at throw time), HOLDS in place facing the player for <see cref="holdSeconds"/>,
     /// then WANDERS for <see cref="wanderSeconds"/> at the regular MoveSpeed before the base FSM
     /// resumes — ready to attack again once the cooldown (begun at the flee's start) allows.
     ///

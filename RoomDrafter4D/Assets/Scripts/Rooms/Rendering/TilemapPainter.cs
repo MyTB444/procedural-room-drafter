@@ -5,9 +5,10 @@ using UnityEngine.Tilemaps;
 namespace TRV
 {
     /// <summary>
-    /// Renders a finished <see cref="RoomGrid"/> onto the 4 Tilemap layers. Pure view — it reads
-    /// cell types and stamps the matching tile: Wall/Water → Walls layer, Floor → Map layer,
-    /// Door → Door layer (plus floor underneath so it's walkable). Extras handled by a later pass.
+    /// Renders a finished <see cref="RoomGrid"/> onto the scene's Tilemap layers (13 of them —
+    /// core: Wall/Water → Walls, Floor → Map, Door → Door with floor underneath; plus the
+    /// collision overflow layers and the Extras layers for decor, all painted here). Pure view —
+    /// it reads cell types + flags and stamps tiles; the grid data is never touched.
     /// </summary>
     public class TilemapPainter : MonoBehaviour
     {
@@ -613,7 +614,7 @@ namespace TRV
         /// solid base on the Collision5 layer with the upper tile(s) on ExtrasFrontOfPlayer:
         /// • Patch B (3 tall) places ONCE, on a random south corridor, its base exactly 1 tile
         ///   behind the corridor's last middle floor tile.
-        /// • Patch A (2 tall) scatters 2–4 bases along the NORTH edge (top interior row, skipping
+        /// • Patch A (2 tall) scatters 1–2 bases along the NORTH edge (top interior row, skipping
         ///   the north door's columns so its mouth stays open) and on the row just ABOVE each
         ///   corridor's end — never ON the end row itself, where the rim walls live.
         /// Deterministic (VariantSeed-seeded rng, decoupled from the other decor passes) and
@@ -1650,16 +1651,16 @@ namespace TRV
             }
         }
 
-        /// <summary>
-        /// Rotation for south-side wall cells that borrow a north tile — only when the biome has
-        /// <see cref="BiomeConfig.RotateSouthWalls"/> on (else the south tiles are assigned explicitly
-        /// and need no rotation), and the borrowed slot actually has tiles.
-        /// </summary>
         /// <summary>The straight south edge gets floor painted beneath it (so the sprite's base shows
         /// ground). NOT the SW/SE corners — under an igroom those corner tiles sit over water and a
         /// floor patch beneath them just pokes out.</summary>
         private static bool IsSouthFacing(WallKind kind) => kind == WallKind.South;
 
+        /// <summary>
+        /// Rotation for south-side wall cells that borrow a north tile — only when the biome has
+        /// <see cref="BiomeConfig.RotateSouthWalls"/> on (else the south tiles are assigned explicitly
+        /// and need no rotation), and the borrowed slot actually has tiles.
+        /// </summary>
         private static bool TryGetWallRotation(WallKind kind, BiomeConfig config, out Matrix4x4 rotation)
         {
             rotation = Matrix4x4.identity;
@@ -1681,7 +1682,7 @@ namespace TRV
             }
         }
 
-        public void Clear()
+        private void Clear()
         {
             if (wallsTilemap) wallsTilemap.ClearAllTiles();
             if (unseenCollisionTilemap) unseenCollisionTilemap.ClearAllTiles();

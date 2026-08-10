@@ -11,10 +11,13 @@ namespace TRV
     /// — resolved by the room's biome LAYOUT via <see cref="RoomManager.TryGetRoomBiome"/> (the
     /// cache + the current room).
     ///
+    /// Each cell may also carry a TMP text child — it shows that room's LAYER number (drafted rooms
+    /// only, never the start room). <see cref="testFillAll"/> previews colours + ring distances.
+    ///
     /// Setup: give <see cref="gridParent"/> a GridLayoutGroup constrained to 5 columns. Cells are
     /// either the parent's EXISTING Image children (make 25, row-major, top-left first) or, when
     /// <see cref="cellPrefab"/> is assigned, 25 clones instantiated at runtime. Refreshes every
-    /// frame (25 dictionary lookups — trivial).
+    /// frame while visible (cheap; skipped while hidden).
     /// </summary>
     public class RoomMapUI : MonoBehaviour
     {

@@ -9,10 +9,12 @@ namespace TRV
     /// object is consumed (the one-per-run id is NOT used — books are repeatable).
     ///
     /// Choices LEVEL: each choice (keyed by its Label, shared across all books offering it) can be
-    /// taken <see cref="PlayerUpgrades.MaxChoiceLevel"/> (10) times per run — the UI shows
-    /// "Label lvlN" and disables maxed choices; a book whose every choice is maxed stops being
-    /// interactable. Each choice bundles stat modifiers (same data as <see cref="StatUpgrade"/>)
-    /// and/or an ability unlock. Different books just hold different choice lists — the UI adapts.
+    /// taken up to its own <see cref="Choice.MaxLevel"/> (0 = the global
+    /// <see cref="PlayerUpgrades.MaxChoiceLevel"/> of 10); deeper LAYERS grant extra levels per
+    /// pick. The UI shows "Label lvl N" and disables maxed choices; a book whose every choice is
+    /// maxed stops being interactable, and NO book is interactable while the room still has
+    /// enemies. Each choice bundles stat modifiers (same data as <see cref="StatUpgrade"/>) and/or
+    /// an ability unlock. Different books just hold different choice lists — the UI adapts.
     /// </summary>
     public class BookUpgrade : Upgrade
     {
@@ -63,9 +65,9 @@ namespace TRV
         /// <summary>The choices this book offers (read by the choice UI).</summary>
         public Choice[] Choices => choices;
 
-        /// <summary>Books ignore the one-per-run id (they're repeatable — many books per run,
-        /// choices levelling up to <see cref="PlayerUpgrades.MaxChoiceLevel"/>): interactable while
-        /// unused AND at least one choice isn't maxed yet.</summary>
+        /// <summary>Books ignore the one-per-run id (they're repeatable — many books per run):
+        /// interactable while unused, the ROOM IS CLEARED of enemies, and at least one choice
+        /// isn't maxed yet.</summary>
         protected override bool CanInteract()
         {
             if (Used) return false;

@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 namespace TRV
 {
     /// <summary>
-    /// A captured copy of one room's tiles across the 10 layers — including each cell's per-cell
+    /// A captured copy of one room’s tiles across the 13 layers — including each cell's per-cell
     /// transform (rotation/scale), so a visited room (the hand-made start area, or rooms where you
     /// rotated tiles) is restored exactly when the player returns to its coord. Island decor objects
     /// aren't tiles, so their placements ride along here and are re-spawned from the pool on return.

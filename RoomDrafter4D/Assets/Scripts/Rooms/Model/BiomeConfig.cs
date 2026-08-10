@@ -50,8 +50,8 @@ namespace TRV
 
         [field: Header("Walls")]
         [field: Tooltip("Thickness of the outer wall ring in cells. The playable interior shrinks by " +
-                        "this much per side, and each door keeps this many walls behind it (sealing the " +
-                        "room until it's cleared — future). 2 = player can't exit yet.")]
+                        "this much per side; each door keeps WallThickness-1 wall cells behind it " +
+                        "(the painter adds solid backing tiles outside the grid).")]
         [field: Min(1)]
         [field: SerializeField] public int WallThickness { get; private set; } = 2;
 
@@ -139,8 +139,8 @@ namespace TRV
         [field: SerializeField] public int EnemySpawnSafeRadius { get; private set; } = 4;
 
         [field: Header("Island decor (pooled objects)")]
-        [field: Tooltip("Decor prefabs scattered on each island, each with a relative pick chance " +
-                        "(weight). Spawned/reused from IslandDecorPool at runtime — not painted to a tilemap.")]
+        [field: Tooltip("Decor prefabs scattered on each island, each with its own INDEPENDENT " +
+                        "chance (0-1). Spawned/reused from IslandDecorPool at runtime — not painted to a tilemap.")]
         [field: SerializeField] public IslandDecorEntry[] IslandDecorObjects { get; private set; }
 
         [field: Tooltip("How many decor objects per island (random in [min, max] inclusive). Capped by " +
@@ -188,8 +188,8 @@ namespace TRV
         [field: SerializeField] public float BarrelAtEndChance { get; private set; } = 0.35f;
 
         [field: Header("Water island")]
-        [field: Tooltip("If the room's largest water body has at least this many cells, a strictly " +
-                        "2-wide path is carved from the nearest floor to its middle, ending in a 4×4 " +
+        [field: Tooltip("EVERY water body with at least this many cells gets an island: a strictly " +
+                        "2-wide path carved from the nearest floor to its middle, ending in a 4×4 " +
                         "island made of four 2×2 patches. 0 = never.")]
         [field: Min(0)]
         [field: SerializeField] public int MinWaterForIsland { get; private set; } = 40;
@@ -271,11 +271,11 @@ namespace TRV
 
         [field: Tooltip("Thin shoreline wall painted ON TOP of a REGULAR floor cell (on the " +
                         "Collision layer) when WATER lies directly to its LEFT (west). High-ground " +
-                        "floor gets its own edge tiles (separate slots, to come). A cell bordering " +
-                        "water on several sides paints ONE tile, picked in priority order " +
-                        "left/right/top/bottom (corner tiles to come). Empty = off. The tile's " +
-                        "Collider Type decides the physics: Sprite = a thin physical rim, None = " +
-                        "pure visual.")]
+                        "floor has its own rim slots below. A cell bordering water on several sides " +
+                        "paints the first tile by priority left/right/top/bottom (the second goes " +
+                        "to Collision2); corners use Floor Edge Corner Tile. Empty = off. The " +
+                        "tile's Collider Type decides the physics: Sprite = a thin physical rim, " +
+                        "None = pure visual.")]
         [field: SerializeField] public TileBase FloorEdgeLeftTile { get; private set; }
 
         [field: Tooltip("Thin shoreline wall for a regular floor cell with WATER directly to its " +
@@ -423,14 +423,14 @@ namespace TRV
         [field: SerializeField] public TileBase[] WaterfallBasePatch { get; private set; }
 
         [field: Tooltip("Floor decor column (Halls): a vertical tile strip authored TOP→BOTTOM, placed " +
-                        "1–3 times on the field floor on the ExtrasFrontOfPlayer layer (bottom tile on the " +
+                        "2–3 times on the field floor on the ExtrasFrontOfPlayer layer (bottom tile on the " +
                         "floor, rising up). Its bottom cell gets a water collision tile on UnseenCollision " +
                         "so the base blocks movement. Empty = off.")]
         [field: SerializeField] public TileBase[] FloorDecorColumn { get; private set; }
 
-        [field: Tooltip("Cube patch (Halls): a 3×3 tile group, 9 tiles row-major TOP row first. 3 per " +
-                        "room, split across two layers (always 2/1, never all on one): some on " +
-                        "ExtrasBehind with the bottom-middle cell on an igroom's south corner, the rest on " +
+        [field: Tooltip("Cube patch (Halls): a 3×3 tile group, 9 tiles row-major TOP row first. 2–3 per " +
+                        "room, split across two layers (never all on one): some on ExtrasBehind with " +
+                        "the bottom-middle cell on an igroom's south corner, the rest on " +
                         "ExtrasFrontOfPlayer with the bottom edge along the room's south edge (kept clear " +
                         "of each other and the floor decor columns). Empty = off.")]
         [field: SerializeField] public TileBase[] CubePatch { get; private set; }
@@ -482,17 +482,17 @@ namespace TRV
         [field: SerializeField] public TileBase RightDoorTile { get; private set; }
 
         [field: Header("Tiles — ExtrasBehind background (Halls)")]
-        [field: Tooltip("Horizontal bands painted on ExtrasBehind from beneath the north edge down: a " +
-                        "random run of NorthBehind, then Transition1, Transition2, then Blank fills the " +
-                        "rest to the south edge. Assign North Behind to enable.")]
+        [field: Tooltip("Horizontal bands painted on ExtrasFullBehind from beneath the north edge " +
+                        "down: one Transition1 row, one Transition2 row, then Blank fills the rest " +
+                        "to the south edge. Assign Transition1 to enable. (NorthBehind is unused.)")]
         [field: SerializeField] public TileBase NorthBehindTile { get; private set; }
         [field: SerializeField] public TileBase Transition1Tile { get; private set; }
         [field: SerializeField] public TileBase Transition2Tile { get; private set; }
         [field: SerializeField] public TileBase BlankBehindTile { get; private set; }
 
-        [field: Tooltip("End-cap tiles for the NorthBehind / Transition1 bands where they meet a floor " +
-                        "tile horizontally: floor to the WEST → the Left end, floor to the EAST → the " +
-                        "Right end. Empty = use the regular band tile.")]
+        [field: Tooltip("End-cap tiles for the Transition1 band where it meets a field floor tile " +
+                        "horizontally: floor to the WEST → the Left end, floor to the EAST → the " +
+                        "Right end. Empty = use the regular band tile. (The NorthBehind caps are unused.)")]
         [field: SerializeField] public TileBase NorthBehindLeftEndTile { get; private set; }
         [field: SerializeField] public TileBase NorthBehindRightEndTile { get; private set; }
         [field: SerializeField] public TileBase Transition1LeftEndTile { get; private set; }

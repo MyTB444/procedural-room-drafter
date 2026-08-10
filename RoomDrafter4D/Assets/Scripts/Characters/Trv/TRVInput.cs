@@ -9,8 +9,9 @@ namespace TRV
     /// "InputSystem_Actions" asset (the "Player" action map) and re-exposes
     /// everything as clean, engine-agnostic data:
     ///
-    ///   • <see cref="MoveInput"/>  — polled each frame.
-    ///   • <see cref="DashPressed"/> / <see cref="AttackPressed"/> / <see cref="InteractPressed"/> — C# events.
+    ///   • <see cref="MoveInput"/> / <see cref="PointerScreenPosition"/> — polled each frame.
+    ///   • <see cref="DashPressed"/> / <see cref="AttackPressed"/> / <see cref="FirePressed"/> /
+    ///     <see cref="InteractPressed"/> — C# events.
     ///
     /// Nothing else in the game references InputAction, key codes, or devices, so
     /// rebinding or swapping the input backend never reaches gameplay code.

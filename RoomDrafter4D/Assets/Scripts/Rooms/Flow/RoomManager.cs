@@ -10,14 +10,15 @@ namespace TRV
     /// the same place — we never create new grids. Walking through a door: fade to black → repaint
     /// the grid for the neighbour room → drop the player in front of the matching entry door → fade in.
     ///
-    /// Multiple biomes: <see cref="biomes"/> lists what's available; the player picks the biome for
-    /// the NEXT new room via <see cref="SelectBiome"/>. Each room remembers the biome that generated
-    /// it (on its snapshot) so a cached room restores its decor/dimensions correctly.
+    /// Multiple biomes: <see cref="biomes"/> lists what's available; the player DRAFTS the next
+    /// room's biome at the door (RoomDraftUI — keys pick a biome, Skip takes the default; the
+    /// testing hotkeys force one via <see cref="SelectBiome"/>). Each room remembers the biome
+    /// that generated it (on its snapshot) so a cached room restores correctly.
     /// </summary>
     public class RoomManager : MonoBehaviour
     {
         [Header("References")]
-        [Tooltip("Available biomes. The player chooses among these; index 0 is the default/start biome.")]
+        [Tooltip("Available biomes. The player drafts among these; the DEFAULT (start/skip) biome is the Lands/Plain entry when present, else the first.")]
         [SerializeField] private BiomeConfig[] biomes;
         [SerializeField] private TilemapPainter painter;
         [SerializeField] private ScreenFader fader;
@@ -171,22 +172,13 @@ namespace TRV
         /// <summary>The biomes the player can choose from (for a selection UI).</summary>
         public IReadOnlyList<BiomeConfig> Biomes => biomes;
 
-        /// <summary>The biome the current room was generated with.</summary>
-        public BiomeConfig CurrentBiome => _currentBiome;
-
-        /// <summary>Pick the biome used to generate the NEXT new room the player walks into.</summary>
+        /// <summary>TESTING (BiomeHotkeys): force the NEXT new room's biome — bypasses the whole
+        /// draft flow once, until a fresh room consumes the pick.</summary>
         public void SelectBiome(BiomeConfig biome)
         {
             if (biome == null) return;
             _nextBiome = biome;
-            _nextBiomeForced = true; // testing pick — bypasses the draft flow at the next new door
-        }
-
-        /// <summary>Pick the next-room biome by index into <see cref="Biomes"/>.</summary>
-        public void SelectBiome(int index)
-        {
-            if (biomes != null && index >= 0 && index < biomes.Length)
-                SelectBiome(biomes[index]);
+            _nextBiomeForced = true;
         }
 
         private void Awake()
@@ -614,12 +606,8 @@ namespace TRV
                         cells.Add(new Vector2Int(x, y));
                 }
 
-            // Fisher–Yates shuffle, then keep half — random subset = scattered locations.
-            for (int i = cells.Count - 1; i > 0; i--)
-            {
-                int j = Random.Range(0, i + 1);
-                (cells[i], cells[j]) = (cells[j], cells[i]);
-            }
+            // Shuffle, then keep a quarter — random subset = scattered locations.
+            Shuffle(cells);
             int keep = cells.Count / 4; // sparse: a quarter of the interior gets a filler
             if (cells.Count > keep) cells.RemoveRange(keep, cells.Count - keep);
             return cells;
@@ -746,11 +734,7 @@ namespace TRV
                     candidates.Add(new Vector2Int(x, y));
                 }
 
-            for (int i = candidates.Count - 1; i > 0; i--) // shuffle
-            {
-                int j = Random.Range(0, i + 1);
-                (candidates[i], candidates[j]) = (candidates[j], candidates[i]);
-            }
+            Shuffle(candidates);
             foreach (var c in candidates)
             {
                 if (count == 0) break;
@@ -762,6 +746,17 @@ namespace TRV
                 count--;
             }
             return cells;
+        }
+
+        /// <summary>In-place Fisher–Yates via UnityEngine.Random (the manager's spawn-time stream —
+        /// distinct from the generator's seeded System.Random).</summary>
+        private static void Shuffle(List<Vector2Int> list)
+        {
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                (list[i], list[j]) = (list[j], list[i]);
+            }
         }
 
         private static bool NearDoor(RoomGrid grid, int x, int y)
@@ -833,11 +828,7 @@ namespace TRV
             // are random. (A normal enemy harmlessly takes slot 0 when no miniboss spawns.)
             var prime = LargestSpaceCell(grid, pickFrom);
             pickFrom.Remove(prime);
-            for (int i = pickFrom.Count - 1; i > 0; i--) // Fisher–Yates on the remainder
-            {
-                int j = Random.Range(0, i + 1);
-                (pickFrom[i], pickFrom[j]) = (pickFrom[j], pickFrom[i]);
-            }
+            Shuffle(pickFrom);
 
             int n = Mathf.Min(biome.EnemiesPerRoom + ExtraEnemies, pickFrom.Count + 1); // layers add enemies
             positions.Add(painter.CellCenterWorld(prime.x, prime.y));

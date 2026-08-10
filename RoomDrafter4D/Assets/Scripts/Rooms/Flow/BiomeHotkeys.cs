@@ -4,11 +4,10 @@ using UnityEngine.InputSystem;
 namespace TRV
 {
     /// <summary>
-    /// TESTING hotkeys for the NEXT room's biome: press 0 → the
-    /// Aqua (Corridors) biome, 1 → the Halls biome, 2 → the Anubis (Open) biome (found BY LAYOUT in
-    /// <see cref="RoomManager.Biomes"/>, so list order doesn't matter), via
-    /// <see cref="RoomManager.SelectBiome(BiomeConfig)"/>. Drop this on the RoomManager object.
-    /// (Placeholder selector until a real in-game flow exists.)
+    /// TESTING hotkeys for the NEXT room's biome: 0 → Aqua (Corridors), 1 → Halls, 2 → Anubis
+    /// (Open), 3 → Lands (Plain) — found BY LAYOUT in <see cref="RoomManager.Biomes"/>, so list
+    /// order doesn't matter — via <see cref="RoomManager.SelectBiome"/> (a forced pick that
+    /// bypasses the draft flow once). Drop this on the RoomManager object.
     /// </summary>
     [RequireComponent(typeof(RoomManager))]
     public class BiomeHotkeys : MonoBehaviour

@@ -17,9 +17,6 @@ namespace TRV
         /// <summary>True while the pause menu or death screen is up — blocks even the map.</summary>
         public static bool MenuActive { get; set; }
 
-        /// <summary>A blocking UI is currently open.</summary>
-        public static bool IsBlocked => _owner != null;
-
         /// <summary>Claim the gate. False (refuse to open) while another UI holds it.</summary>
         public static bool TryOpen(object owner)
         {

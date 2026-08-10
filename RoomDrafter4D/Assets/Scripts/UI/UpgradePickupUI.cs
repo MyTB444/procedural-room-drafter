@@ -5,10 +5,10 @@ using UnityEngine;
 namespace TRV
 {
     /// <summary>
-    /// Shows a brief on-screen message when the player collects an <see cref="Upgrade"/> — each upgrade
-    /// carries its own <see cref="Upgrade.Message"/> (e.g. "Attack Speed +50%"). Subscribes to the static
-    /// <see cref="Upgrade.Collected"/> event, reveals the text for <see cref="displaySeconds"/>, then hides
-    /// it. Collecting another upgrade before it fades restarts the timer with the new message. One instance
+    /// Shows a brief on-screen message when the player collects an <see cref="Upgrade"/> — the string
+    /// comes with the static <see cref="Upgrade.Collected"/> event (a plain pickup's Message, or the
+    /// chosen choice's Label for books). Reveals the text for <see cref="displaySeconds"/>, then hides
+    /// it; another pickup before it fades restarts the timer with the new message. One instance
     /// serves every upgrade — drop it on a Canvas.
     /// </summary>
     public class UpgradePickupUI : MonoBehaviour

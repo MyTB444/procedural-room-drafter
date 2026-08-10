@@ -4,7 +4,7 @@ namespace TRV
 {
     /// <summary>
     /// Runs an ordered list of <see cref="IRoomPass"/> over a fresh grid to build one room.
-    /// Edit the pass list to define new biomes; later add LandmarkPass / DecorPass here.
+    /// Edit the pass list to define new biomes; later add LandmarkPass here.
     /// </summary>
     public class RoomGenerator
     {

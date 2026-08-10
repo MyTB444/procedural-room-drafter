@@ -40,7 +40,7 @@ namespace TRV
 
         private Rigidbody2D _body;
         private Health _health;
-        private PlayerUpgrades _upgrades; // runtime stat multipliers + ability unlocks (auto-added)
+        private PlayerUpgrades _upgrades; // runtime flat stat bonuses + ability unlocks (auto-added)
         private Vector2 _velocity;        // our own smoothed velocity
         private Cooldown _attackCooldown;
         private bool _controlsEnabled = true; // false while the pause menu is open or the player is dead
@@ -84,7 +84,7 @@ namespace TRV
         public Vector2 AimDirection => GetAimDirection().normalized;
 
         /// <summary>Fraction of the attack cooldown still remaining (1 = just attacked, 0 = ready to swing).
-        /// Reflects the CURRENT cooldown length, so it stays accurate if an effect changes it — for UI.</summary>
+        /// Measured against the duration captured when the cooldown began — for UI.</summary>
         public float AttackCooldownRemaining01 => _attackCooldown.Remaining01;
 
         /// <summary>Current stamina (0..MaxStamina). Actions spend it; it regenerates after a short delay.</summary>
@@ -102,11 +102,10 @@ namespace TRV
         public float AttackCooldownSeconds => Effective(PlayerUpgrades.Stat.AttackCooldown, stats != null ? stats.AttackCooldown : 0f);
         public float MoveSpeed => Effective(PlayerUpgrades.Stat.MoveSpeed, stats != null ? stats.MoveSpeed : 0f);
 
-        /// <summary>A stat with its upgrades applied (base × multiplier + bonus); the base when no upgrades.</summary>
+        /// <summary>A stat with its upgrades applied (base + flat bonuses); the base when no upgrades.</summary>
         private float Effective(PlayerUpgrades.Stat stat, float baseValue) =>
             _upgrades != null ? _upgrades.Apply(stat, baseValue) : baseValue;
 
-        public event Action<CharacterDirection> FacingChanged;
         public event Action<CharacterDirection> DashStarted; // passes the 8-way dash direction
         public event Action<CharacterDirection> Attacked;    // passes the aimed attack direction
         public event Action<Vector2> Fired;                  // ranged fire — passes the RAW 360° aim direction
@@ -282,7 +281,6 @@ namespace TRV
             _previousFacing = Facing;
             _facingSetTime = Time.time;
             Facing = newFacing;
-            FacingChanged?.Invoke(Facing);
         }
 
         // ─────────────────────────────────────────────────────────────

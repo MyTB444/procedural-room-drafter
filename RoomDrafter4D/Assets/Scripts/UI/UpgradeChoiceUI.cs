@@ -13,8 +13,8 @@ namespace TRV
     /// Setup: author up to N choice buttons under <see cref="panelRoot"/> and assign them to
     /// <see cref="choiceButtons"/> (wired in code — no OnClick setup). Each button's label text is
     /// auto-found in its children (or assign <see cref="choiceTexts"/> explicitly, same order).
-    /// Put the component on an ACTIVE object (e.g. the canvas) and let it toggle the panel root —
-    /// the panel itself starts hidden.
+    /// Works from an active OR initially-inactive object (idempotent EnsureInit); the panel root
+    /// itself starts hidden. Buttons show "Label lvl N" and are tinted by the book's type.
     /// </summary>
     public class UpgradeChoiceUI : MonoBehaviour
     {

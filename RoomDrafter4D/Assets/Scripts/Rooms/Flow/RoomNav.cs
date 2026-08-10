@@ -6,7 +6,7 @@ namespace TRV
     /// <summary>
     /// Walkability + A* pathfinding for the CURRENT room, so enemies can route AROUND water/walls
     /// instead of pressing straight into them. RoomManager rebuilds it on every room load from the
-    /// painted Collision tilemap (a cell is walkable when it holds no solid tile) and sets it as
+    /// painted collision layers (a cell is walkable when HasSolidAt finds no solid tile) and sets it as
     /// <see cref="Current"/>. Cell↔world conversion is delegated to the painter, so callers work in
     /// world space. Pure logic — no scene presence; reusable by any enemy.
     /// </summary>
@@ -36,7 +36,7 @@ namespace TRV
                     _walkable[x, y] = !painter.HasSolidAt(x, y);
         }
 
-        public bool InBounds(int x, int y) => x >= 0 && y >= 0 && x < _w && y < _h;
+        private bool InBounds(int x, int y) => x >= 0 && y >= 0 && x < _w && y < _h;
         public bool IsWalkable(int x, int y) => InBounds(x, y) && _walkable[x, y];
 
         public Vector2Int CellOf(Vector3 world) => _painter.WorldToGridCell(world);

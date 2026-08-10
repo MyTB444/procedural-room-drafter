@@ -7,7 +7,7 @@ namespace TRV
     /// Shows the player's EFFECTIVE stats (upgrades applied) on the menu screen: max HP, max
     /// stamina, HP regen, stamina regen, attack damage, attack cooldown and move speed — each an
     /// optional TMP text (leave any you don't want empty). Values come from the
-    /// <see cref="TRVController"/> display properties, so upgrade multipliers/bonuses are included.
+    /// <see cref="TRVController"/> display properties, so upgrade bonuses are included.
     ///
     /// Put this on (a child of) the pause-menu root and assign the texts: it refreshes on enable
     /// and every frame while visible (the menu root being inactive stops the polling), so stats
