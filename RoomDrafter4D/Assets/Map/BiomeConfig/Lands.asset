@@ -31,7 +31,7 @@ MonoBehaviour:
   <WaterDecorPatches>k__BackingField: []
   <EnemyPrefabs>k__BackingField:
   - {fileID: 1836165832468638347, guid: 89e2f1e2e9e76624f96ebc43f7fc9470, type: 3}
-  <EnemiesPerRoom>k__BackingField: 2
+  <EnemiesPerRoom>k__BackingField: 0
   <MinibossPrefabs>k__BackingField: []
   <MinibossChance>k__BackingField: 1
   <EnemySpawnSafeRadius>k__BackingField: 4

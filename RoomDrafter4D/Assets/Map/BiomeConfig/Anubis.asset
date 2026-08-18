@@ -32,7 +32,7 @@ MonoBehaviour:
   <EnemyPrefabs>k__BackingField:
   - {fileID: 9166532618414639373, guid: 92b1a1d4ee9334948acff985df292b20, type: 3}
   - {fileID: 6191281873977571966, guid: 1260c57f6f8b88d4d994f755c988207d, type: 3}
-  <EnemiesPerRoom>k__BackingField: 2
+  <EnemiesPerRoom>k__BackingField: 0
   <MinibossPrefabs>k__BackingField:
   - {fileID: 9166532618414639373, guid: 92b1a1d4ee9334948acff985df292b20, type: 3}
   <MinibossChance>k__BackingField: 1
